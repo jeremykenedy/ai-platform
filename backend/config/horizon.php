@@ -114,9 +114,9 @@ return [
     */
 
     'trim' => [
-        'recent' => 60,
-        'pending' => 60,
-        'completed' => 60,
+        'recent' => 4320,
+        'pending' => 4320,
+        'completed' => 4320,
         'recent_failed' => 10080,
         'failed' => 10080,
         'monitored' => 10080,
@@ -216,31 +216,49 @@ return [
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
+            'supervisor-default' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'inference', 'training', 'notifications'],
+                'queue' => ['default', 'inference', 'notifications'],
                 'balance' => 'auto',
                 'autoScalingStrategy' => 'time',
-                'maxProcesses' => 3,
+                'maxProcesses' => 2,
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
                 'memory' => 128,
                 'tries' => 3,
-                'timeout' => 60,
+                'timeout' => 300,
+            ],
+            'supervisor-long' => [
+                'connection' => 'redis',
+                'queue' => ['training'],
+                'balance' => false,
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'timeout' => 3600,
             ],
         ],
 
         'local' => [
-            'supervisor-1' => [
+            'supervisor-default' => [
                 'connection' => 'redis',
-                'queue' => ['default', 'inference', 'training', 'notifications'],
+                'queue' => ['default', 'inference', 'notifications'],
                 'balance' => 'auto',
                 'autoScalingStrategy' => 'time',
                 'maxProcesses' => 2,
                 'balanceCooldown' => 3,
                 'memory' => 128,
                 'tries' => 3,
-                'timeout' => 60,
+                'timeout' => 300,
+            ],
+            'supervisor-long' => [
+                'connection' => 'redis',
+                'queue' => ['training'],
+                'balance' => false,
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'timeout' => 3600,
             ],
         ],
     ],
