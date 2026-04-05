@@ -1,0 +1,11 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "ordered_imports": true,
+        "no_unused_imports": true,
+        "strict_param": true,
+        "declare_strict_types": true,
+        "final_class": false,
+        "php_unit_test_class_requires_covers": false
+    }
+}
