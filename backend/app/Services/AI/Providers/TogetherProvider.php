@@ -1,0 +1,199 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\AI\Providers;
+
+use App\Services\AI\AbstractAiProvider;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Psr\Http\Message\StreamInterface;
+
+class TogetherProvider extends AbstractAiProvider
+{
+    protected string $apiKey;
+
+    public function __construct()
+    {
+        parent::__construct('https://api.together.xyz');
+
+        $this->apiKey = (string) config('services.together.api_key', '');
+
+        $this->capabilities = [
+            'chat',
+            'streaming',
+            'vision',
+            'code',
+            'reasoning',
+            'embeddings',
+        ];
+    }
+
+    /**
+     * @param  array<int, array{role: string, content: string}>  $messages
+     * @param  array<string, mixed>  $options
+     * @return array{content: string, tokens_used: int, finish_reason: string}
+     */
+    public function chat(array $messages, string $model, array $options = []): array
+    {
+        $payload = array_merge([
+            'model' => $model,
+            'messages' => $messages,
+        ], $options);
+
+        $response = Http::withHeaders($this->buildHeaders())
+            ->timeout(120)
+            ->connectTimeout(10)
+            ->post("{$this->baseUrl}/v1/chat/completions", $payload);
+
+        $response->throw();
+
+        $data = $response->json();
+
+        return [
+            'content' => $data['choices'][0]['message']['content'] ?? '',
+            'tokens_used' => $data['usage']['total_tokens'] ?? 0,
+            'finish_reason' => $data['choices'][0]['finish_reason'] ?? 'stop',
+        ];
+    }
+
+    /**
+     * @param  array<int, array{role: string, content: string}>  $messages
+     * @param  array<string, mixed>  $options
+     */
+    public function stream(array $messages, string $model, array $options = []): \Generator
+    {
+        $payload = array_merge([
+            'model' => $model,
+            'messages' => $messages,
+            'stream' => true,
+        ], $options);
+
+        $response = Http::withHeaders($this->buildHeaders())
+            ->timeout(120)
+            ->connectTimeout(10)
+            ->withOptions(['stream' => true])
+            ->post("{$this->baseUrl}/v1/chat/completions", $payload);
+
+        $response->throw();
+
+        $body = $response->toPsrResponse()->getBody();
+
+        while (! $body->eof()) {
+            $line = $this->readLine($body);
+
+            if ($line === '' || ! str_starts_with($line, 'data: ')) {
+                continue;
+            }
+
+            $jsonStr = substr($line, 6);
+
+            if ($jsonStr === '[DONE]') {
+                yield ['__finish__' => true, 'finish_reason' => 'stop'];
+                break;
+            }
+
+            $chunk = json_decode($jsonStr, true);
+
+            if (! is_array($chunk)) {
+                continue;
+            }
+
+            $delta = $chunk['choices'][0]['delta']['content'] ?? '';
+
+            if ($delta !== '') {
+                yield $delta;
+            }
+
+            $finishReason = $chunk['choices'][0]['finish_reason'] ?? null;
+
+            if ($finishReason !== null && $finishReason !== '') {
+                yield ['__finish__' => true, 'finish_reason' => $finishReason];
+            }
+        }
+    }
+
+    /**
+     * @return float[]
+     */
+    public function embed(string $text, ?string $model = null): array
+    {
+        $payload = [
+            'model' => $model ?? 'togethercomputer/m2-bert-80M-8k-retrieval',
+            'input' => $text,
+        ];
+
+        $response = Http::withHeaders($this->buildHeaders())
+            ->timeout(60)
+            ->connectTimeout(10)
+            ->post("{$this->baseUrl}/v1/embeddings", $payload);
+
+        $response->throw();
+
+        return $response->json()['data'][0]['embedding'] ?? [];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listModels(): array
+    {
+        try {
+            $response = Http::withHeaders($this->buildHeaders())
+                ->timeout(30)
+                ->connectTimeout(10)
+                ->get("{$this->baseUrl}/v1/models");
+
+            $response->throw();
+
+            return array_map(fn (array $m): array => [
+                'id' => $m['id'],
+                'display_name' => $m['display_name'] ?? $m['id'],
+                'context_length' => $m['context_length'] ?? null,
+                'type' => $m['type'] ?? null,
+            ], $response->json() ?? []);
+        } catch (\Throwable $e) {
+            Log::warning('[TogetherProvider] listModels failed: '.$e->getMessage());
+
+            return [];
+        }
+    }
+
+    public function isAvailable(): bool
+    {
+        return $this->apiKey !== '';
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function buildHeaders(): array
+    {
+        return [
+            'Authorization' => "Bearer {$this->apiKey}",
+            'Content-Type' => 'application/json',
+        ];
+    }
+
+    protected function getDefaultTestModel(): string
+    {
+        return 'meta-llama/Llama-3-8b-chat-hf';
+    }
+
+    private function readLine(StreamInterface $body): string
+    {
+        $line = '';
+
+        while (! $body->eof()) {
+            $char = $body->read(1);
+
+            if ($char === "\n") {
+                break;
+            }
+
+            $line .= $char;
+        }
+
+        return trim($line);
+    }
+}
