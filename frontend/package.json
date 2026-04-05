@@ -1,0 +1,66 @@
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/ --fix",
+    "lint:check": "eslint src/",
+    "lint:style": "stylelint \"src/**/*.{vue,css}\" --fix",
+    "format": "prettier --write \"src/**/*.{vue,js,css,json}\"",
+    "format:check": "prettier --check \"src/**/*.{vue,js,css,json}\"",
+    "lint:all": "npm run lint && npm run lint:style && npm run format",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{vue,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{vue,css}": [
+      "stylelint --fix"
+    ]
+  },
+  "dependencies": {
+    "@tanstack/vue-virtual": "^3.13.23",
+    "@vueuse/core": "^14.2.1",
+    "axios": "^1.14.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "idb": "^8.0.3",
+    "laravel-echo": "^2.3.3",
+    "lucide-vue-next": "^1.0.0",
+    "markdown-it": "^14.1.1",
+    "pinia": "^3.0.4",
+    "pusher-js": "^8.5.0",
+    "radix-vue": "^1.9.17",
+    "shiki": "^4.0.2",
+    "tailwind-merge": "^3.5.0",
+    "vue": "^3.5.30",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^10.2.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
+    "stylelint": "^17.6.0",
+    "stylelint-config-standard": "^40.0.0",
+    "tailwindcss": "^4.2.2",
+    "vite": "^8.0.1",
+    "vite-plugin-compression2": "^2.5.3",
+    "vite-plugin-pwa": "^1.2.0",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0",
+    "workbox-strategies": "^7.4.0",
+    "workbox-window": "^7.4.0"
+  }
+}
