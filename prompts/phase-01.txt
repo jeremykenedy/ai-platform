@@ -1,0 +1,35 @@
+Read BRIEF.md and CLAUDE.md completely before doing anything.
+
+Build Phase 1: Repository Structure and Docker Infrastructure.
+
+Create the following at the project root:
+- .editorconfig (4 space indent for PHP/JS/Vue/JSON/YAML, 2 for YAML, LF line endings, final newline, trim trailing whitespace)
+- .gitignore (complete version from BRIEF.md covering .env files, vendor, node_modules, docker data volumes, editor files, logs, build artifacts)
+- README.md with project name, description, tech stack summary, prerequisites, setup instructions for local and QNAP, and make target reference
+- Makefile with all targets specified in BRIEF.md (up, down, build, fresh, migrate, seed, shell, tinker, logs, lint, test, deploy-local, deploy-qnap, ssh-qnap). The DOCKER variable must auto-detect the binary: check for /share/CE_CACHEDEV1_DATA/.qpkg/container-station/usr/bin/.libs/docker first, fall back to docker. QNAP_HOST must come from .env via grep or dotenv parsing.
+
+Create the docker/ directory with all service configuration files:
+- docker/postgres/postgresql.conf (tuned: shared_buffers=4GB, work_mem=64MB, effective_cache_size=12GB, maintenance_work_mem=512MB, max_connections=100, wal_level=replica, max_wal_size=1GB, checkpoint_completion_target=0.9)
+- docker/postgres/init/ directory with 00-extensions.sql that creates pgvector and uuid-ossp extensions
+- docker/redis/redis.conf (maxmemory 2gb, allkeys-lru, appendonly yes, appendfsync everysec)
+- docker/ollama/entrypoint.sh (start ollama serve in background, wait for health, pull default models from env, keep alive)
+- docker/frankenphp/Caddyfile (PHP server config, gzip, static file serving, /api/* to PHP, SPA fallback)
+- docker/searxng/settings.yml (engines: google, bing, duckduckgo, github, stackoverflow, arxiv, wikipedia, safe_search 0, no limiter)
+- docker/minio/ directory (empty, data volume mount point)
+
+Create docker-compose.yml at project root with all services defined in BRIEF.md:
+frankenphp, horizon, reverb, frontend, postgres, pgbouncer, redis, minio, ollama, open-webui, comfyui, axolotl, glitchtip, searxng, watchtower.
+Every port, credential, resource limit, and path must use ${VARIABLE:-default} syntax from .env. Never hardcode any value. Use the safe port assignments from BRIEF.md. Postgres, PgBouncer, and Redis are internal network only, never exposed. All services on a shared bridge network called ai-platform.
+
+Create docker-compose.override.yml for local dev overrides (reduced resource limits, no GPU passthrough, local ports).
+
+Create the three .env files as specified in BRIEF.md:
+- .env with local development values
+- .env.production with QNAP production values (do not commit this, just create it as reference)
+- .env.example with all keys present and no values (this is the only one committed)
+
+Do not create the backend/ or frontend/ directories yet.
+
+When done, run: git add -A && git commit -m "feat: phase 1 — repository structure and docker infrastructure"
+
+Then stop and wait. Do not start Phase 2 until I say go.

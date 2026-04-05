@@ -1,0 +1,91 @@
+Read BRIEF.md and CLAUDE.md if you have not already.
+
+Build Phase 2: Laravel 12 Backend Scaffold.
+
+Inside the project root, create the Laravel 12 application in the backend/ directory:
+cd to project root and run: composer create-project laravel/laravel backend
+Then cd into backend/ for all subsequent work.
+
+Install all Composer packages specified in BRIEF.md:
+- laravel/sanctum
+- laravel/horizon
+- laravel/reverb
+- laravel/pulse
+- spatie/laravel-permission
+- spatie/laravel-data
+- spatie/laravel-activitylog
+- spatie/laravel-medialibrary
+- pgvector/pgvector (Laravel pgvector)
+- prism-php/prism (PrismPHP for multi-provider AI)
+- echolabsdev/prism (if separate from above, verify correct package)
+- tightenco/ziggy
+- predis/predis
+- league/flysystem-aws-s3-v3
+
+Install dev packages:
+- larastan/larastan
+- laravel/pint
+- laravel/telescope
+- friendsofphp/php-cs-fixer
+- nunomaduro/collision
+
+Create phpstan.neon at level 8 with Larastan extension, paths to app/, ignoreErrors empty.
+Create pint.json with Laravel preset.
+Create .php-cs-fixer.php with rules matching Pint defaults.
+
+Create ALL migrations in the exact order specified in BRIEF.md. Every migration must use:
+- $table->ulid('id')->primary() for all public-facing models
+- Correct foreign key types matching parent (ulid for ulid parents)
+- All indexes on foreign keys and frequently queried columns
+- Soft deletes where specified (conversations, messages, personas, projects, training_datasets, training_jobs)
+
+Migration order:
+1. users (add avatar, locale, timezone, invite_token, last_active_at columns to default)
+2. Spatie permission tables (use spatie migration publisher)
+3. user_settings
+4. projects
+5. personas
+6. conversations (with project_id nullable FK, persona_id nullable FK, enabled_integrations json, model override columns)
+7. messages (with conversation_id FK, role enum, content text, token counts, finish_reason, model used, pgvector embedding column nullable)
+8. message_attachments
+9. ai_models (provider, model_id, display_name, capabilities json, context_window, pricing json, is_local boolean, is_active boolean)
+10. ai_providers
+11. training_datasets
+12. training_jobs
+13. integration_definitions
+14. user_integrations
+15. integration_tool_calls
+16. memories (user_id FK, content text, category, importance integer, source_conversation_id nullable FK, embedding vector(1536), last_accessed_at, access_count, is_active boolean)
+17. memory_conflicts
+18. conversation_summaries
+19. activity_log (Spatie, use publisher)
+
+Create ALL Models with:
+- Complete $fillable arrays
+- Complete $casts arrays (json columns cast to array, datetime columns cast, enums cast)
+- All relationships defined (belongsTo, hasMany, belongsToMany, morphMany as needed)
+- ULIDs trait on all public-facing models
+- SoftDeletes where specified
+- Scope methods for common queries
+- $hidden for sensitive attributes
+
+Create ALL Seeders:
+- RoleAndPermissionSeeder (all roles and permissions from BRIEF.md)
+- DefaultAiModelsSeeder (seed known models for all 13 providers with capabilities)
+- IntegrationDefinitionsSeeder (all 30 integrations with name, category, auth_type, icon, description)
+- DatabaseSeeder that calls them in order
+
+Create the SuperAdminSeeder or reference the artisan command (app:seed-super-admin) that creates the initial super admin user from .env variables SUPER_ADMIN_NAME, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD.
+
+Configure Sanctum for SPA cookie auth in config/sanctum.php (stateful domains from env).
+Configure Horizon in config/horizon.php (environments, queue workers, memory limits).
+Configure Reverb in config/reverb.php (host, port from env).
+Update config/database.php for pgbouncer connection pooling.
+Update config/filesystems.php for MinIO S3 disk.
+Update config/app.php timezone to America/Los_Angeles.
+
+Do not create controllers, routes, services, or policies yet.
+
+When done, run: git add -A && git commit -m "feat: phase 2 — laravel scaffold, migrations, models, and seeders"
+
+Then stop and wait. Do not start Phase 3 until I say go.

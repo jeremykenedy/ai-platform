@@ -1,0 +1,70 @@
+services:
+  frankenphp:
+    environment:
+      SERVER_NAME: "http://localhost"
+      APP_ENV: local
+      APP_DEBUG: "true"
+    volumes:
+      - ./backend:/app
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+
+  postgres:
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 2G
+
+  redis:
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 512M
+
+  ollama:
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    devices: []
+    environment:
+      OLLAMA_INTEL_GPU: "0"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G
+
+  open-webui:
+    ports:
+      - "${OPENWEBUI_PORT:-3000}:8080"
+
+  glitchtip:
+    ports:
+      - "${GLITCHTIP_PORT:-8200}:8000"
+
+  minio:
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+
+  comfyui:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G
+
+  axolotl:
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G

@@ -1,0 +1,16 @@
+{
+    frankenphp
+    order php_server before file_server
+}
+
+{$SERVER_NAME:localhost} {
+    root * /app/public
+
+    encode gzip
+
+    php_server
+
+    file_server {
+        precompressed br gzip
+    }
+}

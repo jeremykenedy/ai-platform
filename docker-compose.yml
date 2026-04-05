@@ -1,0 +1,347 @@
+services:
+
+  frankenphp:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: "${APP_URL:-https://ai.local}"
+      OCTANE_SERVER: frankenphp
+      APP_ENV: "${APP_ENV:-production}"
+    volumes:
+      - ./backend:/app
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "${APP_HTTP_PORT:-80}:80"
+      - "${APP_HTTPS_PORT:-443}:443"
+    depends_on:
+      pgbouncer:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      reverb:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "${FRANKENPHP_CPU_LIMIT:-2.0}"
+          memory: "${FRANKENPHP_MEMORY_LIMIT:-4G}"
+    networks:
+      - ai-platform
+
+  horizon:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    command: php artisan horizon
+    restart: unless-stopped
+    depends_on:
+      - frankenphp
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    networks:
+      - ai-platform
+
+  reverb:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    command: php artisan reverb:start --host=0.0.0.0 --port=${REVERB_PORT:-8080}
+    restart: unless-stopped
+    ports:
+      - "${REVERB_EXTERNAL_PORT:-8080}:${REVERB_PORT:-8080}"
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: "${REVERB_CPU_LIMIT:-0.5}"
+          memory: "${REVERB_MEMORY_LIMIT:-512M}"
+    networks:
+      - ai-platform
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - ai-platform
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${DB_DATABASE:-ai_platform}"
+      POSTGRES_USER: "${DB_USERNAME:-ai_user}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-ai_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "${POSTGRES_CPU_LIMIT:-1.0}"
+          memory: "${POSTGRES_MEMORY_LIMIT:-6G}"
+    networks:
+      - ai-platform
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_NAME: "${DB_DATABASE:-ai_platform}"
+      DB_USER: "${DB_USERNAME:-ai_user}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 100
+      DEFAULT_POOL_SIZE: 15
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - ai-platform
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: "${REDIS_CONTAINER_MEMORY:-2G}"
+    networks:
+      - ai-platform
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - ai-platform
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      OLLAMA_NUM_THREAD: "${OLLAMA_NUM_THREAD:-4}"
+      OLLAMA_INTEL_GPU: "${OLLAMA_INTEL_GPU:-1}"
+      OLLAMA_HOST: 0.0.0.0
+    devices:
+      - "${INTEL_GPU_DEVICE_CARD:-/dev/dri/card0}:${INTEL_GPU_DEVICE_CARD:-/dev/dri/card0}"
+      - "${INTEL_GPU_DEVICE_RENDER:-/dev/dri/renderD128}:${INTEL_GPU_DEVICE_RENDER:-/dev/dri/renderD128}"
+    volumes:
+      - ollama_models:/root/.ollama
+      - ./docker/ollama/entrypoint.sh:/entrypoint.sh
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "${OLLAMA_CPU_LIMIT:-3.0}"
+          memory: "${OLLAMA_MEMORY_LIMIT:-16G}"
+    networks:
+      - ai-platform
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    environment:
+      OLLAMA_BASE_URL: "http://ollama:${OLLAMA_PORT:-11434}"
+    volumes:
+      - open_webui_data:/app/backend/data
+    ports:
+      - "${OPENWEBUI_PORT:-3000}:8080"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - ai-platform
+
+  comfyui:
+    image: ghcr.io/ai-dock/comfyui:latest-cpu
+    restart: unless-stopped
+    volumes:
+      - comfyui_models:/opt/ComfyUI/models
+      - comfyui_output:/opt/ComfyUI/output
+      - comfyui_input:/opt/ComfyUI/input
+    environment:
+      COMFYUI_FLAGS: "--cpu --lowvram"
+    ports:
+      - "${COMFYUI_PORT:-8188}:8188"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8188/system_stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 20G
+    networks:
+      - ai-platform
+
+  axolotl:
+    image: winglian/axolotl:main-latest
+    restart: unless-stopped
+    volumes:
+      - axolotl_data:/workspace
+      - minio_data:/minio
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 24G
+    networks:
+      - ai-platform
+
+  glitchtip:
+    image: glitchtip/glitchtip:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "postgresql://${DB_USERNAME:-ai_user}:${DB_PASSWORD}@postgres/${GLITCHTIP_DB:-glitchtip}"
+      SECRET_KEY: "${GLITCHTIP_SECRET_KEY}"
+      EMAIL_URL: "${GLITCHTIP_EMAIL_URL:-}"
+      GLITCHTIP_DOMAIN: "${GLITCHTIP_DOMAIN:-}"
+    ports:
+      - "${GLITCHTIP_PORT:-8200}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - ai-platform
+
+  searxng:
+    image: searxng/searxng:latest
+    restart: unless-stopped
+    volumes:
+      - ./docker/searxng:/etc/searxng
+    ports:
+      - "${SEARXNG_PORT:-8888}:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - ai-platform
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 3 * * *" --cleanup
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+    networks:
+      - ai-platform
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  ollama_models:
+  open_webui_data:
+  axolotl_data:
+  caddy_data:
+  caddy_config:
+  comfyui_models:
+  comfyui_output:
+  comfyui_input:
+
+networks:
+  ai-platform:
+    driver: bridge
