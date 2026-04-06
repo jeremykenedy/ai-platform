@@ -196,6 +196,18 @@
     delete mergeForms.value[conflictId]
   }
 
+  function cancelClear() {
+    clearConfirmStep.value = 0
+    clearTypeValue.value = ''
+  }
+
+  async function clearAllMemories() {
+    await memoryStore.bulkDestroy(memoryStore.memories.map((m) => m.id))
+    clearConfirmStep.value = 0
+    clearTypeValue.value = ''
+    uiStore.addToast({ type: 'success', message: 'All memories cleared.' })
+  }
+
   async function toggleMemoryEnabled() {
     memoryEnabled.value = !memoryEnabled.value
     try {
@@ -688,10 +700,7 @@
           <button
             type="button"
             class="px-3 py-1.5 rounded-lg text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-            @click="
-              clearConfirmStep = 0
-              clearTypeValue = ''
-            "
+            @click="cancelClear"
           >
             Cancel
           </button>
@@ -699,13 +708,7 @@
             type="button"
             :disabled="clearTypeValue !== 'DELETE'"
             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white font-medium transition"
-            @click="
-              memoryStore.bulkDestroy(memoryStore.memories.map((m) => m.id)).then(() => {
-                clearConfirmStep = 0
-                clearTypeValue = ''
-                uiStore.addToast({ type: 'success', message: 'All memories cleared.' })
-              })
-            "
+            @click="clearAllMemories"
           >
             <Trash2 class="w-3.5 h-3.5" /> Clear all memories
           </button>
