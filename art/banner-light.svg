@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200">
+  <rect width="800" height="200" rx="16" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>
+  <g transform="translate(560, 25)">
+    <rect x="10" y="10" width="140" height="95" rx="10" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1"/>
+    <rect x="20" y="20" width="80" height="8" rx="4" fill="#e9d5ff"/>
+    <rect x="20" y="34" width="55" height="8" rx="4" fill="#f3e8ff"/>
+    <rect x="20" y="52" width="120" height="6" rx="3" fill="#ede9fe"/>
+    <rect x="20" y="62" width="100" height="6" rx="3" fill="#f3e8ff"/>
+    <rect x="20" y="72" width="110" height="6" rx="3" fill="#ede9fe"/>
+    <rect x="20" y="86" width="60" height="14" rx="7" fill="#8b5cf6"/>
+    <text x="50" y="96" font-size="8" font-weight="600" fill="#fff" text-anchor="middle" font-family="system-ui">Send</text>
+    <circle cx="170" cy="35" r="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+    <text x="170" y="39" font-size="12" fill="#3b82f6" text-anchor="middle" font-family="system-ui">AI</text>
+    <circle cx="170" cy="75" r="14" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+    <circle cx="165" cy="75" r="5" fill="#22c55e"/>
+    <rect x="173" y="71" width="12" height="3" rx="1.5" fill="#86efac"/>
+    <rect x="173" y="76" width="8" height="3" rx="1.5" fill="#bbf7d0"/>
+  </g>
+  <text x="50" y="78" font-size="40" font-weight="700" fill="#0f172a" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" letter-spacing="-.5">AI Platform</text>
+  <text x="50" y="108" font-size="14" fill="#64748b" font-family="system-ui, -apple-system, sans-serif">Self-hosted AI chat platform with local LLM inference via Ollama</text>
+  <g transform="translate(50, 128)">
+    <rect width="60" height="22" rx="11" fill="#f5f3ff" stroke="#c4b5fd" stroke-width=".8"/>
+    <text x="30" y="15" font-size="10" font-weight="500" fill="#6d28d9" text-anchor="middle" font-family="system-ui">Laravel</text>
+    <rect x="70" width="48" height="22" rx="11" fill="#eff6ff" stroke="#93c5fd" stroke-width=".8"/>
+    <text x="94" y="15" font-size="10" font-weight="500" fill="#1e40af" text-anchor="middle" font-family="system-ui">Vue 3</text>
+    <rect x="128" width="55" height="22" rx="11" fill="#f0fdf4" stroke="#86efac" stroke-width=".8"/>
+    <text x="155.5" y="15" font-size="10" font-weight="500" fill="#166534" text-anchor="middle" font-family="system-ui">Ollama</text>
+    <rect x="193" width="55" height="22" rx="11" fill="#fffbeb" stroke="#fcd34d" stroke-width=".8"/>
+    <text x="220.5" y="15" font-size="10" font-weight="500" fill="#b45309" text-anchor="middle" font-family="system-ui">Docker</text>
+    <rect x="258" width="70" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width=".8"/>
+    <text x="293" y="15" font-size="10" font-weight="500" fill="#b91c1c" text-anchor="middle" font-family="system-ui">pgvector</text>
+    <rect x="338" width="45" height="22" rx="11" fill="#f0f9ff" stroke="#7dd3fc" stroke-width=".8"/>
+    <text x="360.5" y="15" font-size="10" font-weight="500" fill="#0369a1" text-anchor="middle" font-family="system-ui">PWA</text>
+  </g>
+</svg>
