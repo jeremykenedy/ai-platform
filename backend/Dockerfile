@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.3-alpine AS base
+FROM dunglas/frankenphp:latest-php8.4-alpine AS base
 
 RUN install-php-extensions \
     pdo_pgsql \
@@ -32,6 +32,9 @@ RUN composer install --no-dev --no-scripts --no-autoloader --optimize-autoloader
 
 COPY . .
 RUN composer dump-autoload --optimize --no-dev
+
+RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 80 443
 
