@@ -21,7 +21,7 @@ in the phase prompt.
 - Node: v24.12.0, npm: 11.6.2
 - Herd TLD: .test, ~/sites/ is auto-served, app at https://ai-platform.test
 - QNAP NAS production target, SSH available
-- Docker binary on QNAP: /share/CE_CACHEDEV1_DATA/.qpkg/container-station/usr/bin/.libs/docker
+- Docker binary on QNAP: configured via QNAP_DOCKER_BINARY in .env
 - Docker Compose on QNAP: v2.29.1
 - Git: 2.50.1
 
