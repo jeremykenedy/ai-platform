@@ -17,9 +17,9 @@ class SeedSuperAdmin extends Command
 
     public function handle(): int
     {
-        $name = env('SUPER_ADMIN_NAME');
-        $email = env('SUPER_ADMIN_EMAIL');
-        $password = env('SUPER_ADMIN_PASSWORD');
+        $name = config('app.super_admin.name');
+        $email = config('app.super_admin.email');
+        $password = config('app.super_admin.password');
 
         if (empty($name) || empty($email) || empty($password)) {
             $this->error('Set SUPER_ADMIN_NAME, SUPER_ADMIN_EMAIL, and SUPER_ADMIN_PASSWORD in .env before running this command.');

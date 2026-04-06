@@ -1,121 +1,151 @@
 <script setup>
-import { ref } from 'vue'
-import { Upload, AlertCircle } from 'lucide-vue-next'
-import { useToast } from '@/composables/useToast'
+  import { ref } from 'vue'
+  import { Upload } from 'lucide-vue-next'
+  import { useToast } from '@/composables/useToast'
 
-const emit = defineEmits(['files'])
+  const emit = defineEmits(['files'])
 
-const { toast } = useToast()
-const isDragOver = ref(false)
-const dragCounter = ref(0)
-const fileInput = ref(null)
+  const { toast } = useToast()
+  const isDragOver = ref(false)
+  const dragCounter = ref(0)
+  const fileInput = ref(null)
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50 MB
+  const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50 MB
 
-const ACCEPTED_MIME_TYPES = new Set([
-  // Images
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/svg+xml',
-  // PDFs
-  'application/pdf',
-  // Documents
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'application/vnd.ms-excel',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  // Text / code
-  'text/plain',
-  'text/html',
-  'text/css',
-  'text/javascript',
-  'text/typescript',
-  'text/csv',
-  'text/markdown',
-  'application/json',
-  'application/xml',
-  'application/x-yaml',
-])
+  const ACCEPTED_MIME_TYPES = new Set([
+    // Images
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml',
+    // PDFs
+    'application/pdf',
+    // Documents
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    // Text / code
+    'text/plain',
+    'text/html',
+    'text/css',
+    'text/javascript',
+    'text/typescript',
+    'text/csv',
+    'text/markdown',
+    'application/json',
+    'application/xml',
+    'application/x-yaml',
+  ])
 
-const ACCEPTED_EXTENSIONS = new Set([
-  'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg',
-  'pdf',
-  'doc', 'docx', 'xls', 'xlsx',
-  'txt', 'md', 'csv', 'html', 'css', 'js', 'ts', 'jsx', 'tsx',
-  'json', 'xml', 'yaml', 'yml',
-  'py', 'rb', 'php', 'java', 'c', 'cpp', 'h', 'go', 'rs', 'swift', 'kt', 'sh',
-])
+  const ACCEPTED_EXTENSIONS = new Set([
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp',
+    'svg',
+    'pdf',
+    'doc',
+    'docx',
+    'xls',
+    'xlsx',
+    'txt',
+    'md',
+    'csv',
+    'html',
+    'css',
+    'js',
+    'ts',
+    'jsx',
+    'tsx',
+    'json',
+    'xml',
+    'yaml',
+    'yml',
+    'py',
+    'rb',
+    'php',
+    'java',
+    'c',
+    'cpp',
+    'h',
+    'go',
+    'rs',
+    'swift',
+    'kt',
+    'sh',
+  ])
 
-function isAccepted(file) {
-  if (ACCEPTED_MIME_TYPES.has(file.type)) return true
-  const ext = file.name.split('.').pop()?.toLowerCase()
-  return ext ? ACCEPTED_EXTENSIONS.has(ext) : false
-}
-
-function validate(files) {
-  const valid = []
-  for (const file of files) {
-    if (!isAccepted(file)) {
-      toast({
-        title: 'Unsupported file type',
-        description: `"${file.name}" is not a supported file type.`,
-        variant: 'destructive',
-      })
-      continue
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      toast({
-        title: 'File too large',
-        description: `"${file.name}" exceeds the 50 MB limit.`,
-        variant: 'destructive',
-      })
-      continue
-    }
-    valid.push(file)
+  function isAccepted(file) {
+    if (ACCEPTED_MIME_TYPES.has(file.type)) return true
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    return ext ? ACCEPTED_EXTENSIONS.has(ext) : false
   }
-  return valid
-}
 
-function onDragEnter(e) {
-  e.preventDefault()
-  dragCounter.value++
-  isDragOver.value = true
-}
+  function validate(files) {
+    const valid = []
+    for (const file of files) {
+      if (!isAccepted(file)) {
+        toast({
+          title: 'Unsupported file type',
+          description: `"${file.name}" is not a supported file type.`,
+          variant: 'destructive',
+        })
+        continue
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: 'File too large',
+          description: `"${file.name}" exceeds the 50 MB limit.`,
+          variant: 'destructive',
+        })
+        continue
+      }
+      valid.push(file)
+    }
+    return valid
+  }
 
-function onDragLeave(e) {
-  e.preventDefault()
-  dragCounter.value--
-  if (dragCounter.value <= 0) {
+  function onDragEnter(e) {
+    e.preventDefault()
+    dragCounter.value++
+    isDragOver.value = true
+  }
+
+  function onDragLeave(e) {
+    e.preventDefault()
+    dragCounter.value--
+    if (dragCounter.value <= 0) {
+      dragCounter.value = 0
+      isDragOver.value = false
+    }
+  }
+
+  function onDragOver(e) {
+    e.preventDefault()
+  }
+
+  function onDrop(e) {
+    e.preventDefault()
     dragCounter.value = 0
     isDragOver.value = false
+    const files = Array.from(e.dataTransfer?.files ?? [])
+    const valid = validate(files)
+    if (valid.length) emit('files', valid)
   }
-}
 
-function onDragOver(e) {
-  e.preventDefault()
-}
+  function openPicker() {
+    fileInput.value?.click()
+  }
 
-function onDrop(e) {
-  e.preventDefault()
-  dragCounter.value = 0
-  isDragOver.value = false
-  const files = Array.from(e.dataTransfer?.files ?? [])
-  const valid = validate(files)
-  if (valid.length) emit('files', valid)
-}
-
-function openPicker() {
-  fileInput.value?.click()
-}
-
-function onFileInputChange(e) {
-  const files = Array.from(e.target.files ?? [])
-  const valid = validate(files)
-  if (valid.length) emit('files', valid)
-  e.target.value = ''
-}
+  function onFileInputChange(e) {
+    const files = Array.from(e.target.files ?? [])
+    const valid = validate(files)
+    if (valid.length) emit('files', valid)
+    e.target.value = ''
+  }
 </script>
 
 <template>

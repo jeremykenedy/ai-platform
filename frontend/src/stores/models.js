@@ -9,15 +9,15 @@ export const useModelsStore = defineStore('models', () => {
 
   const availableModels = computed(() => models.value.filter((m) => m.available !== false))
 
-  const activeModel = computed(() =>
-    models.value.find((m) => m.id === activeModelId.value) ?? null,
-  )
+  const activeModel = computed(() => models.value.find((m) => m.id === activeModelId.value) ?? null)
 
   const localModels = computed(() => models.value.filter((m) => m.provider === 'ollama'))
 
   const remoteModels = computed(() => models.value.filter((m) => m.provider !== 'ollama'))
 
-  const defaultModel = computed(() => models.value.find((m) => m.is_default) ?? models.value[0] ?? null)
+  const defaultModel = computed(
+    () => models.value.find((m) => m.is_default) ?? models.value[0] ?? null
+  )
 
   async function fetch() {
     isLoading.value = true

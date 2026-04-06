@@ -1,87 +1,87 @@
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
-import { Mic, Loader2 } from 'lucide-vue-next'
-import { useVoice } from '@/composables/useVoice'
-import WaveformVisualizer from './WaveformVisualizer.vue'
+  import { ref, computed, onUnmounted } from 'vue'
+  import { Mic, Loader2 } from 'lucide-vue-next'
+  import { useVoice } from '@/composables/useVoice'
+  import WaveformVisualizer from './WaveformVisualizer.vue'
 
-const emit = defineEmits(['transcript', 'recording'])
+  const emit = defineEmits(['transcript', 'recording'])
 
-const { isRecording, transcript, startRecording, stopRecording } = useVoice()
-const isProcessing = ref(false)
-const holdTimer = ref(null)
-const isHoldMode = ref(false)
+  const { isRecording, transcript, startRecording, stopRecording } = useVoice()
+  const isProcessing = ref(false)
+  const holdTimer = ref(null)
+  const isHoldMode = ref(false)
 
-const state = computed(() => {
-  if (isProcessing.value) return 'processing'
-  if (isRecording.value) return 'recording'
-  return 'idle'
-})
-
-async function handleClick() {
-  if (isProcessing.value) return
-
-  if (isRecording.value) {
-    await endRecording()
-  } else {
-    await beginRecording()
-  }
-}
-
-async function beginRecording() {
-  try {
-    await startRecording()
-    emit('recording', true)
-  } catch {
-    // Permission error handled by MicrophonePermission component upstream
-  }
-}
-
-async function endRecording() {
-  stopRecording()
-  emit('recording', false)
-  isProcessing.value = true
-  // Wait for transcript to populate (the composable sends to API and sets transcript)
-  const maxWait = 15000
-  const step = 200
-  let waited = 0
-  await new Promise((resolve) => {
-    const check = setInterval(() => {
-      waited += step
-      if (transcript.value || waited >= maxWait) {
-        clearInterval(check)
-        resolve()
-      }
-    }, step)
+  const state = computed(() => {
+    if (isProcessing.value) return 'processing'
+    if (isRecording.value) return 'recording'
+    return 'idle'
   })
-  if (transcript.value) {
-    emit('transcript', transcript.value)
-    transcript.value = ''
-  }
-  isProcessing.value = false
-}
 
-// Hold-to-talk
-function onPointerDown(e) {
-  holdTimer.value = setTimeout(async () => {
-    isHoldMode.value = true
-    await beginRecording()
-  }, 150)
-}
+  async function handleClick() {
+    if (isProcessing.value) return
 
-function onPointerUp(e) {
-  if (holdTimer.value) {
-    clearTimeout(holdTimer.value)
-    holdTimer.value = null
+    if (isRecording.value) {
+      await endRecording()
+    } else {
+      await beginRecording()
+    }
   }
-  if (isHoldMode.value && isRecording.value) {
-    isHoldMode.value = false
-    endRecording()
-  }
-}
 
-onUnmounted(() => {
-  if (holdTimer.value) clearTimeout(holdTimer.value)
-})
+  async function beginRecording() {
+    try {
+      await startRecording()
+      emit('recording', true)
+    } catch {
+      // Permission error handled by MicrophonePermission component upstream
+    }
+  }
+
+  async function endRecording() {
+    stopRecording()
+    emit('recording', false)
+    isProcessing.value = true
+    // Wait for transcript to populate (the composable sends to API and sets transcript)
+    const maxWait = 15000
+    const step = 200
+    let waited = 0
+    await new Promise((resolve) => {
+      const check = setInterval(() => {
+        waited += step
+        if (transcript.value || waited >= maxWait) {
+          clearInterval(check)
+          resolve()
+        }
+      }, step)
+    })
+    if (transcript.value) {
+      emit('transcript', transcript.value)
+      transcript.value = ''
+    }
+    isProcessing.value = false
+  }
+
+  // Hold-to-talk
+  function onPointerDown(_e) {
+    holdTimer.value = setTimeout(async () => {
+      isHoldMode.value = true
+      await beginRecording()
+    }, 150)
+  }
+
+  function onPointerUp(_e) {
+    if (holdTimer.value) {
+      clearTimeout(holdTimer.value)
+      holdTimer.value = null
+    }
+    if (isHoldMode.value && isRecording.value) {
+      isHoldMode.value = false
+      endRecording()
+    }
+  }
+
+  onUnmounted(() => {
+    if (holdTimer.value) clearTimeout(holdTimer.value)
+  })
 </script>
 
 <template>
@@ -131,11 +131,7 @@ onUnmounted(() => {
     <p v-if="state === 'idle'" class="text-[10px] text-neutral-400 dark:text-neutral-500">
       Hold to talk
     </p>
-    <p v-else-if="state === 'recording'" class="text-[10px] text-rose-500">
-      Recording...
-    </p>
-    <p v-else-if="state === 'processing'" class="text-[10px] text-neutral-400">
-      Processing...
-    </p>
+    <p v-else-if="state === 'recording'" class="text-[10px] text-rose-500">Recording...</p>
+    <p v-else-if="state === 'processing'" class="text-[10px] text-neutral-400">Processing...</p>
   </div>
 </template>

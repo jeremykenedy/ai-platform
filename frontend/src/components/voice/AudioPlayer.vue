@@ -1,115 +1,115 @@
 <script setup>
-import { ref, computed, watch, onUnmounted } from 'vue'
-import { Play, Pause, X, ChevronDown } from 'lucide-vue-next'
+  import { ref, computed, watch, onUnmounted } from 'vue'
+  import { Play, Pause, X, ChevronDown } from 'lucide-vue-next'
 
-const props = defineProps({
-  audioUrl: {
-    type: String,
-    default: null,
-  },
-  audioData: {
-    type: [ArrayBuffer, Blob],
-    default: null,
-  },
-})
+  const props = defineProps({
+    audioUrl: {
+      type: String,
+      default: null,
+    },
+    audioData: {
+      type: [ArrayBuffer, Blob],
+      default: null,
+    },
+  })
 
-const emit = defineEmits(['close'])
+  const emit = defineEmits(['close'])
 
-const audioEl = ref(null)
-const isPlaying = ref(false)
-const currentTime = ref(0)
-const duration = ref(0)
-const isSeeking = ref(false)
-const showSpeedMenu = ref(false)
-const speed = ref(1)
-const objectUrl = ref(null)
+  const audioEl = ref(null)
+  const isPlaying = ref(false)
+  const currentTime = ref(0)
+  const duration = ref(0)
+  const isSeeking = ref(false)
+  const showSpeedMenu = ref(false)
+  const speed = ref(1)
+  const objectUrl = ref(null)
 
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
+  const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
 
-const src = computed(() => {
-  if (props.audioUrl) return props.audioUrl
-  if (objectUrl.value) return objectUrl.value
-  return null
-})
+  const src = computed(() => {
+    if (props.audioUrl) return props.audioUrl
+    if (objectUrl.value) return objectUrl.value
+    return null
+  })
 
-watch(
-  () => props.audioData,
-  (data) => {
+  watch(
+    () => props.audioData,
+    (data) => {
+      if (objectUrl.value) URL.revokeObjectURL(objectUrl.value)
+      if (data instanceof Blob) {
+        objectUrl.value = URL.createObjectURL(data)
+      } else if (data instanceof ArrayBuffer) {
+        objectUrl.value = URL.createObjectURL(new Blob([data]))
+      } else {
+        objectUrl.value = null
+      }
+    },
+    { immediate: true }
+  )
+
+  onUnmounted(() => {
     if (objectUrl.value) URL.revokeObjectURL(objectUrl.value)
-    if (data instanceof Blob) {
-      objectUrl.value = URL.createObjectURL(data)
-    } else if (data instanceof ArrayBuffer) {
-      objectUrl.value = URL.createObjectURL(new Blob([data]))
-    } else {
-      objectUrl.value = null
+  })
+
+  function formatTime(secs) {
+    const s = Math.floor(secs % 60)
+    const m = Math.floor(secs / 60)
+    return `${m}:${s.toString().padStart(2, '0')}`
+  }
+
+  const progressPercent = computed(() => {
+    if (!duration.value) return 0
+    return (currentTime.value / duration.value) * 100
+  })
+
+  function onTimeUpdate() {
+    if (!isSeeking.value) {
+      currentTime.value = audioEl.value?.currentTime ?? 0
     }
-  },
-  { immediate: true },
-)
-
-onUnmounted(() => {
-  if (objectUrl.value) URL.revokeObjectURL(objectUrl.value)
-})
-
-function formatTime(secs) {
-  const s = Math.floor(secs % 60)
-  const m = Math.floor(secs / 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
-}
-
-const progressPercent = computed(() => {
-  if (!duration.value) return 0
-  return (currentTime.value / duration.value) * 100
-})
-
-function onTimeUpdate() {
-  if (!isSeeking.value) {
-    currentTime.value = audioEl.value?.currentTime ?? 0
   }
-}
 
-function onDurationChange() {
-  duration.value = audioEl.value?.duration ?? 0
-}
+  function onDurationChange() {
+    duration.value = audioEl.value?.duration ?? 0
+  }
 
-function onEnded() {
-  isPlaying.value = false
-  currentTime.value = 0
-}
-
-async function togglePlay() {
-  if (!audioEl.value) return
-  if (isPlaying.value) {
-    audioEl.value.pause()
+  function onEnded() {
     isPlaying.value = false
-  } else {
-    await audioEl.value.play()
-    isPlaying.value = true
+    currentTime.value = 0
   }
-}
 
-function seekTo(e) {
-  if (!audioEl.value || !duration.value) return
-  const rect = e.currentTarget.getBoundingClientRect()
-  const ratio = (e.clientX - rect.left) / rect.width
-  const time = Math.max(0, Math.min(duration.value, ratio * duration.value))
-  audioEl.value.currentTime = time
-  currentTime.value = time
-}
-
-function setSpeed(s) {
-  speed.value = s
-  if (audioEl.value) audioEl.value.playbackRate = s
-  showSpeedMenu.value = false
-}
-
-function onClose() {
-  if (audioEl.value) {
-    audioEl.value.pause()
-    isPlaying.value = false
+  async function togglePlay() {
+    if (!audioEl.value) return
+    if (isPlaying.value) {
+      audioEl.value.pause()
+      isPlaying.value = false
+    } else {
+      await audioEl.value.play()
+      isPlaying.value = true
+    }
   }
-  emit('close')
-}
+
+  function seekTo(e) {
+    if (!audioEl.value || !duration.value) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+    const time = Math.max(0, Math.min(duration.value, ratio * duration.value))
+    audioEl.value.currentTime = time
+    currentTime.value = time
+  }
+
+  function setSpeed(s) {
+    speed.value = s
+    if (audioEl.value) audioEl.value.playbackRate = s
+    showSpeedMenu.value = false
+  }
+
+  function onClose() {
+    if (audioEl.value) {
+      audioEl.value.pause()
+      isPlaying.value = false
+    }
+    emit('close')
+  }
 </script>
 
 <template>

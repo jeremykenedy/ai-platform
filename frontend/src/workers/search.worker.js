@@ -39,10 +39,7 @@ self.onmessage = ({ data }) => {
   }
 
   if (type === 'search') {
-    const results = [
-      ...searchConversations(payload.query),
-      ...searchMessages(payload.query),
-    ]
+    const results = [...searchConversations(payload.query), ...searchMessages(payload.query)]
     self.postMessage({ type: 'results', results })
   }
 }

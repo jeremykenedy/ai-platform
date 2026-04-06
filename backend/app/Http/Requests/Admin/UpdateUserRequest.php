@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,8 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        $userId = $this->route('user')?->id ?? $this->route('id');
+        $routeUser = $this->route('user');
+        $userId = ($routeUser instanceof User) ? $routeUser->id : $this->route('id');
 
         return [
             'name' => ['nullable', 'string', 'max:255'],

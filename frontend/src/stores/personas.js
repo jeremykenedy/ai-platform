@@ -7,12 +7,10 @@ export const usePersonasStore = defineStore('personas', () => {
   const activeId = ref(null)
   const isLoading = ref(false)
 
-  const activePersona = computed(() =>
-    personas.value.find((p) => p.id === activeId.value) ?? null,
-  )
+  const activePersona = computed(() => personas.value.find((p) => p.id === activeId.value) ?? null)
 
   const sortedPersonas = computed(() =>
-    [...personas.value].sort((a, b) => a.name.localeCompare(b.name)),
+    [...personas.value].sort((a, b) => a.name.localeCompare(b.name))
   )
 
   async function fetch() {

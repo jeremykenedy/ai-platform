@@ -39,8 +39,8 @@ class MessageController extends Controller
 
         $message = $this->sendMessageAction->handle(
             $conversation,
-            $request->user(),
-            $request->validated(),
+            (string) $request->validated('content'),
+            $request->has('model') ? (string) $request->validated('model') : null,
         );
 
         return (new MessageResource($message))->response()->setStatusCode(202);
@@ -60,7 +60,7 @@ class MessageController extends Controller
     {
         $this->authorize('view', $conversation);
 
-        $this->regenerateMessageAction->handle($conversation, $message);
+        $this->regenerateMessageAction->handle($message);
 
         return response()->json(null, 202);
     }

@@ -48,9 +48,9 @@ class ProcessFileExtractionJob implements ShouldQueue
             return;
         }
 
-        $extractedText = $fileExtractionService->extract($file, (string) $attachment->mime_type);
-
-        $tokenEstimate = (int) ceil(str_word_count($extractedText) * 1.3);
+        $extractionResult = $fileExtractionService->extract($file, (string) $attachment->mime_type);
+        $extractedText = (string) ($extractionResult['text'] ?? '');
+        $tokenEstimate = (int) $extractionResult['token_estimate'];
 
         $attachment->update([
             'extracted_text' => $extractedText,

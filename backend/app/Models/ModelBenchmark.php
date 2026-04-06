@@ -7,7 +7,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $model_id
+ * @property string $category
+ * @property string $prompt_hash
+ * @property int $ttft_ms
+ * @property float $tokens_per_sec
+ * @property int $total_tokens
+ * @property float|null $quality_score
+ * @property Carbon $ran_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class ModelBenchmark extends Model
 {
     use HasUlids;

@@ -1,83 +1,131 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { FileText, FileCode, File, ExternalLink, ChevronDown, ChevronUp, ZoomIn } from 'lucide-vue-next'
+  import { ref, computed } from 'vue'
+  import {
+    FileText,
+    FileCode,
+    File,
+    ExternalLink,
+    ChevronDown,
+    ChevronUp,
+    ZoomIn,
+  } from 'lucide-vue-next'
 
-const props = defineProps({
-  attachment: {
-    type: Object,
-    required: true,
-  },
-})
+  const props = defineProps({
+    attachment: {
+      type: Object,
+      required: true,
+    },
+  })
 
-const showExpanded = ref(false)
-const showFullImage = ref(false)
+  const showExpanded = ref(false)
+  const showFullImage = ref(false)
 
-const isImage = computed(() => {
-  const mime = props.attachment.mime_type ?? ''
-  return mime.startsWith('image/')
-})
+  const isImage = computed(() => {
+    const mime = props.attachment.mime_type ?? ''
+    return mime.startsWith('image/')
+  })
 
-const isPdf = computed(() => {
-  const mime = props.attachment.mime_type ?? ''
-  return mime === 'application/pdf'
-})
+  const isPdf = computed(() => {
+    const mime = props.attachment.mime_type ?? ''
+    return mime === 'application/pdf'
+  })
 
-const isText = computed(() => {
-  const mime = props.attachment.mime_type ?? ''
-  return (
-    mime.startsWith('text/') ||
-    mime === 'application/json' ||
-    mime === 'application/xml' ||
-    mime === 'application/x-yaml'
-  )
-})
+  const isText = computed(() => {
+    const mime = props.attachment.mime_type ?? ''
+    return (
+      mime.startsWith('text/') ||
+      mime === 'application/json' ||
+      mime === 'application/xml' ||
+      mime === 'application/x-yaml'
+    )
+  })
 
-const isCode = computed(() => {
-  const name = props.attachment.filename ?? ''
-  const codeExts = ['js', 'ts', 'jsx', 'tsx', 'vue', 'py', 'rb', 'php', 'java', 'c', 'cpp',
-    'h', 'go', 'rs', 'swift', 'kt', 'sh', 'css', 'html', 'json', 'xml', 'yaml', 'yml']
-  const ext = name.split('.').pop()?.toLowerCase()
-  return codeExts.includes(ext)
-})
+  const isCode = computed(() => {
+    const name = props.attachment.filename ?? ''
+    const codeExts = [
+      'js',
+      'ts',
+      'jsx',
+      'tsx',
+      'vue',
+      'py',
+      'rb',
+      'php',
+      'java',
+      'c',
+      'cpp',
+      'h',
+      'go',
+      'rs',
+      'swift',
+      'kt',
+      'sh',
+      'css',
+      'html',
+      'json',
+      'xml',
+      'yaml',
+      'yml',
+    ]
+    const ext = name.split('.').pop()?.toLowerCase()
+    return codeExts.includes(ext)
+  })
 
-const icon = computed(() => {
-  if (isPdf.value || isText.value) return FileText
-  if (isCode.value) return FileCode
-  return File
-})
+  const icon = computed(() => {
+    if (isPdf.value || isText.value) return FileText
+    if (isCode.value) return FileCode
+    return File
+  })
 
-const previewLines = computed(() => {
-  const text = props.attachment.extracted_text ?? ''
-  if (!text) return []
-  const lines = text.split('\n')
-  return showExpanded.value ? lines : lines.slice(0, 10)
-})
+  const previewLines = computed(() => {
+    const text = props.attachment.extracted_text ?? ''
+    if (!text) return []
+    const lines = text.split('\n')
+    return showExpanded.value ? lines : lines.slice(0, 10)
+  })
 
-const totalLines = computed(() => {
-  return (props.attachment.extracted_text ?? '').split('\n').length
-})
+  const totalLines = computed(() => {
+    return (props.attachment.extracted_text ?? '').split('\n').length
+  })
 
-const hasMore = computed(() => totalLines.value > 10)
+  const hasMore = computed(() => totalLines.value > 10)
 
-const detectedLanguage = computed(() => {
-  const ext = (props.attachment.filename ?? '').split('.').pop()?.toLowerCase()
-  const langMap = {
-    js: 'javascript', ts: 'typescript', jsx: 'jsx', tsx: 'tsx',
-    py: 'python', rb: 'ruby', php: 'php', java: 'java',
-    c: 'c', cpp: 'cpp', h: 'c', go: 'go', rs: 'rust',
-    swift: 'swift', kt: 'kotlin', sh: 'bash',
-    json: 'json', xml: 'xml', yaml: 'yaml', yml: 'yaml',
-    html: 'html', css: 'css', vue: 'vue',
+  const detectedLanguage = computed(() => {
+    const ext = (props.attachment.filename ?? '').split('.').pop()?.toLowerCase()
+    const langMap = {
+      js: 'javascript',
+      ts: 'typescript',
+      jsx: 'jsx',
+      tsx: 'tsx',
+      py: 'python',
+      rb: 'ruby',
+      php: 'php',
+      java: 'java',
+      c: 'c',
+      cpp: 'cpp',
+      h: 'c',
+      go: 'go',
+      rs: 'rust',
+      swift: 'swift',
+      kt: 'kotlin',
+      sh: 'bash',
+      json: 'json',
+      xml: 'xml',
+      yaml: 'yaml',
+      yml: 'yaml',
+      html: 'html',
+      css: 'css',
+      vue: 'vue',
+    }
+    return langMap[ext] ?? 'text'
+  })
+
+  function formatSize(bytes) {
+    if (!bytes) return ''
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`
+    return `${bytes} B`
   }
-  return langMap[ext] ?? 'text'
-})
-
-function formatSize(bytes) {
-  if (!bytes) return ''
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`
-  return `${bytes} B`
-}
 </script>
 
 <template>
@@ -128,7 +176,9 @@ function formatSize(bytes) {
     <!-- PDF -->
     <template v-else-if="isPdf">
       <div class="flex items-center gap-3 p-3">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/30">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-100 dark:bg-rose-900/30"
+        >
           <FileText class="h-5 w-5 text-rose-600 dark:text-rose-400" />
         </div>
         <div class="min-w-0 flex-1">
@@ -155,12 +205,18 @@ function formatSize(bytes) {
 
     <!-- Text / code files -->
     <template v-else-if="isText || isCode">
-      <div class="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-700">
+      <div
+        class="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-700"
+      >
         <component :is="icon" class="h-4 w-4 shrink-0 text-neutral-400" />
-        <span class="min-w-0 flex-1 truncate text-xs font-medium text-neutral-700 dark:text-neutral-300">
+        <span
+          class="min-w-0 flex-1 truncate text-xs font-medium text-neutral-700 dark:text-neutral-300"
+        >
           {{ attachment.filename }}
         </span>
-        <span class="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+        <span
+          class="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+        >
           {{ detectedLanguage }}
         </span>
       </div>
@@ -188,7 +244,9 @@ function formatSize(bytes) {
     <!-- Generic file -->
     <template v-else>
       <div class="flex items-center gap-3 p-3">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 dark:bg-neutral-800"
+        >
           <File class="h-5 w-5 text-neutral-400 dark:text-neutral-500" />
         </div>
         <div class="min-w-0 flex-1">

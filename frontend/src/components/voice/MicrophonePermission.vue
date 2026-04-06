@@ -1,30 +1,32 @@
 <script setup>
-import { ref } from 'vue'
-import { Mic, AlertTriangle, ExternalLink } from 'lucide-vue-next'
+  import { ref } from 'vue'
+  import { Mic, AlertTriangle, ExternalLink } from 'lucide-vue-next'
 
-const emit = defineEmits(['granted', 'denied'])
+  const emit = defineEmits(['granted', 'denied'])
 
-const state = ref('prompt') // 'prompt' | 'requesting' | 'denied'
+  const state = ref('prompt') // 'prompt' | 'requesting' | 'denied'
 
-async function requestPermission() {
-  state.value = 'requesting'
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    stream.getTracks().forEach((t) => t.stop())
-    state.value = 'prompt'
-    emit('granted')
-  } catch (err) {
-    state.value = 'denied'
-    emit('denied')
+  async function requestPermission() {
+    state.value = 'requesting'
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      stream.getTracks().forEach((t) => t.stop())
+      state.value = 'prompt'
+      emit('granted')
+    } catch {
+      state.value = 'denied'
+      emit('denied')
+    }
   }
-}
 </script>
 
 <template>
   <div
     class="flex items-start gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-700 dark:bg-neutral-800/50"
   >
-    <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-700">
+    <div
+      class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-700"
+    >
       <AlertTriangle v-if="state === 'denied'" class="h-4 w-4 text-amber-500" />
       <Mic v-else class="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
     </div>

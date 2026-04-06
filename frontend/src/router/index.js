@@ -46,13 +46,41 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: '', redirect: '/settings/general' },
-        { path: 'general', name: 'settings.general', component: () => import('@/pages/settings/GeneralPage.vue') },
-        { path: 'models', name: 'settings.models', component: () => import('@/pages/settings/ModelsPage.vue') },
-        { path: 'personas', name: 'settings.personas', component: () => import('@/pages/settings/PersonasPage.vue') },
-        { path: 'memory', name: 'settings.memory', component: () => import('@/pages/settings/MemoryPage.vue') },
-        { path: 'integrations', name: 'settings.integrations', component: () => import('@/pages/settings/IntegrationsPage.vue') },
-        { path: 'voice', name: 'settings.voice', component: () => import('@/pages/settings/VoicePage.vue') },
-        { path: 'appearance', name: 'settings.appearance', component: () => import('@/pages/settings/AppearancePage.vue') },
+        {
+          path: 'general',
+          name: 'settings.general',
+          component: () => import('@/pages/settings/GeneralPage.vue'),
+        },
+        {
+          path: 'models',
+          name: 'settings.models',
+          component: () => import('@/pages/settings/ModelsPage.vue'),
+        },
+        {
+          path: 'personas',
+          name: 'settings.personas',
+          component: () => import('@/pages/settings/PersonasPage.vue'),
+        },
+        {
+          path: 'memory',
+          name: 'settings.memory',
+          component: () => import('@/pages/settings/MemoryPage.vue'),
+        },
+        {
+          path: 'integrations',
+          name: 'settings.integrations',
+          component: () => import('@/pages/settings/IntegrationsPage.vue'),
+        },
+        {
+          path: 'voice',
+          name: 'settings.voice',
+          component: () => import('@/pages/settings/VoicePage.vue'),
+        },
+        {
+          path: 'appearance',
+          name: 'settings.appearance',
+          component: () => import('@/pages/settings/AppearancePage.vue'),
+        },
       ],
     },
     {
@@ -61,10 +89,26 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true },
       children: [
         { path: '', redirect: '/admin/dashboard' },
-        { path: 'dashboard', name: 'admin.dashboard', component: () => import('@/pages/admin/DashboardPage.vue') },
-        { path: 'users', name: 'admin.users', component: () => import('@/pages/admin/UsersPage.vue') },
-        { path: 'models', name: 'admin.models', component: () => import('@/pages/admin/ModelsPage.vue') },
-        { path: 'training', name: 'admin.training', component: () => import('@/pages/admin/TrainingPage.vue') },
+        {
+          path: 'dashboard',
+          name: 'admin.dashboard',
+          component: () => import('@/pages/admin/DashboardPage.vue'),
+        },
+        {
+          path: 'users',
+          name: 'admin.users',
+          component: () => import('@/pages/admin/UsersPage.vue'),
+        },
+        {
+          path: 'models',
+          name: 'admin.models',
+          component: () => import('@/pages/admin/ModelsPage.vue'),
+        },
+        {
+          path: 'training',
+          name: 'admin.training',
+          component: () => import('@/pages/admin/TrainingPage.vue'),
+        },
       ],
     },
   ],

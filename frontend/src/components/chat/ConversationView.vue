@@ -1,96 +1,103 @@
 <script setup>
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { ChevronDown, MessageSquare, Sparkles } from 'lucide-vue-next'
-import { useMessagesStore } from '@/stores/messages'
-import { useVirtualScroll } from '@/composables/useVirtualScroll'
-import MessageBubble from '@/components/chat/MessageBubble.vue'
-import StreamingIndicator from '@/components/chat/StreamingIndicator.vue'
+  import { ref, computed, watch, nextTick, onMounted } from 'vue'
+  import { ChevronDown, MessageSquare, Sparkles } from 'lucide-vue-next'
+  import { useMessagesStore } from '@/stores/messages'
+  import { useVirtualScroll } from '@/composables/useVirtualScroll'
+  import MessageBubble from '@/components/chat/MessageBubble.vue'
+  import StreamingIndicator from '@/components/chat/StreamingIndicator.vue'
 
-const props = defineProps({
-  conversationId: {
-    type: String,
-    required: true,
-  },
-})
+  const props = defineProps({
+    conversationId: {
+      type: String,
+      required: true,
+    },
+  })
 
-const emit = defineEmits(['suggest', 'edit-message', 'regenerate', 'delete-message', 'continue-message', 'load-older'])
+  const emit = defineEmits([
+    'suggest',
+    'edit-message',
+    'regenerate',
+    'delete-message',
+    'continue-message',
+    'load-older',
+  ])
 
-const messagesStore = useMessagesStore()
+  const messagesStore = useMessagesStore()
 
-const messages = computed(() => messagesStore.activeMessages)
-const isStreaming = computed(() => messagesStore.isStreaming)
+  const messages = computed(() => messagesStore.activeMessages)
+  const isStreaming = computed(() => messagesStore.isStreaming)
 
-const { scrollRef, virtualizer } = useVirtualScroll(messages)
+  const { scrollRef, virtualizer } = useVirtualScroll(messages)
 
-const isAtBottom = ref(true)
-const isLoadingOlder = ref(false)
+  const isAtBottom = ref(true)
+  const isLoadingOlder = ref(false)
 
-const SCROLL_THRESHOLD = 100
+  const SCROLL_THRESHOLD = 100
 
-function updateIsAtBottom() {
-  const el = scrollRef.value
-  if (!el) return
-  const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
-  isAtBottom.value = distanceFromBottom < SCROLL_THRESHOLD
-}
-
-function scrollToBottom(behavior = 'smooth') {
-  nextTick(() => {
+  function updateIsAtBottom() {
     const el = scrollRef.value
     if (!el) return
-    el.scrollTo({ top: el.scrollHeight, behavior })
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    isAtBottom.value = distanceFromBottom < SCROLL_THRESHOLD
+  }
+
+  function scrollToBottom(behavior = 'smooth') {
+    nextTick(() => {
+      const el = scrollRef.value
+      if (!el) return
+      el.scrollTo({ top: el.scrollHeight, behavior })
+    })
+  }
+
+  async function handleScroll() {
+    updateIsAtBottom()
+
+    const el = scrollRef.value
+    if (!el) return
+
+    if (el.scrollTop < 80 && !isLoadingOlder.value) {
+      isLoadingOlder.value = true
+      await emit('load-older')
+      isLoadingOlder.value = false
+    }
+  }
+
+  watch(
+    () => messages.value.length,
+    () => {
+      if (isAtBottom.value) {
+        scrollToBottom('auto')
+      }
+    }
+  )
+
+  watch(isStreaming, (streaming) => {
+    if (streaming && isAtBottom.value) {
+      scrollToBottom('auto')
+    }
   })
-}
 
-async function handleScroll() {
-  updateIsAtBottom()
-
-  const el = scrollRef.value
-  if (!el) return
-
-  if (el.scrollTop < 80 && !isLoadingOlder.value) {
-    isLoadingOlder.value = true
-    await emit('load-older')
-    isLoadingOlder.value = false
-  }
-}
-
-watch(
-  () => messages.value.length,
-  () => {
-    if (isAtBottom.value) {
+  onMounted(async () => {
+    if (props.conversationId) {
+      await messagesStore.fetchForConversation(props.conversationId)
       scrollToBottom('auto')
     }
-  },
-)
+  })
 
-watch(isStreaming, (streaming) => {
-  if (streaming && isAtBottom.value) {
-    scrollToBottom('auto')
-  }
-})
-
-onMounted(async () => {
-  if (props.conversationId) {
-    await messagesStore.fetchForConversation(props.conversationId)
-    scrollToBottom('auto')
-  }
-})
-
-watch(
-  () => props.conversationId,
-  async (id) => {
-    if (id) {
-      await messagesStore.fetchForConversation(id)
-      scrollToBottom('auto')
+  watch(
+    () => props.conversationId,
+    async (id) => {
+      if (id) {
+        await messagesStore.fetchForConversation(id)
+        scrollToBottom('auto')
+      }
     }
-  },
-)
+  )
 
-const suggestions = [
-  { icon: Sparkles, text: 'Ask me anything' },
-  { icon: MessageSquare, text: 'Start a conversation' },
-]
+  const suggestions = [
+    { icon: Sparkles, text: 'Ask me anything' },
+    { icon: MessageSquare, text: 'Start a conversation' },
+  ]
 </script>
 
 <template>
@@ -105,7 +112,9 @@ const suggestions = [
       </div>
       <div class="text-center">
         <h3 class="text-lg font-semibold text-foreground dark:text-foreground">How can I help?</h3>
-        <p class="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">Send a message to start a conversation.</p>
+        <p class="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
+          Send a message to start a conversation.
+        </p>
       </div>
       <div class="flex flex-wrap justify-center gap-2">
         <button
@@ -121,15 +130,12 @@ const suggestions = [
     </div>
 
     <!-- Virtual message list -->
-    <div
-      v-else
-      ref="scrollRef"
-      class="flex-1 overflow-y-auto"
-      @scroll="handleScroll"
-    >
+    <div v-else ref="scrollRef" class="flex-1 overflow-y-auto" @scroll="handleScroll">
       <!-- Older loading indicator -->
       <div v-if="isLoadingOlder" class="flex justify-center py-3">
-        <div class="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground" />
+        <div
+          class="h-5 w-5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground dark:border-muted-foreground/20 dark:border-t-muted-foreground"
+        />
       </div>
 
       <div :style="{ height: virtualizer.getTotalSize() + 'px', position: 'relative' }">
@@ -138,29 +144,33 @@ const suggestions = [
           :key="item.key"
           :ref="(el) => virtualizer.measureElement(el)"
           :data-index="item.index"
-          :style="{ position: 'absolute', top: 0, left: 0, width: '100%', transform: `translateY(${item.start}px)` }"
+          :style="{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            transform: `translateY(${item.start}px)`,
+          }"
         >
-          <template v-memo="[messages[item.index]?.id, messages[item.index]?.isStreaming, messages[item.index]?.content]">
-            <MessageBubble
-              v-if="!messages[item.index]?.isStreaming"
-              v-once
-              :message="messages[item.index]"
-              :is-last="item.index === messages.length - 1"
-              @edit="emit('edit-message', $event)"
-              @regenerate="emit('regenerate', $event)"
-              @delete="emit('delete-message', $event)"
-              @continue="emit('continue-message', $event)"
-            />
-            <MessageBubble
-              v-else
-              :message="messages[item.index]"
-              :is-last="item.index === messages.length - 1"
-              @edit="emit('edit-message', $event)"
-              @regenerate="emit('regenerate', $event)"
-              @delete="emit('delete-message', $event)"
-              @continue="emit('continue-message', $event)"
-            />
-          </template>
+          <MessageBubble
+            v-if="!messages[item.index]?.isStreaming"
+            v-once
+            :message="messages[item.index]"
+            :is-last="item.index === messages.length - 1"
+            @edit="emit('edit-message', $event)"
+            @regenerate="emit('regenerate', $event)"
+            @delete="emit('delete-message', $event)"
+            @continue="emit('continue-message', $event)"
+          />
+          <MessageBubble
+            v-else
+            :message="messages[item.index]"
+            :is-last="item.index === messages.length - 1"
+            @edit="emit('edit-message', $event)"
+            @regenerate="emit('regenerate', $event)"
+            @delete="emit('delete-message', $event)"
+            @continue="emit('continue-message', $event)"
+          />
         </div>
       </div>
 

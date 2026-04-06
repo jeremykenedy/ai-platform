@@ -9,7 +9,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $name
+ * @property string|null $description
+ * @property string $system_prompt
+ * @property string|null $model_name
+ * @property float $temperature
+ * @property float $top_p
+ * @property int $top_k
+ * @property float $repeat_penalty
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Persona extends Model
 {
     use HasUlids, SoftDeletes;

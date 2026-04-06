@@ -9,8 +9,25 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Pgvector\Laravel\HasNeighbors;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $content
+ * @property string|null $source_conversation_id
+ * @property string|null $source_message_id
+ * @property string $category
+ * @property int $importance
+ * @property Carbon|null $last_accessed_at
+ * @property int $access_count
+ * @property bool $is_active
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Conversation|null $sourceConversation
+ */
 class Memory extends Model
 {
     use HasNeighbors, HasUlids, SoftDeletes;

@@ -28,7 +28,7 @@ class MemoryRetrievalService
     public function retrieveForMessage(string $userId, string $messageContent, int $limit = 15): Collection
     {
         try {
-            $embedding = $this->embeddingService->embed($messageContent);
+            $embedding = $this->embeddingService->generateEmbedding($messageContent);
         } catch (\Throwable $e) {
             Log::warning('[MemoryRetrievalService] Embedding generation failed: '.$e->getMessage());
 

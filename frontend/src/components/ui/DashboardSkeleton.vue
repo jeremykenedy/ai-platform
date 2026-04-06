@@ -1,10 +1,10 @@
 <script setup>
-import SkeletonLine from '@/components/ui/SkeletonLine.vue'
+  import SkeletonLine from '@/components/ui/SkeletonLine.vue'
 
-const row1 = ['100%', '100%', '100%', '100%']
-const row2 = ['100%', '100%', '100%', '100%']
+  const row1 = ['100%', '100%', '100%', '100%']
+  const row2 = ['100%', '100%', '100%', '100%']
 
-const activityItems = 5
+  const activityItems = 5
 </script>
 
 <template>
@@ -57,10 +57,7 @@ const activityItems = 5
         >
           <div class="h-8 w-8 shrink-0 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
           <div class="flex flex-1 flex-col gap-1.5">
-            <SkeletonLine
-              :width="i % 2 === 0 ? '55%' : '70%'"
-              height="0.75rem"
-            />
+            <SkeletonLine :width="i % 2 === 0 ? '55%' : '70%'" height="0.75rem" />
             <SkeletonLine width="30%" height="0.625rem" />
           </div>
           <SkeletonLine width="4rem" height="0.75rem" />

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\TrainingDataset;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin TrainingDataset */
 class TrainingDatasetResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -19,8 +21,8 @@ class TrainingDatasetResource extends JsonResource
             'row_count' => $this->row_count,
             'created_at' => $this->created_at,
             'user' => $this->whenLoaded('user', fn () => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
+                'id' => $this->user?->id,
+                'name' => $this->user?->name,
             ]),
         ];
     }

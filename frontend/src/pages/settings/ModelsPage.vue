@@ -1,67 +1,82 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { Bot, Zap, Code2, Eye, Brain, Info, Loader2, CheckCircle } from 'lucide-vue-next'
-import { useModelsStore } from '@/stores/models'
-import { useSettingsStore } from '@/stores/settings'
-import { useUiStore } from '@/stores/ui'
+  import { ref, reactive, computed, onMounted } from 'vue'
+  import { Bot, Zap, Code2, Eye, Brain, Info, Loader2, CheckCircle } from 'lucide-vue-next'
+  import { useModelsStore } from '@/stores/models'
+  import { useSettingsStore } from '@/stores/settings'
+  import { useUiStore } from '@/stores/ui'
 
-const modelsStore = useModelsStore()
-const settingsStore = useSettingsStore()
-const uiStore = useUiStore()
+  const modelsStore = useModelsStore()
+  const settingsStore = useSettingsStore()
+  const uiStore = useUiStore()
 
-const saving = ref(false)
+  const saving = ref(false)
 
-const form = reactive({
-  default_model_id: null,
-  prefer_local: false,
-  auto_routing: false,
-  task_model_code: null,
-  task_model_vision: null,
-  task_model_reasoning: null,
-})
+  const form = reactive({
+    default_model_id: null,
+    prefer_local: false,
+    auto_routing: false,
+    task_model_code: null,
+    task_model_vision: null,
+    task_model_reasoning: null,
+  })
 
-const activeModels = computed(() => modelsStore.availableModels)
+  const activeModels = computed(() => modelsStore.availableModels)
 
-onMounted(async () => {
-  await Promise.all([modelsStore.fetch(), settingsStore.fetch()])
-  const s = settingsStore.settings
-  if (s) {
-    form.default_model_id = s.default_model_id ?? modelsStore.defaultModel?.id ?? null
-    form.prefer_local = s.prefer_local ?? false
-    form.auto_routing = s.auto_routing ?? false
-    form.task_model_code = s.task_model_code ?? null
-    form.task_model_vision = s.task_model_vision ?? null
-    form.task_model_reasoning = s.task_model_reasoning ?? null
-  } else if (modelsStore.defaultModel) {
-    form.default_model_id = modelsStore.defaultModel.id
+  onMounted(async () => {
+    await Promise.all([modelsStore.fetch(), settingsStore.fetch()])
+    const s = settingsStore.settings
+    if (s) {
+      form.default_model_id = s.default_model_id ?? modelsStore.defaultModel?.id ?? null
+      form.prefer_local = s.prefer_local ?? false
+      form.auto_routing = s.auto_routing ?? false
+      form.task_model_code = s.task_model_code ?? null
+      form.task_model_vision = s.task_model_vision ?? null
+      form.task_model_reasoning = s.task_model_reasoning ?? null
+    } else if (modelsStore.defaultModel) {
+      form.default_model_id = modelsStore.defaultModel.id
+    }
+  })
+
+  async function save() {
+    saving.value = true
+    try {
+      await settingsStore.update({
+        default_model_id: form.default_model_id,
+        prefer_local: form.prefer_local,
+        auto_routing: form.auto_routing,
+        task_model_code: form.task_model_code,
+        task_model_vision: form.task_model_vision,
+        task_model_reasoning: form.task_model_reasoning,
+      })
+      uiStore.addToast({ type: 'success', message: 'Model preferences saved.' })
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? 'Failed to save preferences.'
+      uiStore.addToast({ type: 'error', message: msg })
+    } finally {
+      saving.value = false
+    }
   }
-})
 
-async function save() {
-  saving.value = true
-  try {
-    await settingsStore.update({
-      default_model_id: form.default_model_id,
-      prefer_local: form.prefer_local,
-      auto_routing: form.auto_routing,
-      task_model_code: form.task_model_code,
-      task_model_vision: form.task_model_vision,
-      task_model_reasoning: form.task_model_reasoning,
-    })
-    uiStore.addToast({ type: 'success', message: 'Model preferences saved.' })
-  } catch (err) {
-    const msg = err?.response?.data?.message ?? 'Failed to save preferences.'
-    uiStore.addToast({ type: 'error', message: msg })
-  } finally {
-    saving.value = false
-  }
-}
-
-const TASK_MODELS = [
-  { key: 'task_model_code', icon: Code2, label: 'Code', description: 'Best model for coding tasks, debugging, and technical questions.' },
-  { key: 'task_model_vision', icon: Eye, label: 'Vision', description: 'Best model for image analysis, OCR, and visual reasoning.' },
-  { key: 'task_model_reasoning', icon: Brain, label: 'Reasoning', description: 'Best model for complex reasoning, math, and multi-step problems.' },
-]
+  const TASK_MODELS = [
+    {
+      key: 'task_model_code',
+      icon: Code2,
+      label: 'Code',
+      description: 'Best model for coding tasks, debugging, and technical questions.',
+    },
+    {
+      key: 'task_model_vision',
+      icon: Eye,
+      label: 'Vision',
+      description: 'Best model for image analysis, OCR, and visual reasoning.',
+    },
+    {
+      key: 'task_model_reasoning',
+      icon: Brain,
+      label: 'Reasoning',
+      description: 'Best model for complex reasoning, math, and multi-step problems.',
+    },
+  ]
 </script>
 
 <template>
@@ -69,14 +84,21 @@ const TASK_MODELS = [
     <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Model Preferences</h1>
 
     <!-- Default Model -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+    <section
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4"
+    >
       <div class="flex items-center gap-2 mb-1">
         <Bot class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Default Model</h2>
       </div>
-      <p class="text-sm text-gray-500 dark:text-gray-400">This model is used for all new conversations unless overridden.</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        This model is used for all new conversations unless overridden.
+      </p>
 
-      <div v-if="modelsStore.isLoading" class="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 py-2">
+      <div
+        v-if="modelsStore.isLoading"
+        class="flex items-center gap-2 text-sm text-gray-400 dark:text-gray-500 py-2"
+      >
         <Loader2 class="w-4 h-4 animate-spin" /> Loading models...
       </div>
 
@@ -93,7 +115,9 @@ const TASK_MODELS = [
     </section>
 
     <!-- Routing Toggles -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+    <section
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5"
+    >
       <div class="flex items-center gap-2 mb-1">
         <Zap class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Routing</h2>
@@ -118,7 +142,8 @@ const TASK_MODELS = [
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Prefer local models</p>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-start gap-1">
             <Info class="w-3 h-3 mt-0.5 flex-shrink-0" />
-            Routes requests to your local Ollama instance before trying cloud providers. Falls back to cloud if the local model is unavailable.
+            Routes requests to your local Ollama instance before trying cloud providers. Falls back
+            to cloud if the local model is unavailable.
           </p>
         </div>
       </div>
@@ -142,22 +167,29 @@ const TASK_MODELS = [
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Auto-routing</p>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-start gap-1">
             <Info class="w-3 h-3 mt-0.5 flex-shrink-0" />
-            Automatically selects the best model for each message based on the detected task type (code, vision, reasoning, etc.). Ignores the default model setting when enabled.
+            Automatically selects the best model for each message based on the detected task type
+            (code, vision, reasoning, etc.). Ignores the default model setting when enabled.
           </p>
         </div>
       </div>
     </section>
 
     <!-- Task-specific models -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+    <section
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5"
+    >
       <div class="flex items-center gap-2 mb-1">
         <Brain class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Task-Specific Models</h2>
       </div>
-      <p class="text-sm text-gray-500 dark:text-gray-400">Override the default model for specific task categories. Leave blank to use the default.</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Override the default model for specific task categories. Leave blank to use the default.
+      </p>
 
       <div v-for="task in TASK_MODELS" :key="task.key" class="space-y-1.5">
-        <label class="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="flex items-center gap-1.5 text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           <component :is="task.icon" class="w-4 h-4 text-gray-400 dark:text-gray-500" />
           {{ task.label }}
         </label>

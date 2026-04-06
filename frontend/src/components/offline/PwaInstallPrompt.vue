@@ -1,58 +1,58 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { Download, X, CheckCircle } from 'lucide-vue-next'
+  import { ref, onMounted, onUnmounted } from 'vue'
+  import { Download, X, CheckCircle } from 'lucide-vue-next'
 
-const DISMISS_KEY = 'pwa-install-dismissed-at'
-const DISMISS_TTL = 7 * 24 * 60 * 60 * 1000 // 7 days
+  const DISMISS_KEY = 'pwa-install-dismissed-at'
+  const DISMISS_TTL = 7 * 24 * 60 * 60 * 1000 // 7 days
 
-const showBanner = ref(false)
-const showSuccess = ref(false)
-let deferredPrompt = null
+  const showBanner = ref(false)
+  const showSuccess = ref(false)
+  let deferredPrompt = null
 
-function isDismissedRecently() {
-  const ts = localStorage.getItem(DISMISS_KEY)
-  if (!ts) return false
-  return Date.now() - Number(ts) < DISMISS_TTL
-}
-
-function isIos() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent)
-}
-
-function handleBeforeInstallPrompt(e) {
-  e.preventDefault()
-  if (isDismissedRecently()) return
-  deferredPrompt = e
-  showBanner.value = true
-}
-
-async function install() {
-  if (!deferredPrompt) return
-  deferredPrompt.prompt()
-  const { outcome } = await deferredPrompt.userChoice
-  deferredPrompt = null
-  showBanner.value = false
-  if (outcome === 'accepted') {
-    showSuccess.value = true
-    setTimeout(() => {
-      showSuccess.value = false
-    }, 3000)
+  function isDismissedRecently() {
+    const ts = localStorage.getItem(DISMISS_KEY)
+    if (!ts) return false
+    return Date.now() - Number(ts) < DISMISS_TTL
   }
-}
 
-function dismiss() {
-  localStorage.setItem(DISMISS_KEY, String(Date.now()))
-  showBanner.value = false
-}
+  function isIos() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent)
+  }
 
-onMounted(() => {
-  if (isIos()) return
-  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-})
+  function handleBeforeInstallPrompt(e) {
+    e.preventDefault()
+    if (isDismissedRecently()) return
+    deferredPrompt = e
+    showBanner.value = true
+  }
 
-onUnmounted(() => {
-  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-})
+  async function install() {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    deferredPrompt = null
+    showBanner.value = false
+    if (outcome === 'accepted') {
+      showSuccess.value = true
+      setTimeout(() => {
+        showSuccess.value = false
+      }, 3000)
+    }
+  }
+
+  function dismiss() {
+    localStorage.setItem(DISMISS_KEY, String(Date.now()))
+    showBanner.value = false
+  }
+
+  onMounted(() => {
+    if (isIos()) return
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+  })
 </script>
 
 <template>
@@ -108,18 +108,25 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.slide-up-enter-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.slide-up-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.slide-up-enter-from {
-  transform: translate(-50%, 100%);
-  opacity: 0;
-}
-.slide-up-leave-to {
-  transform: translate(-50%, 100%);
-  opacity: 0;
-}
+  .slide-up-enter-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .slide-up-leave-active {
+    transition:
+      transform 0.25s ease,
+      opacity 0.25s ease;
+  }
+
+  .slide-up-enter-from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+
+  .slide-up-leave-to {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
 </style>

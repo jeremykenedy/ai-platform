@@ -8,7 +8,7 @@ use App\Models\AiModel;
 use App\Models\UserSetting;
 use App\Services\AI\Contracts\AiProviderInterface;
 use App\Services\AI\Providers\AnthropicProvider;
-use App\Services\AI\Providers\GeminiProvider;
+use App\Services\AI\Providers\GoogleProvider;
 use App\Services\AI\Providers\GroqProvider;
 use App\Services\AI\Providers\MistralProvider;
 use App\Services\AI\Providers\OllamaProvider;
@@ -28,7 +28,7 @@ class ModelRouterService
         'ollama' => OllamaProvider::class,
         'anthropic' => AnthropicProvider::class,
         'openai' => OpenAiProvider::class,
-        'gemini' => GeminiProvider::class,
+        'gemini' => GoogleProvider::class,
         'mistral' => MistralProvider::class,
         'groq' => GroqProvider::class,
         'together' => TogetherProvider::class,

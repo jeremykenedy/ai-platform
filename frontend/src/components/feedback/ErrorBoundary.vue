@@ -1,34 +1,36 @@
 <script setup>
-import { ref, onErrorCaptured } from 'vue'
-import { AlertOctagon, RotateCcw } from 'lucide-vue-next'
+  import { ref, onErrorCaptured } from 'vue'
+  import { AlertOctagon, RotateCcw } from 'lucide-vue-next'
 
-const props = defineProps({
-  fallbackMessage: {
-    type: String,
-    default: 'Something went wrong',
-  },
-})
+  defineProps({
+    fallbackMessage: {
+      type: String,
+      default: 'Something went wrong',
+    },
+  })
 
-const error = ref(null)
-const errorInfo = ref(null)
+  const error = ref(null)
+  const errorInfo = ref(null)
 
-onErrorCaptured((err, instance, info) => {
-  error.value = err
-  errorInfo.value = info
-  console.error('[ErrorBoundary] Captured error:', err, '\nComponent info:', info)
-  return false
-})
+  onErrorCaptured((err, instance, info) => {
+    error.value = err
+    errorInfo.value = info
+    console.error('[ErrorBoundary] Captured error:', err, '\nComponent info:', info)
+    return false
+  })
 
-function reset() {
-  error.value = null
-  errorInfo.value = null
-}
+  function reset() {
+    error.value = null
+    errorInfo.value = null
+  }
 </script>
 
 <template>
   <template v-if="error">
     <slot name="fallback" :error="error" :reset="reset">
-      <div class="flex flex-col items-center justify-center gap-4 rounded-xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950/20">
+      <div
+        class="flex flex-col items-center justify-center gap-4 rounded-xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950/20"
+      >
         <AlertOctagon class="h-10 w-10 text-red-500 dark:text-red-400" />
         <div class="flex flex-col gap-1">
           <p class="text-sm font-semibold text-gray-900 dark:text-gray-50">

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Message;
 
+use App\Models\Conversation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreMessageRequest extends FormRequest
@@ -12,7 +13,7 @@ class StoreMessageRequest extends FormRequest
     {
         $conversation = $this->route('conversation');
 
-        if (! $conversation) {
+        if (! ($conversation instanceof Conversation)) {
             return false;
         }
 

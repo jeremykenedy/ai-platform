@@ -93,9 +93,9 @@ class MemoryController extends Controller
 
     public function resolveConflict(Request $request, MemoryConflict $conflict): JsonResponse
     {
-        $request->validate(['resolution' => ['required', 'string', 'in:keep_new,keep_old,merge,dismiss']]);
+        $validated = $request->validate(['resolution' => ['required', 'string', 'in:keep_new,keep_old,merge,dismiss']]);
 
-        $this->resolveMemoryConflictAction->handle($conflict, $request->validated('resolution'));
+        $this->resolveMemoryConflictAction->handle($conflict, (string) $validated['resolution']);
 
         return response()->json(['message' => 'Conflict resolved.']);
     }

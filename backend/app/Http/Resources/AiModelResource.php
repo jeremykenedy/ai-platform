@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\AiModel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin AiModel */
 class AiModelResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -34,8 +36,8 @@ class AiModelResource extends JsonResource
             'output_cost_per_1k' => $this->output_cost_per_1k,
             'last_updated_at' => $this->last_updated_at,
             'provider' => $this->whenLoaded('provider', fn () => [
-                'name' => $this->provider->name,
-                'display_name' => $this->provider->display_name,
+                'name' => $this->provider?->name,
+                'display_name' => $this->provider?->display_name,
             ]),
         ];
     }

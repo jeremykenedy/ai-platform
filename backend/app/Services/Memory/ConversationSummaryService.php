@@ -38,10 +38,10 @@ class ConversationSummaryService
         }
 
         $llmMessages = $this->buildSummarizationPrompt($messages);
-        $provider = $this->modelRouter->route('auto');
+        $route = $this->modelRouter->route('auto');
 
         try {
-            $response = $provider->chat($llmMessages, $this->modelRouter->getDefaultModel(), [
+            $response = $route['provider']->chat($llmMessages, $route['model'], [
                 'format' => 'json',
                 'max_tokens' => 1024,
             ]);

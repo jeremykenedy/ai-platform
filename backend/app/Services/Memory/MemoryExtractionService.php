@@ -35,7 +35,7 @@ class MemoryExtractionService
         }
 
         $userId = (string) $conversation->user_id;
-        $provider = $this->modelRouter->route('auto');
+        $route = $this->modelRouter->route('auto');
         $prompt = $this->buildExtractionPrompt($messages->toArray());
 
         $systemPrompt = 'Extract key facts and preferences about the user from this conversation. Return JSON array: [{"content": "...", "category": "preference|fact|instruction|context|personality", "importance": 1-10}]. Only include information worth remembering long-term.';
@@ -56,7 +56,7 @@ class MemoryExtractionService
                     ];
                 }
 
-                $response = $provider->chat($llmMessages, $this->modelRouter->getDefaultModel(), [
+                $response = $route['provider']->chat($llmMessages, $route['model'], [
                     'system' => $systemPrompt,
                     'format' => 'json',
                     'max_tokens' => 2048,
@@ -85,7 +85,7 @@ class MemoryExtractionService
 
         foreach ($candidates as $memoryData) {
             try {
-                $embedding = $this->embeddingService->embed($memoryData['content']);
+                $embedding = $this->embeddingService->generateEmbedding($memoryData['content']);
                 $memory = $this->createOrUpdateMemory(
                     $userId,
                     $memoryData,
@@ -212,7 +212,7 @@ class MemoryExtractionService
         $similarity = (float) $row->similarity;
 
         if ($similarity >= $threshold) {
-            return Memory::find($row->id);
+            return Memory::where('id', $row->id)->first();
         }
 
         return null;
@@ -245,7 +245,7 @@ class MemoryExtractionService
         $similarity = (float) $row->similarity;
 
         if ($similarity >= 0.7 && $similarity < 0.92) {
-            return Memory::find($row->id);
+            return Memory::where('id', $row->id)->first();
         }
 
         return null;

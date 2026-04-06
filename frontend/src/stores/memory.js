@@ -54,7 +54,9 @@ export const useMemoryStore = defineStore('memory', () => {
   }
 
   async function resolveConflict(conflictId, resolution) {
-    const response = await api.post(`/api/v1/memory/conflicts/${conflictId}/resolve`, { resolution })
+    const response = await api.post(`/api/v1/memory/conflicts/${conflictId}/resolve`, {
+      resolution,
+    })
     conflicts.value = conflicts.value.filter((c) => c.id !== conflictId)
     return response.data
   }

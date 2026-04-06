@@ -75,7 +75,7 @@ class ModelsList extends Command
             }
 
             $params = $model->parameter_count !== null
-                ? number_format($model->parameter_count / 1_000_000_000, 1).'B'
+                ? number_format((float) $model->parameter_count / 1_000_000_000, 1).'B'
                 : '-';
 
             $context = $model->context_window !== null

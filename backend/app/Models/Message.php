@@ -9,8 +9,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Pgvector\Laravel\HasNeighbors;
 
+/**
+ * @property string $id
+ * @property string $conversation_id
+ * @property string $role
+ * @property string $content
+ * @property int|null $tokens_used
+ * @property string|null $finish_reason
+ * @property string|null $model_version
+ * @property int|null $sequence
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Conversation $conversation
+ */
 class Message extends Model
 {
     use HasNeighbors, HasUlids, SoftDeletes;
@@ -47,16 +62,19 @@ class Message extends Model
         ];
     }
 
+    /** @return BelongsTo<Conversation, Message> */
     public function conversation(): BelongsTo
     {
         return $this->belongsTo(Conversation::class);
     }
 
+    /** @return HasMany<MessageAttachment, Message> */
     public function attachments(): HasMany
     {
         return $this->hasMany(MessageAttachment::class);
     }
 
+    /** @return HasMany<MessageEdit, Message> */
     public function edits(): HasMany
     {
         return $this->hasMany(MessageEdit::class);

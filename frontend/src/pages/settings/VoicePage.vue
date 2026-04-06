@@ -1,205 +1,210 @@
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import {
-  Volume2,
-  Mic,
-  Play,
-  Square,
-  CheckCircle,
-  Loader2,
-  AlertCircle,
-  Info,
-  Keyboard,
-  ShieldCheck,
-  ShieldAlert,
-} from 'lucide-vue-next'
-import { useSettingsStore } from '@/stores/settings'
-import { useUiStore } from '@/stores/ui'
+  import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+  import {
+    Volume2,
+    Mic,
+    Play,
+    Square,
+    CheckCircle,
+    Loader2,
+    Info,
+    Keyboard,
+    ShieldCheck,
+    ShieldAlert,
+  } from 'lucide-vue-next'
+  import { useSettingsStore } from '@/stores/settings'
+  import { useUiStore } from '@/stores/ui'
 
-const settingsStore = useSettingsStore()
-const uiStore = useUiStore()
+  const settingsStore = useSettingsStore()
+  const uiStore = useUiStore()
 
-const VOICES = [
-  { id: 'alloy', name: 'Alloy', description: 'Neutral, balanced' },
-  { id: 'echo', name: 'Echo', description: 'Male, warm' },
-  { id: 'fable', name: 'Fable', description: 'British accent' },
-  { id: 'onyx', name: 'Onyx', description: 'Male, deep' },
-  { id: 'nova', name: 'Nova', description: 'Female, energetic' },
-  { id: 'shimmer', name: 'Shimmer', description: 'Female, gentle' },
-]
+  const VOICES = [
+    { id: 'alloy', name: 'Alloy', description: 'Neutral, balanced' },
+    { id: 'echo', name: 'Echo', description: 'Male, warm' },
+    { id: 'fable', name: 'Fable', description: 'British accent' },
+    { id: 'onyx', name: 'Onyx', description: 'Male, deep' },
+    { id: 'nova', name: 'Nova', description: 'Female, energetic' },
+    { id: 'shimmer', name: 'Shimmer', description: 'Female, gentle' },
+  ]
 
-const tts = reactive({
-  voice: 'alloy',
-  speed: 1.0,
-  auto_play: false,
-})
+  const tts = reactive({
+    voice: 'alloy',
+    speed: 1.0,
+    auto_play: false,
+  })
 
-const stt = reactive({
-  mode: 'browser',
-  silence_threshold: 2,
-  continuous: false,
-  push_to_talk_key: 'Space',
-})
+  const stt = reactive({
+    mode: 'browser',
+    silence_threshold: 2,
+    continuous: false,
+    push_to_talk_key: 'Space',
+  })
 
-const saving = ref(false)
-const previewingVoice = ref(false)
-const recordingTest = ref(false)
-const testAudioUrl = ref(null)
-const recordingChunks = ref([])
-const mediaRecorder = ref(null)
-const micPermission = ref('unknown')
-const listeningForKey = ref(false)
+  const saving = ref(false)
+  const previewingVoice = ref(false)
+  const recordingTest = ref(false)
+  const testAudioUrl = ref(null)
+  const recordingChunks = ref([])
+  const mediaRecorder = ref(null)
+  const micPermission = ref('unknown')
+  const listeningForKey = ref(false)
 
-onMounted(async () => {
-  await settingsStore.fetch()
-  const s = settingsStore.settings
-  if (s) {
-    tts.voice = s.tts_voice ?? 'alloy'
-    tts.speed = s.tts_speed ?? 1.0
-    tts.auto_play = s.tts_auto_play ?? false
-    stt.mode = s.stt_mode ?? 'browser'
-    stt.silence_threshold = s.stt_silence_threshold ?? 2
-    stt.continuous = s.stt_continuous ?? false
-    stt.push_to_talk_key = s.stt_push_to_talk_key ?? 'Space'
-  }
-  checkMicPermission()
-})
+  onMounted(async () => {
+    await settingsStore.fetch()
+    const s = settingsStore.settings
+    if (s) {
+      tts.voice = s.tts_voice ?? 'alloy'
+      tts.speed = s.tts_speed ?? 1.0
+      tts.auto_play = s.tts_auto_play ?? false
+      stt.mode = s.stt_mode ?? 'browser'
+      stt.silence_threshold = s.stt_silence_threshold ?? 2
+      stt.continuous = s.stt_continuous ?? false
+      stt.push_to_talk_key = s.stt_push_to_talk_key ?? 'Space'
+    }
+    checkMicPermission()
+  })
 
-async function checkMicPermission() {
-  if (!navigator.permissions) {
-    micPermission.value = 'unknown'
-    return
-  }
-  try {
-    const result = await navigator.permissions.query({ name: 'microphone' })
-    micPermission.value = result.state
-    result.addEventListener('change', () => {
+  async function checkMicPermission() {
+    if (!navigator.permissions) {
+      micPermission.value = 'unknown'
+      return
+    }
+    try {
+      const result = await navigator.permissions.query({ name: 'microphone' })
       micPermission.value = result.state
-    })
-  } catch {
-    micPermission.value = 'unknown'
-  }
-}
-
-async function requestMicPermission() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    stream.getTracks().forEach((t) => t.stop())
-    micPermission.value = 'granted'
-    uiStore.addToast({ type: 'success', message: 'Microphone access granted.' })
-  } catch {
-    micPermission.value = 'denied'
-    uiStore.addToast({ type: 'error', message: 'Microphone access denied.' })
-  }
-}
-
-async function previewVoice() {
-  if (previewingVoice.value) return
-  previewingVoice.value = true
-  try {
-    const response = await fetch(`/api/v1/tts/preview?voice=${tts.voice}&speed=${tts.speed}`)
-    if (!response.ok) throw new Error()
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
-    const audio = new Audio(url)
-    audio.onended = () => {
-      previewingVoice.value = false
-      URL.revokeObjectURL(url)
+      result.addEventListener('change', () => {
+        micPermission.value = result.state
+      })
+    } catch {
+      micPermission.value = 'unknown'
     }
-    audio.onerror = () => {
-      previewingVoice.value = false
-    }
-    audio.play()
-  } catch {
-    previewingVoice.value = false
-    uiStore.addToast({ type: 'error', message: 'Preview not available. Save settings and try from a conversation.' })
   }
-}
 
-async function startTestRecording() {
-  if (micPermission.value !== 'granted') {
-    await requestMicPermission()
-    if (micPermission.value !== 'granted') return
-  }
-  testAudioUrl.value = null
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    recordingChunks.value = []
-    mediaRecorder.value = new MediaRecorder(stream)
-    mediaRecorder.value.ondataavailable = (e) => {
-      if (e.data.size > 0) recordingChunks.value.push(e.data)
-    }
-    mediaRecorder.value.onstop = () => {
-      const blob = new Blob(recordingChunks.value, { type: 'audio/webm' })
-      testAudioUrl.value = URL.createObjectURL(blob)
+  async function requestMicPermission() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       stream.getTracks().forEach((t) => t.stop())
+      micPermission.value = 'granted'
+      uiStore.addToast({ type: 'success', message: 'Microphone access granted.' })
+    } catch {
+      micPermission.value = 'denied'
+      uiStore.addToast({ type: 'error', message: 'Microphone access denied.' })
     }
-    mediaRecorder.value.start()
-    recordingTest.value = true
-  } catch {
-    uiStore.addToast({ type: 'error', message: 'Could not access microphone.' })
   }
-}
 
-function stopTestRecording() {
-  mediaRecorder.value?.stop()
-  recordingTest.value = false
-}
-
-function startListeningForKey() {
-  listeningForKey.value = true
-  window.addEventListener('keydown', captureKey, { once: true })
-}
-
-function captureKey(e) {
-  e.preventDefault()
-  stt.push_to_talk_key = e.code
-  listeningForKey.value = false
-}
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', captureKey)
-  if (testAudioUrl.value) URL.revokeObjectURL(testAudioUrl.value)
-})
-
-async function save() {
-  saving.value = true
-  try {
-    await settingsStore.update({
-      tts_voice: tts.voice,
-      tts_speed: tts.speed,
-      tts_auto_play: tts.auto_play,
-      stt_mode: stt.mode,
-      stt_silence_threshold: stt.silence_threshold,
-      stt_continuous: stt.continuous,
-      stt_push_to_talk_key: stt.push_to_talk_key,
-    })
-    uiStore.addToast({ type: 'success', message: 'Voice settings saved.' })
-  } catch (err) {
-    const msg = err?.response?.data?.message ?? 'Failed to save settings.'
-    uiStore.addToast({ type: 'error', message: msg })
-  } finally {
-    saving.value = false
+  async function previewVoice() {
+    if (previewingVoice.value) return
+    previewingVoice.value = true
+    try {
+      const response = await fetch(`/api/v1/tts/preview?voice=${tts.voice}&speed=${tts.speed}`)
+      if (!response.ok) throw new Error()
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audio.onended = () => {
+        previewingVoice.value = false
+        URL.revokeObjectURL(url)
+      }
+      audio.onerror = () => {
+        previewingVoice.value = false
+      }
+      audio.play()
+    } catch {
+      previewingVoice.value = false
+      uiStore.addToast({
+        type: 'error',
+        message: 'Preview not available. Save settings and try from a conversation.',
+      })
+    }
   }
-}
 
-const micPermissionIcon = computed(() => {
-  if (micPermission.value === 'granted') return ShieldCheck
-  return ShieldAlert
-})
+  async function startTestRecording() {
+    if (micPermission.value !== 'granted') {
+      await requestMicPermission()
+      if (micPermission.value !== 'granted') return
+    }
+    testAudioUrl.value = null
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      recordingChunks.value = []
+      mediaRecorder.value = new MediaRecorder(stream)
+      mediaRecorder.value.ondataavailable = (e) => {
+        if (e.data.size > 0) recordingChunks.value.push(e.data)
+      }
+      mediaRecorder.value.onstop = () => {
+        const blob = new Blob(recordingChunks.value, { type: 'audio/webm' })
+        testAudioUrl.value = URL.createObjectURL(blob)
+        stream.getTracks().forEach((t) => t.stop())
+      }
+      mediaRecorder.value.start()
+      recordingTest.value = true
+    } catch {
+      uiStore.addToast({ type: 'error', message: 'Could not access microphone.' })
+    }
+  }
 
-const micPermissionText = computed(() => ({
-  granted: 'Microphone access granted',
-  denied: 'Microphone access denied',
-  prompt: 'Microphone permission not yet requested',
-  unknown: 'Microphone permission status unknown',
-}[micPermission.value] ?? 'Unknown'))
+  function stopTestRecording() {
+    mediaRecorder.value?.stop()
+    recordingTest.value = false
+  }
 
-const micPermissionColor = computed(() =>
-  micPermission.value === 'granted'
-    ? 'text-green-600 dark:text-green-400'
-    : 'text-amber-500 dark:text-amber-400',
-)
+  function startListeningForKey() {
+    listeningForKey.value = true
+    window.addEventListener('keydown', captureKey, { once: true })
+  }
+
+  function captureKey(e) {
+    e.preventDefault()
+    stt.push_to_talk_key = e.code
+    listeningForKey.value = false
+  }
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', captureKey)
+    if (testAudioUrl.value) URL.revokeObjectURL(testAudioUrl.value)
+  })
+
+  async function save() {
+    saving.value = true
+    try {
+      await settingsStore.update({
+        tts_voice: tts.voice,
+        tts_speed: tts.speed,
+        tts_auto_play: tts.auto_play,
+        stt_mode: stt.mode,
+        stt_silence_threshold: stt.silence_threshold,
+        stt_continuous: stt.continuous,
+        stt_push_to_talk_key: stt.push_to_talk_key,
+      })
+      uiStore.addToast({ type: 'success', message: 'Voice settings saved.' })
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? 'Failed to save settings.'
+      uiStore.addToast({ type: 'error', message: msg })
+    } finally {
+      saving.value = false
+    }
+  }
+
+  const micPermissionIcon = computed(() => {
+    if (micPermission.value === 'granted') return ShieldCheck
+    return ShieldAlert
+  })
+
+  const micPermissionText = computed(
+    () =>
+      ({
+        granted: 'Microphone access granted',
+        denied: 'Microphone access denied',
+        prompt: 'Microphone permission not yet requested',
+        unknown: 'Microphone permission status unknown',
+      })[micPermission.value] ?? 'Unknown'
+  )
+
+  const micPermissionColor = computed(() =>
+    micPermission.value === 'granted'
+      ? 'text-green-600 dark:text-green-400'
+      : 'text-amber-500 dark:text-amber-400'
+  )
 </script>
 
 <template>
@@ -207,7 +212,9 @@ const micPermissionColor = computed(() =>
     <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Voice Settings</h1>
 
     <!-- Text-to-Speech -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+    <section
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5"
+    >
       <div class="flex items-center gap-2 mb-1">
         <Volume2 class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Text-to-Speech</h2>
@@ -222,12 +229,16 @@ const micPermissionColor = computed(() =>
             :key="voice.id"
             type="button"
             class="flex flex-col items-start p-3 rounded-lg border text-left transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            :class="tts.voice === voice.id
-              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
-              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'"
+            :class="
+              tts.voice === voice.id
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+            "
             @click="tts.voice = voice.id"
           >
-            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ voice.name }}</span>
+            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{
+              voice.name
+            }}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">{{ voice.description }}</span>
           </button>
         </div>
@@ -249,7 +260,9 @@ const micPermissionColor = computed(() =>
       <div>
         <div class="flex items-center justify-between mb-1">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Speed</label>
-          <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ tts.speed.toFixed(1) }}x</span>
+          <span class="text-xs font-mono text-gray-500 dark:text-gray-400"
+            >{{ tts.speed.toFixed(1) }}x</span
+          >
         </div>
         <input
           v-model.number="tts.speed"
@@ -291,7 +304,9 @@ const micPermissionColor = computed(() =>
     </section>
 
     <!-- Speech-to-Text -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+    <section
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5"
+    >
       <div class="flex items-center gap-2 mb-1">
         <Mic class="w-5 h-5 text-gray-500 dark:text-gray-400" />
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Speech-to-Text</h2>
@@ -299,29 +314,39 @@ const micPermissionColor = computed(() =>
 
       <!-- Mode -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recognition mode</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >Recognition mode</label
+        >
         <div class="grid grid-cols-2 gap-3">
           <button
             type="button"
             class="flex flex-col items-start p-3 rounded-lg border text-left transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            :class="stt.mode === 'browser'
-              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
-              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'"
+            :class="
+              stt.mode === 'browser'
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+            "
             @click="stt.mode = 'browser'"
           >
             <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Browser</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Uses the Web Speech API. No server required, instant results.</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+              >Uses the Web Speech API. No server required, instant results.</span
+            >
           </button>
           <button
             type="button"
             class="flex flex-col items-start p-3 rounded-lg border text-left transition focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            :class="stt.mode === 'whisper'
-              ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
-              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'"
+            :class="
+              stt.mode === 'whisper'
+                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 dark:border-indigo-400'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+            "
             @click="stt.mode = 'whisper'"
           >
             <span class="text-sm font-medium text-gray-900 dark:text-gray-100">Whisper</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Server-side transcription via OpenAI Whisper. Higher accuracy, multi-language.</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+              >Server-side transcription via OpenAI Whisper. Higher accuracy, multi-language.</span
+            >
           </button>
         </div>
       </div>
@@ -329,8 +354,12 @@ const micPermissionColor = computed(() =>
       <!-- Silence threshold -->
       <div>
         <div class="flex items-center justify-between mb-1">
-          <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Silence detection threshold</label>
-          <span class="text-xs font-mono text-gray-500 dark:text-gray-400">{{ stt.silence_threshold }}s</span>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300"
+            >Silence detection threshold</label
+          >
+          <span class="text-xs font-mono text-gray-500 dark:text-gray-400"
+            >{{ stt.silence_threshold }}s</span
+          >
         </div>
         <input
           v-model.number="stt.silence_threshold"
@@ -363,22 +392,34 @@ const micPermissionColor = computed(() =>
         </button>
         <div>
           <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Continuous dictation</p>
-          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Keep listening after each utterance. Sends on silence.</p>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            Keep listening after each utterance. Sends on silence.
+          </p>
         </div>
       </div>
 
       <!-- Push-to-talk key -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Push-to-talk key</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >Push-to-talk key</label
+        >
         <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 min-w-28">
+          <div
+            class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 min-w-28"
+          >
             <Keyboard class="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span class="text-sm font-mono text-gray-700 dark:text-gray-300">{{ stt.push_to_talk_key }}</span>
+            <span class="text-sm font-mono text-gray-700 dark:text-gray-300">{{
+              stt.push_to_talk_key
+            }}</span>
           </div>
           <button
             type="button"
             class="px-3 py-2 rounded-lg text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-            :class="listeningForKey ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-400 dark:border-indigo-500 text-indigo-700 dark:text-indigo-300' : ''"
+            :class="
+              listeningForKey
+                ? 'bg-indigo-50 dark:bg-indigo-900/30 border-indigo-400 dark:border-indigo-500 text-indigo-700 dark:text-indigo-300'
+                : ''
+            "
             @click="startListeningForKey"
           >
             {{ listeningForKey ? 'Press any key...' : 'Change key' }}
@@ -388,7 +429,11 @@ const micPermissionColor = computed(() =>
 
       <!-- Mic permission -->
       <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3">
-        <component :is="micPermissionIcon" class="w-5 h-5 flex-shrink-0" :class="micPermissionColor" />
+        <component
+          :is="micPermissionIcon"
+          class="w-5 h-5 flex-shrink-0"
+          :class="micPermissionColor"
+        />
         <div class="flex-1">
           <p class="text-sm font-medium" :class="micPermissionColor">{{ micPermissionText }}</p>
         </div>
@@ -397,12 +442,16 @@ const micPermissionColor = computed(() =>
           type="button"
           class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition"
           @click="requestMicPermission"
-        >Request access</button>
+        >
+          Request access
+        </button>
       </div>
 
       <!-- Test recording -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Test microphone</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+          >Test microphone</label
+        >
         <div class="flex items-center gap-3 flex-wrap">
           <button
             v-if="!recordingTest"
@@ -420,7 +469,10 @@ const micPermissionColor = computed(() =>
           >
             <Square class="w-4 h-4" /> Stop recording
           </button>
-          <span v-if="recordingTest" class="flex items-center gap-1.5 text-xs text-red-500 dark:text-red-400 animate-pulse">
+          <span
+            v-if="recordingTest"
+            class="flex items-center gap-1.5 text-xs text-red-500 dark:text-red-400 animate-pulse"
+          >
             <span class="w-2 h-2 rounded-full bg-red-500 dark:bg-red-400 inline-block" />
             Recording...
           </span>

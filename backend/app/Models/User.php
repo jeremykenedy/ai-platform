@@ -12,9 +12,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Activitylog\Traits\CausesActivity;
+use Illuminate\Support\Carbon;
+use Spatie\Activitylog\Models\Concerns\CausesActivity;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $email
+ * @property Carbon|null $email_verified_at
+ * @property string $password
+ * @property string|null $avatar
+ * @property string $locale
+ * @property string $timezone
+ * @property string|null $invite_token
+ * @property string|null $invited_by
+ * @property string|null $subscription_tier
+ * @property Carbon|null $last_active_at
+ * @property string|null $remember_token
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

@@ -1,72 +1,72 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { Search, Check, UserCircle, X, Plus } from 'lucide-vue-next'
-import { usePersonasStore } from '@/stores/personas'
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { Search, Check, UserCircle, X, Plus } from 'lucide-vue-next'
+  import { usePersonasStore } from '@/stores/personas'
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: null,
-  },
-  show: {
-    type: Boolean,
-    default: false,
-  },
-})
+  const props = defineProps({
+    modelValue: {
+      type: String,
+      default: null,
+    },
+    show: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-const emit = defineEmits(['update:modelValue', 'update:show'])
+  const emit = defineEmits(['update:modelValue', 'update:show'])
 
-const router = useRouter()
-const personasStore = usePersonasStore()
-const searchQuery = ref('')
-const searchInput = ref(null)
+  const router = useRouter()
+  const personasStore = usePersonasStore()
+  const searchQuery = ref('')
+  const searchInput = ref(null)
 
-watch(
-  () => props.show,
-  async (val) => {
-    if (val) {
-      searchQuery.value = ''
-      await nextTick()
-      searchInput.value?.focus()
+  watch(
+    () => props.show,
+    async (val) => {
+      if (val) {
+        searchQuery.value = ''
+        await nextTick()
+        searchInput.value?.focus()
+      }
     }
-  },
-)
-
-const filteredPersonas = computed(() => {
-  const q = searchQuery.value.toLowerCase().trim()
-  if (!q) return personasStore.sortedPersonas
-  return personasStore.sortedPersonas.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.system_prompt?.toLowerCase().includes(q) ||
-      p.description?.toLowerCase().includes(q),
   )
-})
 
-function truncate(text, max = 100) {
-  if (!text) return ''
-  return text.length <= max ? text : text.slice(0, max) + '...'
-}
+  const filteredPersonas = computed(() => {
+    const q = searchQuery.value.toLowerCase().trim()
+    if (!q) return personasStore.sortedPersonas
+    return personasStore.sortedPersonas.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.system_prompt?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q)
+    )
+  })
 
-function select(id) {
-  emit('update:modelValue', id)
-  emit('update:show', false)
-}
+  function truncate(text, max = 100) {
+    if (!text) return ''
+    return text.length <= max ? text : text.slice(0, max) + '...'
+  }
 
-function clearPersona() {
-  emit('update:modelValue', null)
-  emit('update:show', false)
-}
+  function select(id) {
+    emit('update:modelValue', id)
+    emit('update:show', false)
+  }
 
-function close() {
-  emit('update:show', false)
-}
+  function clearPersona() {
+    emit('update:modelValue', null)
+    emit('update:show', false)
+  }
 
-function goCreatePersona() {
-  close()
-  router.push('/settings/personas')
-}
+  function close() {
+    emit('update:show', false)
+  }
+
+  function goCreatePersona() {
+    close()
+    router.push('/settings/personas')
+  }
 </script>
 
 <template>
@@ -92,7 +92,9 @@ function goCreatePersona() {
           class="relative z-10 w-full max-w-lg rounded-xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
         >
           <!-- Search -->
-          <div class="flex items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-700">
+          <div
+            class="flex items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-700"
+          >
             <Search class="h-4 w-4 shrink-0 text-neutral-400" />
             <input
               ref="searchInput"

@@ -1,59 +1,57 @@
 <script setup>
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-vue-next'
-import AuthLayout from '@/components/layout/AuthLayout.vue'
-import { useAuth } from '@/composables/useAuth'
+  import { ref } from 'vue'
+  import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-vue-next'
+  import AuthLayout from '@/components/layout/AuthLayout.vue'
+  import { useAuth } from '@/composables/useAuth'
 
-const route = useRoute()
-const { login } = useAuth()
+  const { login } = useAuth()
 
-const email = ref('')
-const password = ref('')
-const showPassword = ref(false)
-const isLoading = ref(false)
-const error = ref('')
+  const email = ref('')
+  const password = ref('')
+  const showPassword = ref(false)
+  const isLoading = ref(false)
+  const error = ref('')
 
-const emailError = ref('')
-const passwordError = ref('')
+  const emailError = ref('')
+  const passwordError = ref('')
 
-function validateEmail(value) {
-  if (!value) return 'Email is required'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address'
-  return ''
-}
-
-function validatePassword(value) {
-  if (!value) return 'Password is required'
-  return ''
-}
-
-function validate() {
-  emailError.value = validateEmail(email.value)
-  passwordError.value = validatePassword(password.value)
-  return !emailError.value && !passwordError.value
-}
-
-async function handleSubmit() {
-  error.value = ''
-  if (!validate()) return
-
-  isLoading.value = true
-  try {
-    await login(email.value.trim(), password.value)
-  } catch (err) {
-    const status = err?.response?.status
-    if (status === 401 || status === 422) {
-      error.value = 'Invalid email or password. Please try again.'
-    } else if (status === 429) {
-      error.value = 'Too many attempts. Please wait a moment and try again.'
-    } else {
-      error.value = err?.response?.data?.message ?? 'Something went wrong. Please try again.'
-    }
-  } finally {
-    isLoading.value = false
+  function validateEmail(value) {
+    if (!value) return 'Email is required'
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address'
+    return ''
   }
-}
+
+  function validatePassword(value) {
+    if (!value) return 'Password is required'
+    return ''
+  }
+
+  function validate() {
+    emailError.value = validateEmail(email.value)
+    passwordError.value = validatePassword(password.value)
+    return !emailError.value && !passwordError.value
+  }
+
+  async function handleSubmit() {
+    error.value = ''
+    if (!validate()) return
+
+    isLoading.value = true
+    try {
+      await login(email.value.trim(), password.value)
+    } catch (err) {
+      const status = err?.response?.status
+      if (status === 401 || status === 422) {
+        error.value = 'Invalid email or password. Please try again.'
+      } else if (status === 429) {
+        error.value = 'Too many attempts. Please wait a moment and try again.'
+      } else {
+        error.value = err?.response?.data?.message ?? 'Something went wrong. Please try again.'
+      }
+    } finally {
+      isLoading.value = false
+    }
+  }
 </script>
 
 <template>
@@ -70,10 +68,7 @@ async function handleSubmit() {
 
       <!-- Email field -->
       <div class="space-y-1.5">
-        <label
-          for="email"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Email address
         </label>
         <input
@@ -84,9 +79,11 @@ async function handleSubmit() {
           placeholder="you@example.com"
           :disabled="isLoading"
           class="w-full rounded-lg border px-3 py-2.5 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500"
-          :class="emailError
-            ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-red-700 dark:bg-red-950/20'
-            : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400'"
+          :class="
+            emailError
+              ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-red-700 dark:bg-red-950/20'
+              : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400'
+          "
           @blur="emailError = validateEmail(email)"
         />
         <p v-if="emailError" class="text-xs text-red-600 dark:text-red-400">{{ emailError }}</p>
@@ -95,10 +92,7 @@ async function handleSubmit() {
       <!-- Password field -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <label
-            for="password"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password
           </label>
           <router-link
@@ -117,9 +111,11 @@ async function handleSubmit() {
             placeholder="Enter your password"
             :disabled="isLoading"
             class="w-full rounded-lg border px-3 py-2.5 pr-10 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-100 dark:placeholder:text-gray-500"
-            :class="passwordError
-              ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-red-700 dark:bg-red-950/20'
-              : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400'"
+            :class="
+              passwordError
+                ? 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 dark:border-red-700 dark:bg-red-950/20'
+                : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-400'
+            "
             @blur="passwordError = validatePassword(password)"
           />
           <button
@@ -132,7 +128,9 @@ async function handleSubmit() {
             <Eye v-else class="h-4 w-4" />
           </button>
         </div>
-        <p v-if="passwordError" class="text-xs text-red-600 dark:text-red-400">{{ passwordError }}</p>
+        <p v-if="passwordError" class="text-xs text-red-600 dark:text-red-400">
+          {{ passwordError }}
+        </p>
       </div>
 
       <!-- Submit button -->

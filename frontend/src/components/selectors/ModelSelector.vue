@@ -1,140 +1,128 @@
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import {
-  Search,
-  Check,
-  Zap,
-  Eye,
-  Code2,
-  MessageSquare,
-  Globe,
-  X,
-  ChevronDown,
-  Cpu,
-} from 'lucide-vue-next'
-import { useModelsStore } from '@/stores/models'
+  import { ref, computed, watch, nextTick } from 'vue'
+  import { Search, Check, Zap, Eye, Code2, MessageSquare, Globe, X, Cpu } from 'lucide-vue-next'
+  import { useModelsStore } from '@/stores/models'
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: null,
-  },
-  show: {
-    type: Boolean,
-    default: false,
-  },
-})
+  const props = defineProps({
+    modelValue: {
+      type: String,
+      default: null,
+    },
+    show: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-const emit = defineEmits(['update:modelValue', 'update:show'])
+  const emit = defineEmits(['update:modelValue', 'update:show'])
 
-const modelsStore = useModelsStore()
-const searchQuery = ref('')
-const searchInput = ref(null)
+  const modelsStore = useModelsStore()
+  const searchQuery = ref('')
+  const searchInput = ref(null)
 
-watch(
-  () => props.show,
-  async (val) => {
-    if (val) {
-      searchQuery.value = ''
-      await nextTick()
-      searchInput.value?.focus()
+  watch(
+    () => props.show,
+    async (val) => {
+      if (val) {
+        searchQuery.value = ''
+        await nextTick()
+        searchInput.value?.focus()
+      }
     }
-  },
-)
+  )
 
-const PROVIDER_ORDER = ['auto', 'ollama', 'anthropic', 'openai', 'google', 'mistral', 'other']
+  const PROVIDER_ORDER = ['auto', 'ollama', 'anthropic', 'openai', 'google', 'mistral', 'other']
 
-const PROVIDER_LABELS = {
-  auto: 'Auto',
-  ollama: 'Ollama (Local)',
-  anthropic: 'Anthropic',
-  openai: 'OpenAI',
-  google: 'Google',
-  mistral: 'Mistral',
-  other: 'Other',
-}
-
-const COST_LABELS = {
-  free: 'Free',
-  low: '$',
-  medium: '$$',
-  high: '$$$',
-}
-
-const COST_COLORS = {
-  free: 'text-emerald-500 dark:text-emerald-400',
-  low: 'text-sky-500 dark:text-sky-400',
-  medium: 'text-amber-500 dark:text-amber-400',
-  high: 'text-rose-500 dark:text-rose-400',
-}
-
-function capabilityIcon(cap) {
-  const map = {
-    vision: Eye,
-    code: Code2,
-    chat: MessageSquare,
-    web: Globe,
-    fast: Zap,
-    reasoning: Cpu,
-  }
-  return map[cap] ?? MessageSquare
-}
-
-const autoOption = {
-  id: 'auto',
-  name: 'Auto',
-  provider: 'auto',
-  description: 'Automatically route to the best model for each request',
-  capabilities: ['chat', 'code', 'vision'],
-  is_local: false,
-  cost_tier: 'free',
-  parameters: null,
-}
-
-const filteredGrouped = computed(() => {
-  const q = searchQuery.value.toLowerCase().trim()
-
-  const allModels = [autoOption, ...modelsStore.availableModels]
-
-  const matched = q
-    ? allModels.filter(
-        (m) =>
-          m.name.toLowerCase().includes(q) ||
-          m.provider?.toLowerCase().includes(q) ||
-          m.description?.toLowerCase().includes(q),
-      )
-    : allModels
-
-  const groups = {}
-  for (const model of matched) {
-    const provider = model.provider ?? 'other'
-    if (!groups[provider]) groups[provider] = []
-    groups[provider].push(model)
+  const PROVIDER_LABELS = {
+    auto: 'Auto',
+    ollama: 'Ollama (Local)',
+    anthropic: 'Anthropic',
+    openai: 'OpenAI',
+    google: 'Google',
+    mistral: 'Mistral',
+    other: 'Other',
   }
 
-  return PROVIDER_ORDER.filter((p) => groups[p]?.length).map((p) => ({
-    provider: p,
-    label: PROVIDER_LABELS[p] ?? p,
-    models: groups[p],
-  }))
-})
+  const COST_LABELS = {
+    free: 'Free',
+    low: '$',
+    medium: '$$',
+    high: '$$$',
+  }
 
-function select(model) {
-  emit('update:modelValue', model.id)
-  emit('update:show', false)
-}
+  const COST_COLORS = {
+    free: 'text-emerald-500 dark:text-emerald-400',
+    low: 'text-sky-500 dark:text-sky-400',
+    medium: 'text-amber-500 dark:text-amber-400',
+    high: 'text-rose-500 dark:text-rose-400',
+  }
 
-function close() {
-  emit('update:show', false)
-}
+  function capabilityIcon(cap) {
+    const map = {
+      vision: Eye,
+      code: Code2,
+      chat: MessageSquare,
+      web: Globe,
+      fast: Zap,
+      reasoning: Cpu,
+    }
+    return map[cap] ?? MessageSquare
+  }
 
-function formatParams(params) {
-  if (!params) return null
-  if (params >= 1e9) return `${(params / 1e9).toFixed(0)}B`
-  if (params >= 1e6) return `${(params / 1e6).toFixed(0)}M`
-  return `${params}`
-}
+  const autoOption = {
+    id: 'auto',
+    name: 'Auto',
+    provider: 'auto',
+    description: 'Automatically route to the best model for each request',
+    capabilities: ['chat', 'code', 'vision'],
+    is_local: false,
+    cost_tier: 'free',
+    parameters: null,
+  }
+
+  const filteredGrouped = computed(() => {
+    const q = searchQuery.value.toLowerCase().trim()
+
+    const allModels = [autoOption, ...modelsStore.availableModels]
+
+    const matched = q
+      ? allModels.filter(
+          (m) =>
+            m.name.toLowerCase().includes(q) ||
+            m.provider?.toLowerCase().includes(q) ||
+            m.description?.toLowerCase().includes(q)
+        )
+      : allModels
+
+    const groups = {}
+    for (const model of matched) {
+      const provider = model.provider ?? 'other'
+      if (!groups[provider]) groups[provider] = []
+      groups[provider].push(model)
+    }
+
+    return PROVIDER_ORDER.filter((p) => groups[p]?.length).map((p) => ({
+      provider: p,
+      label: PROVIDER_LABELS[p] ?? p,
+      models: groups[p],
+    }))
+  })
+
+  function select(model) {
+    emit('update:modelValue', model.id)
+    emit('update:show', false)
+  }
+
+  function close() {
+    emit('update:show', false)
+  }
+
+  function formatParams(params) {
+    if (!params) return null
+    if (params >= 1e9) return `${(params / 1e9).toFixed(0)}B`
+    if (params >= 1e6) return `${(params / 1e6).toFixed(0)}M`
+    return `${params}`
+  }
 </script>
 
 <template>
@@ -160,7 +148,9 @@ function formatParams(params) {
           class="relative z-10 w-full max-w-lg rounded-xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
         >
           <!-- Search -->
-          <div class="flex items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-700">
+          <div
+            class="flex items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-700"
+          >
             <Search class="h-4 w-4 shrink-0 text-neutral-400" />
             <input
               ref="searchInput"
@@ -227,7 +217,11 @@ function formatParams(params) {
 
                       <!-- Cost tier (remote models) -->
                       <span
-                        v-if="model.provider !== 'ollama' && model.provider !== 'auto' && model.cost_tier"
+                        v-if="
+                          model.provider !== 'ollama' &&
+                          model.provider !== 'auto' &&
+                          model.cost_tier
+                        "
                         class="text-xs font-medium"
                         :class="COST_COLORS[model.cost_tier] ?? 'text-neutral-400'"
                       >

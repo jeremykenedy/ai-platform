@@ -9,7 +9,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $name
+ * @property string|null $description
+ * @property string $disk
+ * @property string $path
+ * @property string $format
+ * @property int $row_count
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read User|null $user
+ */
 class TrainingDataset extends Model
 {
     use HasUlids, SoftDeletes;

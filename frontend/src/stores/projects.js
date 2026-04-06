@@ -7,14 +7,10 @@ export const useProjectsStore = defineStore('projects', () => {
   const activeId = ref(null)
   const isLoading = ref(false)
 
-  const activeProject = computed(() =>
-    projects.value.find((p) => p.id === activeId.value) ?? null,
-  )
+  const activeProject = computed(() => projects.value.find((p) => p.id === activeId.value) ?? null)
 
   const sortedProjects = computed(() =>
-    [...projects.value].sort(
-      (a, b) => new Date(b.updated_at) - new Date(a.updated_at),
-    ),
+    [...projects.value].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
   )
 
   async function fetch() {

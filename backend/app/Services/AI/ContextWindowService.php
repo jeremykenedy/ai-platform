@@ -227,7 +227,7 @@ class ContextWindowService
         }
 
         // Restore chronological order
-        return collect(array_reverse($selected));
+        return new Collection(array_reverse($selected));
     }
 
     private function getLatestSummary(Conversation $conversation): ?ConversationSummary

@@ -1,16 +1,16 @@
 <script setup>
-import { useRegisterSW } from 'virtual:pwa-register/vue'
-import { RefreshCw, X } from 'lucide-vue-next'
+  import { useRegisterSW } from 'virtual:pwa-register/vue'
+  import { RefreshCw, X } from 'lucide-vue-next'
 
-const { needRefresh, updateSW } = useRegisterSW()
+  const { needRefresh, updateSW } = useRegisterSW()
 
-function reload() {
-  updateSW(true)
-}
+  function reload() {
+    updateSW(true)
+  }
 
-function dismiss() {
-  needRefresh.value = false
-}
+  function dismiss() {
+    needRefresh.value = false
+  }
 </script>
 
 <template>
@@ -60,18 +60,25 @@ function dismiss() {
 </template>
 
 <style scoped>
-.slide-up-enter-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.slide-up-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.slide-up-enter-from {
-  transform: translateY(100%);
-  opacity: 0;
-}
-.slide-up-leave-to {
-  transform: translateY(100%);
-  opacity: 0;
-}
+  .slide-up-enter-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .slide-up-leave-active {
+    transition:
+      transform 0.25s ease,
+      opacity 0.25s ease;
+  }
+
+  .slide-up-enter-from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  .slide-up-leave-to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 </style>

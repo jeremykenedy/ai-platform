@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\Memory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin Memory */
 class MemoryResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -21,8 +23,8 @@ class MemoryResource extends JsonResource
             'is_active' => $this->is_active,
             'created_at' => $this->created_at,
             'source_conversation' => $this->whenLoaded('sourceConversation', fn () => [
-                'id' => $this->sourceConversation->id,
-                'title' => $this->sourceConversation->title,
+                'id' => $this->sourceConversation?->id,
+                'title' => $this->sourceConversation?->title,
             ]),
         ];
     }

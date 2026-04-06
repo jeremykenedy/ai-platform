@@ -7,7 +7,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $conversation_id
+ * @property string $content
+ * @property array<mixed> $covers_message_ids
+ * @property int $message_count
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class ConversationSummary extends Model
 {
     use HasUlids;

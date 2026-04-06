@@ -39,8 +39,12 @@ class ConversationController extends Controller
 
     public function store(StoreConversationRequest $request): JsonResponse
     {
+        $user = $request->user();
+
+        abort_if($user === null, 401);
+
         $conversation = $this->createConversationAction->handle(
-            $request->user(),
+            $user,
             $request->validated(),
         );
 

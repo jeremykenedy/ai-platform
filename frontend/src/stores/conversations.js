@@ -9,14 +9,12 @@ export const useConversationsStore = defineStore('conversations', () => {
   const isLoading = ref(false)
   const pagination = ref({ nextCursor: null, hasMore: false })
 
-  const activeConversation = computed(() =>
-    conversations.value.find((c) => c.id === activeId.value) ?? null,
+  const activeConversation = computed(
+    () => conversations.value.find((c) => c.id === activeId.value) ?? null
   )
 
   const sortedConversations = computed(() =>
-    [...conversations.value].sort(
-      (a, b) => new Date(b.updated_at) - new Date(a.updated_at),
-    ),
+    [...conversations.value].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
   )
 
   const grouped = computed(() => {

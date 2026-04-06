@@ -1,49 +1,51 @@
 <script setup>
-import { ref } from 'vue'
-import { Copy, Pencil, RefreshCw, Trash2, Check } from 'lucide-vue-next'
+  import { ref } from 'vue'
+  import { Copy, Pencil, RefreshCw, Trash2, Check } from 'lucide-vue-next'
 
-const props = defineProps({
-  message: {
-    type: Object,
-    required: true,
-  },
-  isLast: {
-    type: Boolean,
-    default: false,
-  },
-})
+  const props = defineProps({
+    message: {
+      type: Object,
+      required: true,
+    },
+    isLast: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-const emit = defineEmits(['edit', 'regenerate', 'delete'])
+  const emit = defineEmits(['edit', 'regenerate', 'delete'])
 
-const copied = ref(false)
+  const copied = ref(false)
 
-async function handleCopy() {
-  try {
-    await navigator.clipboard.writeText(props.message.content ?? '')
-    copied.value = true
-    setTimeout(() => {
-      copied.value = false
-    }, 2000)
-  } catch {
-    // clipboard not available
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(props.message.content ?? '')
+      copied.value = true
+      setTimeout(() => {
+        copied.value = false
+      }, 2000)
+    } catch {
+      // clipboard not available
+    }
   }
-}
 
-function handleEdit() {
-  emit('edit', props.message)
-}
+  function handleEdit() {
+    emit('edit', props.message)
+  }
 
-function handleRegenerate() {
-  emit('regenerate', props.message)
-}
+  function handleRegenerate() {
+    emit('regenerate', props.message)
+  }
 
-function handleDelete() {
-  emit('delete', props.message)
-}
+  function handleDelete() {
+    emit('delete', props.message)
+  }
 </script>
 
 <template>
-  <div class="flex items-center gap-0.5 rounded-lg border border-border bg-background shadow-sm dark:border-border dark:bg-background">
+  <div
+    class="flex items-center gap-0.5 rounded-lg border border-border bg-background shadow-sm dark:border-border dark:bg-background"
+  >
     <!-- Copy -->
     <button
       :title="copied ? 'Copied!' : 'Copy'"

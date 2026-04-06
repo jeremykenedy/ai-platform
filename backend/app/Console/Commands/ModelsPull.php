@@ -13,7 +13,7 @@ class ModelsPull extends Command
 {
     protected $signature = 'models:pull
         {model : The model name to pull (e.g. llama3.2:latest)}
-        {--quiet : Suppress progress output}';
+        {--silent : Suppress progress output}';
 
     protected $description = 'Pull a model via Ollama';
 
@@ -26,7 +26,7 @@ class ModelsPull extends Command
     public function handle(): int
     {
         $model = (string) $this->argument('model');
-        $quiet = (bool) $this->option('quiet');
+        $quiet = (bool) $this->option('silent');
 
         if (! $this->ollamaProvider->isAvailable()) {
             $this->error('Ollama is not available. Ensure the Ollama service is running and reachable.');

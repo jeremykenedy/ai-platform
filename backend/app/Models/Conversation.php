@@ -10,7 +10,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string|null $project_id
+ * @property string|null $persona_id
+ * @property string|null $title
+ * @property string|null $model_name
+ * @property int $context_window_used
+ * @property array<mixed>|null $enabled_integrations
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ */
 class Conversation extends Model
 {
     use HasUlids, SoftDeletes;
@@ -39,26 +53,31 @@ class Conversation extends Model
         ];
     }
 
+    /** @return BelongsTo<User, Conversation> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Project, Conversation> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<Persona, Conversation> */
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class);
     }
 
+    /** @return HasMany<Message, Conversation> */
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
     }
 
+    /** @return HasMany<ConversationSummary, Conversation> */
     public function summaries(): HasMany
     {
         return $this->hasMany(ConversationSummary::class);

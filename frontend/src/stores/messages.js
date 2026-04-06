@@ -52,14 +52,14 @@ export const useMessagesStore = defineStore('messages', () => {
       })
       const saved = response.data.data ?? response.data
       const updated = (messages.value.get(conversationId) ?? []).map((m) =>
-        m.id === optimistic.id ? saved : m,
+        m.id === optimistic.id ? saved : m
       )
       messages.value.set(conversationId, updated)
       return saved
     } catch (err) {
       handleStreamError(err)
       const rollback = (messages.value.get(conversationId) ?? []).filter(
-        (m) => m.id !== optimistic.id,
+        (m) => m.id !== optimistic.id
       )
       messages.value.set(conversationId, rollback)
       throw err

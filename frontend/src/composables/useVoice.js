@@ -46,11 +46,7 @@ export function useVoice() {
   async function speak(text) {
     isPlaying.value = true
     try {
-      const { data } = await api.post(
-        '/audio/tts',
-        { text },
-        { responseType: 'arraybuffer' }
-      )
+      const { data } = await api.post('/audio/tts', { text }, { responseType: 'arraybuffer' })
       const audioContext = new AudioContext()
       const buffer = await audioContext.decodeAudioData(data)
       const source = audioContext.createBufferSource()

@@ -1,6 +1,6 @@
 export async function streamMessage(conversationId, content, options = {}) {
   const controller = new AbortController()
-  const { onToken, onComplete, onError } = options
+  const { onComplete, onError } = options
 
   try {
     const csrfToken = document.cookie

@@ -18,9 +18,10 @@ class ExportConversationAction
      */
     public function handle(Conversation $conversation, string $format = 'json'): array
     {
-        $conversation->loadMissing(['messages.attachments']);
-
-        $messages = $conversation->messages->sortBy('sequence')->values();
+        $messages = Message::where('conversation_id', $conversation->id)
+            ->orderBy('sequence')
+            ->with('attachments')
+            ->get();
 
         if ($format === 'markdown') {
             return $this->exportMarkdown($conversation, $messages);

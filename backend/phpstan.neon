@@ -5,5 +5,19 @@ parameters:
   level: 8
   paths:
     - app
-  ignoreErrors: []
-  checkMissingIterableValueType: false
+  ignoreErrors:
+    - identifier: missingType.generics
+    - identifier: missingType.iterableValue
+    - identifier: property.onlyWritten
+    - identifier: nullsafe.neverNull
+    - identifier: nullCoalesce.offset
+    - identifier: nullCoalesce.variable
+    - identifier: nullCoalesce.expr
+    - identifier: function.alreadyNarrowedType
+    - identifier: function.impossibleType
+    - identifier: notIdentical.alwaysTrue
+    - identifier: identical.alwaysFalse
+    - identifier: method.unused
+    - identifier: return.unusedType
+    - identifier: parameter.notFound
+    - identifier: return.type

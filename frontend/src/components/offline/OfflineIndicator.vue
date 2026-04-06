@@ -1,27 +1,27 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { useOnline } from '@vueuse/core'
-import { WifiOff } from 'lucide-vue-next'
+  import { ref, watch } from 'vue'
+  import { useOnline } from '@vueuse/core'
+  import { WifiOff } from 'lucide-vue-next'
 
-const online = useOnline()
-const showOffline = ref(!online.value)
-const showBackOnline = ref(false)
-let backOnlineTimer = null
+  const online = useOnline()
+  const showOffline = ref(!online.value)
+  const showBackOnline = ref(false)
+  let backOnlineTimer = null
 
-watch(online, (isOnline) => {
-  if (isOnline) {
-    showOffline.value = false
-    showBackOnline.value = true
-    clearTimeout(backOnlineTimer)
-    backOnlineTimer = setTimeout(() => {
+  watch(online, (isOnline) => {
+    if (isOnline) {
+      showOffline.value = false
+      showBackOnline.value = true
+      clearTimeout(backOnlineTimer)
+      backOnlineTimer = setTimeout(() => {
+        showBackOnline.value = false
+      }, 3000)
+    } else {
       showBackOnline.value = false
-    }, 3000)
-  } else {
-    showBackOnline.value = false
-    clearTimeout(backOnlineTimer)
-    showOffline.value = true
-  }
-})
+      clearTimeout(backOnlineTimer)
+      showOffline.value = true
+    }
+  })
 </script>
 
 <template>
@@ -55,18 +55,25 @@ watch(online, (isOnline) => {
 </template>
 
 <style scoped>
-.slide-down-enter-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.slide-down-leave-active {
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.slide-down-enter-from {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-.slide-down-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
-}
+  .slide-down-enter-active {
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
+  }
+
+  .slide-down-leave-active {
+    transition:
+      transform 0.25s ease,
+      opacity 0.25s ease;
+  }
+
+  .slide-down-enter-from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .slide-down-leave-to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
 </style>

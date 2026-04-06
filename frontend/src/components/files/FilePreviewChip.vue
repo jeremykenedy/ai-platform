@@ -1,73 +1,96 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Image, FileText, FileCode, File, X } from 'lucide-vue-next'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { Image, FileText, FileCode, File, X } from 'lucide-vue-next'
 
-const props = defineProps({
-  file: {
-    type: Object,
-    required: true,
-  },
-})
+  const props = defineProps({
+    file: {
+      type: Object,
+      required: true,
+    },
+  })
 
-const emit = defineEmits(['remove'])
+  const emit = defineEmits(['remove'])
 
-const thumbnailUrl = ref(null)
+  const thumbnailUrl = ref(null)
 
-const isImage = computed(() => {
-  const mime = props.file.mime_type ?? props.file.type ?? ''
-  return mime.startsWith('image/')
-})
+  const isImage = computed(() => {
+    const mime = props.file.mime_type ?? props.file.type ?? ''
+    return mime.startsWith('image/')
+  })
 
-const isCode = computed(() => {
-  const name = props.file.name ?? ''
-  const codeExts = ['js', 'ts', 'jsx', 'tsx', 'vue', 'py', 'rb', 'php', 'java', 'c', 'cpp',
-    'h', 'go', 'rs', 'swift', 'kt', 'sh', 'css', 'html', 'json', 'xml', 'yaml', 'yml']
-  const ext = name.split('.').pop()?.toLowerCase()
-  return codeExts.includes(ext)
-})
+  const isCode = computed(() => {
+    const name = props.file.name ?? ''
+    const codeExts = [
+      'js',
+      'ts',
+      'jsx',
+      'tsx',
+      'vue',
+      'py',
+      'rb',
+      'php',
+      'java',
+      'c',
+      'cpp',
+      'h',
+      'go',
+      'rs',
+      'swift',
+      'kt',
+      'sh',
+      'css',
+      'html',
+      'json',
+      'xml',
+      'yaml',
+      'yml',
+    ]
+    const ext = name.split('.').pop()?.toLowerCase()
+    return codeExts.includes(ext)
+  })
 
-const isPdf = computed(() => {
-  const mime = props.file.mime_type ?? props.file.type ?? ''
-  return mime === 'application/pdf' || (props.file.name ?? '').endsWith('.pdf')
-})
+  const isPdf = computed(() => {
+    const mime = props.file.mime_type ?? props.file.type ?? ''
+    return mime === 'application/pdf' || (props.file.name ?? '').endsWith('.pdf')
+  })
 
-const icon = computed(() => {
-  if (isImage.value) return Image
-  if (isCode.value) return FileCode
-  if (isPdf.value) return FileText
-  return File
-})
+  const icon = computed(() => {
+    if (isImage.value) return Image
+    if (isCode.value) return FileCode
+    if (isPdf.value) return FileText
+    return File
+  })
 
-const fileName = computed(() => props.file.name ?? 'Unknown file')
+  const fileName = computed(() => props.file.name ?? 'Unknown file')
 
-const truncatedName = computed(() => {
-  const name = fileName.value
-  if (name.length <= 24) return name
-  const ext = name.includes('.') ? '.' + name.split('.').pop() : ''
-  const base = name.slice(0, 24 - ext.length - 3)
-  return base + '...' + ext
-})
+  const truncatedName = computed(() => {
+    const name = fileName.value
+    if (name.length <= 24) return name
+    const ext = name.includes('.') ? '.' + name.split('.').pop() : ''
+    const base = name.slice(0, 24 - ext.length - 3)
+    return base + '...' + ext
+  })
 
-const fileSize = computed(() => {
-  const bytes = props.file.size ?? 0
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`
-  return `${bytes} B`
-})
+  const fileSize = computed(() => {
+    const bytes = props.file.size ?? 0
+    if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`
+    return `${bytes} B`
+  })
 
-onMounted(() => {
-  if (isImage.value && props.file instanceof File) {
-    thumbnailUrl.value = URL.createObjectURL(props.file)
-  } else if (isImage.value && props.file.path) {
-    thumbnailUrl.value = props.file.path
-  }
-})
+  onMounted(() => {
+    if (isImage.value && props.file instanceof File) {
+      thumbnailUrl.value = URL.createObjectURL(props.file)
+    } else if (isImage.value && props.file.path) {
+      thumbnailUrl.value = props.file.path
+    }
+  })
 
-onUnmounted(() => {
-  if (thumbnailUrl.value && props.file instanceof File) {
-    URL.revokeObjectURL(thumbnailUrl.value)
-  }
-})
+  onUnmounted(() => {
+    if (thumbnailUrl.value && props.file instanceof File) {
+      URL.revokeObjectURL(thumbnailUrl.value)
+    }
+  })
 </script>
 
 <template>
@@ -83,11 +106,7 @@ onUnmounted(() => {
         :alt="fileName"
         class="h-full w-full object-cover"
       />
-      <component
-        v-else
-        :is="icon"
-        class="h-4 w-4 text-neutral-400 dark:text-neutral-500"
-      />
+      <component :is="icon" v-else class="h-4 w-4 text-neutral-400 dark:text-neutral-500" />
     </div>
 
     <!-- Name + size -->
@@ -101,8 +120,8 @@ onUnmounted(() => {
     <!-- Remove button -->
     <button
       class="ml-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-200 hover:text-neutral-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-200"
-      @click.stop="emit('remove')"
       :title="`Remove ${fileName}`"
+      @click.stop="emit('remove')"
     >
       <X class="h-3 w-3" />
     </button>

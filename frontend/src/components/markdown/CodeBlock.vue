@@ -1,70 +1,70 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { Copy, Check } from 'lucide-vue-next'
+  import { ref, onMounted, computed } from 'vue'
+  import { Copy, Check } from 'lucide-vue-next'
 
-const props = defineProps({
-  code: {
-    type: String,
-    default: '',
-  },
-  language: {
-    type: String,
-    default: '',
-  },
-  showLineNumbers: {
-    type: Boolean,
-    default: false,
-  },
-})
+  const props = defineProps({
+    code: {
+      type: String,
+      default: '',
+    },
+    language: {
+      type: String,
+      default: '',
+    },
+    showLineNumbers: {
+      type: Boolean,
+      default: false,
+    },
+  })
 
-const highlightedHtml = ref('')
-const isLoading = ref(true)
-const copied = ref(false)
-let copyTimer = null
+  const highlightedHtml = ref('')
+  const isLoading = ref(true)
+  const copied = ref(false)
+  let copyTimer = null
 
-const displayLanguage = computed(() => props.language || 'text')
+  const displayLanguage = computed(() => props.language || 'text')
 
-const lines = computed(() => {
-  if (!props.showLineNumbers) return []
-  return props.code.split('\n')
-})
+  const lines = computed(() => {
+    if (!props.showLineNumbers) return []
+    return props.code.split('\n')
+  })
 
-onMounted(async () => {
-  await highlight()
-})
+  onMounted(async () => {
+    await highlight()
+  })
 
-async function highlight() {
-  isLoading.value = true
-  try {
-    const { createHighlighter } = await import('shiki')
-    const highlighter = await createHighlighter({
-      themes: ['github-dark'],
-      langs: [props.language || 'text'].filter(Boolean),
-    })
-    highlightedHtml.value = highlighter.codeToHtml(props.code, {
-      lang: props.language || 'text',
-      theme: 'github-dark',
-    })
-  } catch {
-    // Fallback: plain text
-    highlightedHtml.value = ''
-  } finally {
-    isLoading.value = false
+  async function highlight() {
+    isLoading.value = true
+    try {
+      const { createHighlighter } = await import('shiki')
+      const highlighter = await createHighlighter({
+        themes: ['github-dark'],
+        langs: [props.language || 'text'].filter(Boolean),
+      })
+      highlightedHtml.value = highlighter.codeToHtml(props.code, {
+        lang: props.language || 'text',
+        theme: 'github-dark',
+      })
+    } catch {
+      // Fallback: plain text
+      highlightedHtml.value = ''
+    } finally {
+      isLoading.value = false
+    }
   }
-}
 
-async function copyCode() {
-  try {
-    await navigator.clipboard.writeText(props.code)
-    copied.value = true
-    if (copyTimer) clearTimeout(copyTimer)
-    copyTimer = setTimeout(() => {
-      copied.value = false
-    }, 2000)
-  } catch {
-    // Clipboard unavailable
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(props.code)
+      copied.value = true
+      if (copyTimer) clearTimeout(copyTimer)
+      copyTimer = setTimeout(() => {
+        copied.value = false
+      }, 2000)
+    } catch {
+      // Clipboard unavailable
+    }
   }
-}
 </script>
 
 <template>
@@ -87,8 +87,8 @@ async function copyCode() {
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-75"
         >
-          <Check v-if="copied" class="h-3.5 w-3.5 text-emerald-400" key="check" />
-          <Copy v-else class="h-3.5 w-3.5" key="copy" />
+          <Check v-if="copied" key="check" class="h-3.5 w-3.5 text-emerald-400" />
+          <Copy v-else key="copy" class="h-3.5 w-3.5" />
         </Transition>
         {{ copied ? 'Copied!' : 'Copy' }}
       </button>

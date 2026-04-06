@@ -1,55 +1,55 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
-import { X } from 'lucide-vue-next'
+  import { onMounted, onUnmounted } from 'vue'
+  import { X } from 'lucide-vue-next'
 
-const props = defineProps({
-  show: {
-    type: Boolean,
-    required: true,
-  },
-})
+  const props = defineProps({
+    show: {
+      type: Boolean,
+      required: true,
+    },
+  })
 
-const emit = defineEmits(['update:show'])
+  const emit = defineEmits(['update:show'])
 
-function close() {
-  emit('update:show', false)
-}
-
-function onKeydown(e) {
-  if (e.key === 'Escape' && props.show) {
-    close()
+  function close() {
+    emit('update:show', false)
   }
-}
 
-onMounted(() => window.addEventListener('keydown', onKeydown))
-onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+  function onKeydown(e) {
+    if (e.key === 'Escape' && props.show) {
+      close()
+    }
+  }
 
-const sections = [
-  {
-    title: 'Navigation',
-    shortcuts: [
-      { keys: ['⌘', 'K'], description: 'Open command palette' },
-      { keys: ['⌘', 'N'], description: 'New conversation' },
-      { keys: ['⌘', '⇧', 'S'], description: 'Toggle sidebar' },
-    ],
-  },
-  {
-    title: 'Chat',
-    shortcuts: [
-      { keys: ['↵'], description: 'Send message' },
-      { keys: ['⇧', '↵'], description: 'New line' },
-      { keys: ['↑'], description: 'Edit last message' },
-      { keys: ['Esc'], description: 'Cancel' },
-    ],
-  },
-  {
-    title: 'General',
-    shortcuts: [
-      { keys: ['⌘', '/'], description: 'Show shortcuts' },
-      { keys: ['⌘', ','], description: 'Open settings' },
-    ],
-  },
-]
+  onMounted(() => window.addEventListener('keydown', onKeydown))
+  onUnmounted(() => window.removeEventListener('keydown', onKeydown))
+
+  const sections = [
+    {
+      title: 'Navigation',
+      shortcuts: [
+        { keys: ['⌘', 'K'], description: 'Open command palette' },
+        { keys: ['⌘', 'N'], description: 'New conversation' },
+        { keys: ['⌘', '⇧', 'S'], description: 'Toggle sidebar' },
+      ],
+    },
+    {
+      title: 'Chat',
+      shortcuts: [
+        { keys: ['↵'], description: 'Send message' },
+        { keys: ['⇧', '↵'], description: 'New line' },
+        { keys: ['↑'], description: 'Edit last message' },
+        { keys: ['Esc'], description: 'Cancel' },
+      ],
+    },
+    {
+      title: 'General',
+      shortcuts: [
+        { keys: ['⌘', '/'], description: 'Show shortcuts' },
+        { keys: ['⌘', ','], description: 'Open settings' },
+      ],
+    },
+  ]
 </script>
 
 <template>
@@ -60,9 +60,13 @@ const sections = [
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm dark:bg-black/60"
         @click.self="close"
       >
-        <div class="w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
+        <div
+          class="w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+        >
           <!-- Header -->
-          <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+          <div
+            class="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700"
+          >
             <h2 class="text-base font-semibold text-gray-900 dark:text-gray-50">
               Keyboard Shortcuts
             </h2>
@@ -77,12 +81,10 @@ const sections = [
 
           <!-- Shortcut sections -->
           <div class="flex flex-col gap-6 p-6">
-            <div
-              v-for="section in sections"
-              :key="section.title"
-              class="flex flex-col gap-3"
-            >
-              <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            <div v-for="section in sections" :key="section.title" class="flex flex-col gap-3">
+              <h3
+                class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+              >
                 {{ section.title }}
               </h3>
               <div class="flex flex-col gap-2">
@@ -114,12 +116,13 @@ const sections = [
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.15s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

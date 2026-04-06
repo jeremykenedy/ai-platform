@@ -8,7 +8,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $memory_id
+ * @property string $conflicts_with
+ * @property bool $resolved
+ * @property string|null $resolution
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class MemoryConflict extends Model
 {
     use HasUlids;

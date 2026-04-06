@@ -7,7 +7,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string|null $default_model_id
+ * @property string|null $default_persona_id
+ * @property string $theme
+ * @property int $font_size
+ * @property bool $send_on_enter
+ * @property bool $show_token_counts
+ * @property bool $memory_enabled
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read AiModel|null $defaultModel
+ */
 class UserSetting extends Model
 {
     use HasUlids;
@@ -39,11 +54,13 @@ class UserSetting extends Model
         ];
     }
 
+    /** @return BelongsTo<User, UserSetting> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<AiModel, UserSetting> */
     public function defaultModel(): BelongsTo
     {
         return $this->belongsTo(AiModel::class, 'default_model_id');

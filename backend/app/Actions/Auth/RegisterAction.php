@@ -15,13 +15,13 @@ class RegisterAction
     /**
      * Register a new user via an invite token.
      *
-     * @param  array{name: string, email: string, password: string, invite_token: string}  $data
+     * @param  array<string, mixed>  $data
      *
      * @throws ValidationException
      */
     public function handle(array $data): User
     {
-        $inviteToken = (string) ($data['invite_token'] ?? '');
+        $inviteToken = isset($data['invite_token']) ? (string) $data['invite_token'] : '';
 
         $invitingUser = User::where('invite_token', $inviteToken)
             ->whereNotNull('invite_token')

@@ -65,8 +65,8 @@ class TrainingController extends Controller
     {
         $this->authorize('delete', $dataset);
 
-        if ($dataset->file_path !== null) {
-            Storage::disk('local')->delete($dataset->file_path);
+        if ($dataset->path !== null) {
+            Storage::disk('local')->delete($dataset->path);
         }
 
         $dataset->delete();
@@ -93,7 +93,7 @@ class TrainingController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $job = $user->trainingJobs()->create($request->validated());
+        $job = TrainingJob::create(array_merge($request->validated(), ['user_id' => (string) $user->id]));
 
         $this->startTrainingAction->handle($job);
 

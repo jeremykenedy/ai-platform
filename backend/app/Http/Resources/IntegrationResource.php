@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\IntegrationDefinition;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin IntegrationDefinition */
 class IntegrationResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -26,15 +28,15 @@ class IntegrationResource extends JsonResource
             ),
             'is_enabled' => $this->when(
                 $this->resource->relationLoaded('userIntegration') && $this->userIntegration !== null,
-                fn () => $this->userIntegration->is_enabled
+                fn () => $this->userIntegration?->is_enabled
             ),
             'last_used_at' => $this->when(
                 $this->resource->relationLoaded('userIntegration') && $this->userIntegration !== null,
-                fn () => $this->userIntegration->last_used_at
+                fn () => $this->userIntegration?->last_used_at
             ),
             'last_error' => $this->when(
                 $this->resource->relationLoaded('userIntegration') && $this->userIntegration !== null,
-                fn () => $this->userIntegration->last_error
+                fn () => $this->userIntegration?->last_error
             ),
         ];
     }

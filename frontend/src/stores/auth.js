@@ -10,7 +10,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'super_admin')
   const isSuperAdmin = computed(() => user.value?.role === 'super_admin')
   const permissions = computed(() => user.value?.permissions ?? [])
-  const userTimezone = computed(() => user.value?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone)
+  const userTimezone = computed(
+    () => user.value?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  )
 
   async function login(email, password) {
     const response = await api.post('/api/v1/auth/login', { email, password })
