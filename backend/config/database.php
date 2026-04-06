@@ -99,9 +99,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
-            'options' => [
+            'options' => env('DB_PGBOUNCER', false) ? [
                 PDO::ATTR_EMULATE_PREPARES => true,
-            ],
+            ] : [],
         ],
 
         'sqlsrv' => [
