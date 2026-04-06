@@ -10,15 +10,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
+ * @property string      $id
+ * @property string      $user_id
  * @property string|null $default_model_id
  * @property string|null $default_persona_id
- * @property string $theme
- * @property int $font_size
- * @property bool $send_on_enter
- * @property bool $show_token_counts
- * @property bool $memory_enabled
+ * @property string      $theme
+ * @property int         $font_size
+ * @property bool        $send_on_enter
+ * @property bool        $show_token_counts
+ * @property bool        $memory_enabled
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read AiModel|null $defaultModel
@@ -47,10 +47,10 @@ class UserSetting extends Model
     protected function casts(): array
     {
         return [
-            'send_on_enter' => 'boolean',
+            'send_on_enter'     => 'boolean',
             'show_token_counts' => 'boolean',
-            'memory_enabled' => 'boolean',
-            'font_size' => 'integer',
+            'memory_enabled'    => 'boolean',
+            'font_size'         => 'integer',
         ];
     }
 

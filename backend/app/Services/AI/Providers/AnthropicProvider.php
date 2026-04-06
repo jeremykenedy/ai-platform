@@ -32,16 +32,17 @@ class AnthropicProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'      => $model,
             'max_tokens' => $options['max_tokens'] ?? 4096,
-            'messages' => $this->formatMessages($messages),
+            'messages'   => $this->formatMessages($messages),
         ], array_diff_key($options, ['max_tokens' => true]));
 
         $response = Http::withHeaders($this->buildHeaders())
@@ -65,23 +66,23 @@ class AnthropicProvider extends AbstractAiProvider
         $outputTokens = $data['usage']['output_tokens'] ?? 0;
 
         return [
-            'content' => $content,
-            'tokens_used' => $inputTokens + $outputTokens,
+            'content'       => $content,
+            'tokens_used'   => $inputTokens + $outputTokens,
             'finish_reason' => $data['stop_reason'] ?? 'end_turn',
         ];
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'      => $model,
             'max_tokens' => $options['max_tokens'] ?? 4096,
-            'messages' => $this->formatMessages($messages),
-            'stream' => true,
+            'messages'   => $this->formatMessages($messages),
+            'stream'     => true,
         ], array_diff_key($options, ['max_tokens' => true, 'stream' => true]));
 
         $response = Http::withHeaders($this->buildHeaders())
@@ -94,10 +95,10 @@ class AnthropicProvider extends AbstractAiProvider
 
         $body = $response->toPsrResponse()->getBody();
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $line = $this->readLine($body);
 
-            if ($line === '' || ! str_starts_with($line, 'data: ')) {
+            if ($line === '' || !str_starts_with($line, 'data: ')) {
                 continue;
             }
 
@@ -109,7 +110,7 @@ class AnthropicProvider extends AbstractAiProvider
 
             $event = json_decode($jsonStr, true);
 
-            if (! is_array($event)) {
+            if (!is_array($event)) {
                 continue;
             }
 
@@ -167,8 +168,8 @@ class AnthropicProvider extends AbstractAiProvider
     {
         return [
             'anthropic-version' => '2023-06-01',
-            'x-api-key' => $this->apiKey,
-            'content-type' => 'application/json',
+            'x-api-key'         => $this->apiKey,
+            'content-type'      => 'application/json',
         ];
     }
 
@@ -180,14 +181,15 @@ class AnthropicProvider extends AbstractAiProvider
     /**
      * Convert generic message array to Anthropic format.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
+     * @param array<int, array{role: string, content: string}> $messages
+     *
      * @return array<int, array{role: string, content: string}>
      */
     private function formatMessages(array $messages): array
     {
         return array_values(array_filter(
             array_map(fn (array $m): array => [
-                'role' => $m['role'] === 'assistant' ? 'assistant' : 'user',
+                'role'    => $m['role'] === 'assistant' ? 'assistant' : 'user',
                 'content' => $m['content'],
             ], $messages),
             fn (array $m): bool => in_array($m['role'], ['user', 'assistant'], true),
@@ -198,7 +200,7 @@ class AnthropicProvider extends AbstractAiProvider
     {
         $line = '';
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $char = $body->read(1);
 
             if ($char === "\n") {

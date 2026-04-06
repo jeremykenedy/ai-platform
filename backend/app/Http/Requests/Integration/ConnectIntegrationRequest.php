@@ -17,8 +17,8 @@ class ConnectIntegrationRequest extends FormRequest
     {
         return [
             'integration_name' => ['required', 'string', 'exists:integration_definitions,name'],
-            'credentials' => ['nullable', 'array'],
-            'api_key' => ['nullable', 'string'],
+            'credentials'      => ['nullable', 'array'],
+            'api_key'          => ['nullable', 'string'],
         ];
     }
 }

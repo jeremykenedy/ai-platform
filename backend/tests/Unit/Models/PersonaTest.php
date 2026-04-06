@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 it('has correct fillable attributes', function (): void {
-    $persona = new Persona;
+    $persona = new Persona();
     expect($persona->getFillable())->toContain(
         'user_id',
         'name',
@@ -21,7 +21,7 @@ it('has correct fillable attributes', function (): void {
 });
 
 it('has correct casts', function (): void {
-    $persona = new Persona;
+    $persona = new Persona();
     $casts = $persona->getCasts();
     expect($casts)
         ->toHaveKey('temperature', 'float')

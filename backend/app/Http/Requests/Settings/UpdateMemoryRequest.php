@@ -16,8 +16,8 @@ class UpdateMemoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string'],
-            'category' => ['nullable', 'string', 'in:preference,fact,instruction,context,personality'],
+            'content'    => ['required', 'string'],
+            'category'   => ['nullable', 'string', 'in:preference,fact,instruction,context,personality'],
             'importance' => ['nullable', 'integer', 'min:1', 'max:10'],
         ];
     }

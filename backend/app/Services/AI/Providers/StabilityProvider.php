@@ -21,8 +21,9 @@ class StabilityProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -31,8 +32,8 @@ class StabilityProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -68,18 +69,18 @@ class StabilityProvider extends AbstractAiProvider
     /**
      * Generate an image and return the raw base64-encoded image data.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public function generateImage(string $prompt, array $options = []): string
     {
         $formData = array_merge([
-            'prompt' => $prompt,
+            'prompt'        => $prompt,
             'output_format' => 'webp',
         ], $options);
 
         $request = Http::withHeaders([
             'Authorization' => "Bearer {$this->apiKey}",
-            'Accept' => 'application/json',
+            'Accept'        => 'application/json',
         ])
             ->timeout(120)
             ->connectTimeout(10)
@@ -114,7 +115,7 @@ class StabilityProvider extends AbstractAiProvider
     {
         return [
             'Authorization' => "Bearer {$this->apiKey}",
-            'Content-Type' => 'application/json',
+            'Content-Type'  => 'application/json',
         ];
     }
 }

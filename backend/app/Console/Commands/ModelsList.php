@@ -56,14 +56,14 @@ class ModelsList extends Command
             $capabilities = (array) ($model->capabilities ?? []);
 
             $capMap = [
-                'chat' => 'chat',
-                'vision' => 'vis',
-                'code' => 'code',
-                'reasoning' => 'rsn',
-                'image' => 'img',
-                'audio' => 'aud',
+                'chat'       => 'chat',
+                'vision'     => 'vis',
+                'code'       => 'code',
+                'reasoning'  => 'rsn',
+                'image'      => 'img',
+                'audio'      => 'aud',
                 'embeddings' => 'emb',
-                'streaming' => 'str',
+                'streaming'  => 'str',
             ];
 
             $capCodes = [];

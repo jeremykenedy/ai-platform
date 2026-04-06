@@ -21,22 +21,22 @@ class LinearService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_issues',
+                'name'        => 'list_issues',
                 'description' => 'List Linear issues with optional filters.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'first' => ['type' => 'integer', 'description' => 'Number of issues to return.', 'default' => 25],
+                        'first'  => ['type' => 'integer', 'description' => 'Number of issues to return.', 'default' => 25],
                         'filter' => ['type' => 'object', 'description' => 'Filter object (e.g. {"team": {"key": {"eq": "ENG"}}}).'],
                     ],
                     'required' => [],
                 ],
             ],
             [
-                'name' => 'get_issue',
+                'name'        => 'get_issue',
                 'description' => 'Get details for a specific Linear issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'issueId' => ['type' => 'string', 'description' => 'Linear issue ID.'],
                     ],
@@ -44,55 +44,55 @@ class LinearService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_issue',
+                'name'        => 'create_issue',
                 'description' => 'Create a new Linear issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'teamId' => ['type' => 'string', 'description' => 'ID of the team to create the issue in.'],
-                        'title' => ['type' => 'string', 'description' => 'Issue title.'],
+                        'teamId'      => ['type' => 'string', 'description' => 'ID of the team to create the issue in.'],
+                        'title'       => ['type' => 'string', 'description' => 'Issue title.'],
                         'description' => ['type' => 'string', 'description' => 'Issue description (Markdown).'],
-                        'priority' => ['type' => 'integer', 'description' => 'Priority (0=No priority, 1=Urgent, 2=High, 3=Medium, 4=Low).'],
+                        'priority'    => ['type' => 'integer', 'description' => 'Priority (0=No priority, 1=Urgent, 2=High, 3=Medium, 4=Low).'],
                     ],
                     'required' => ['teamId', 'title'],
                 ],
             ],
             [
-                'name' => 'update_issue',
+                'name'        => 'update_issue',
                 'description' => 'Update a Linear issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'issueId' => ['type' => 'string', 'description' => 'Linear issue ID.'],
-                        'state' => ['type' => 'string', 'description' => 'New state ID for the issue.'],
+                        'issueId'    => ['type' => 'string', 'description' => 'Linear issue ID.'],
+                        'state'      => ['type' => 'string', 'description' => 'New state ID for the issue.'],
                         'assigneeId' => ['type' => 'string', 'description' => 'ID of the user to assign the issue to.'],
                     ],
                     'required' => ['issueId'],
                 ],
             ],
             [
-                'name' => 'list_teams',
+                'name'        => 'list_teams',
                 'description' => 'List all teams in the Linear workspace.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'list_projects',
+                'name'        => 'list_projects',
                 'description' => 'List all projects in the Linear workspace.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'search_issues',
+                'name'        => 'search_issues',
                 'description' => 'Search Linear issues by keyword.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => ['type' => 'string', 'description' => 'Search query string.'],
                     ],
@@ -105,21 +105,22 @@ class LinearService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_issues' => $this->listIssues($params, $user),
-            'get_issue' => $this->getIssue($params, $user),
-            'create_issue' => $this->createIssue($params, $user),
-            'update_issue' => $this->updateIssue($params, $user),
-            'list_teams' => $this->listTeams($params, $user),
+            'list_issues'   => $this->listIssues($params, $user),
+            'get_issue'     => $this->getIssue($params, $user),
+            'create_issue'  => $this->createIssue($params, $user),
+            'update_issue'  => $this->updateIssue($params, $user),
+            'list_teams'    => $this->listTeams($params, $user),
             'list_projects' => $this->listProjects($params, $user),
             'search_issues' => $this->searchIssues($params, $user),
-            default => ['error' => "Unknown tool: {$toolName}"],
+            default         => ['error' => "Unknown tool: {$toolName}"],
         };
     }
 
     /**
      * Execute a GraphQL query against the Linear API.
      *
-     * @param  array<string, mixed>  $variables
+     * @param array<string, mixed> $variables
+     *
      * @return array<string, mixed>
      */
     private function graphql(User $user, string $query, array $variables = []): array
@@ -132,7 +133,7 @@ class LinearService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->withToken($token)
             ->post('', [
-                'query' => $query,
+                'query'     => $query,
                 'variables' => $variables,
             ]);
 
@@ -144,7 +145,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listIssues(array $params, User $user): array
@@ -183,7 +185,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getIssue(array $params, User $user): array
@@ -215,7 +218,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createIssue(array $params, User $user): array
@@ -237,7 +241,7 @@ class LinearService extends AbstractIntegrationService
 
             $input = [
                 'teamId' => $params['teamId'],
-                'title' => $params['title'],
+                'title'  => $params['title'],
             ];
 
             if (isset($params['description'])) {
@@ -255,7 +259,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updateIssue(array $params, User $user): array
@@ -287,7 +292,7 @@ class LinearService extends AbstractIntegrationService
             }
 
             return $this->graphql($user, $query, [
-                'id' => $params['issueId'],
+                'id'    => $params['issueId'],
                 'input' => $input,
             ]);
         } catch (\Throwable $e) {
@@ -296,7 +301,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listTeams(array $params, User $user): array
@@ -322,7 +328,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listProjects(array $params, User $user): array
@@ -350,7 +357,8 @@ class LinearService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchIssues(array $params, User $user): array

@@ -51,37 +51,39 @@ class IntegrationManager
      * @var array<string, class-string<IntegrationServiceInterface>>
      */
     private array $serviceMap = [
-        'google_calendar' => GoogleCalendarService::class,
-        'gmail' => GmailService::class,
-        'google_drive' => GoogleDriveService::class,
-        'slack' => SlackService::class,
-        'apple_notes' => AppleNotesService::class,
-        'calendly' => CalendlyService::class,
-        'notion' => NotionService::class,
+        'google_calendar'    => GoogleCalendarService::class,
+        'gmail'              => GmailService::class,
+        'google_drive'       => GoogleDriveService::class,
+        'slack'              => SlackService::class,
+        'apple_notes'        => AppleNotesService::class,
+        'calendly'           => CalendlyService::class,
+        'notion'             => NotionService::class,
         'microsoft_calendar' => MicrosoftCalendarService::class,
-        'github' => GitHubService::class,
-        'gitlab' => GitLabService::class,
-        'postman' => PostmanService::class,
-        'cloudflare' => CloudflareService::class,
-        'jira' => JiraService::class,
-        'linear' => LinearService::class,
-        'vercel' => VercelService::class,
-        'miro' => MiroService::class,
-        'figma' => FigmaService::class,
-        'paypal' => PayPalService::class,
-        'stripe' => StripeService::class,
-        'brave_search' => BraveSearchService::class,
-        'searxng' => SearXNGService::class,
-        'apify' => ApifyService::class,
-        'indeed' => IndeedService::class,
-        'dice' => DiceService::class,
-        'harvey' => HarveyService::class,
-        'spotify' => SpotifyService::class,
-        'filesystem' => FilesystemService::class,
-        'macos' => MacOSService::class,
+        'github'             => GitHubService::class,
+        'gitlab'             => GitLabService::class,
+        'postman'            => PostmanService::class,
+        'cloudflare'         => CloudflareService::class,
+        'jira'               => JiraService::class,
+        'linear'             => LinearService::class,
+        'vercel'             => VercelService::class,
+        'miro'               => MiroService::class,
+        'figma'              => FigmaService::class,
+        'paypal'             => PayPalService::class,
+        'stripe'             => StripeService::class,
+        'brave_search'       => BraveSearchService::class,
+        'searxng'            => SearXNGService::class,
+        'apify'              => ApifyService::class,
+        'indeed'             => IndeedService::class,
+        'dice'               => DiceService::class,
+        'harvey'             => HarveyService::class,
+        'spotify'            => SpotifyService::class,
+        'filesystem'         => FilesystemService::class,
+        'macos'              => MacOSService::class,
     ];
 
-    public function __construct(private readonly Container $container) {}
+    public function __construct(private readonly Container $container)
+    {
+    }
 
     /**
      * Resolve and cache the service instance for the given integration name.
@@ -94,7 +96,7 @@ class IntegrationManager
             return $this->services[$integrationName];
         }
 
-        if (! isset($this->serviceMap[$integrationName])) {
+        if (!isset($this->serviceMap[$integrationName])) {
             throw new \InvalidArgumentException(
                 sprintf('No integration service registered for "%s".', $integrationName),
             );
@@ -139,7 +141,8 @@ class IntegrationManager
      * Each entry in the returned array includes an extra 'integration' key so
      * the caller can route the tool call back to the correct service.
      *
-     * @param  string[]|null  $enabledIntegrations  Limit to these integration names when provided.
+     * @param string[]|null $enabledIntegrations Limit to these integration names when provided.
+     *
      * @return array<int, array{name: string, description: string, parameters: array<string, mixed>, integration: string}>
      */
     public function getToolsForUser(User $user, ?array $enabledIntegrations = null): array
@@ -152,7 +155,7 @@ class IntegrationManager
             try {
                 $service = $this->resolve($name);
 
-                if (! $service->isConnected($user)) {
+                if (!$service->isConnected($user)) {
                     continue;
                 }
 
@@ -170,7 +173,7 @@ class IntegrationManager
     /**
      * Route a tool call to the named integration service and return the result.
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $integrationName, string $toolName, array $params, User $user): mixed
     {

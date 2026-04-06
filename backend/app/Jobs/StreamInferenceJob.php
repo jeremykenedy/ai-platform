@@ -20,7 +20,10 @@ use Illuminate\Support\Facades\Log;
 
 class StreamInferenceJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /** @var array<int, array{role: string, content: string}> */
     public array $context;
@@ -36,8 +39,8 @@ class StreamInferenceJob implements ShouldQueue
     public array $backoff = [1, 5, 10];
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $context
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $context
+     * @param array<string, mixed>                             $options
      */
     public function __construct(
         public readonly string $conversationId,
@@ -73,12 +76,12 @@ class StreamInferenceJob implements ShouldQueue
         /** @var Message $assistantMessage */
         $assistantMessage = Message::create([
             'conversation_id' => $this->conversationId,
-            'role' => 'assistant',
-            'content' => $result['content'],
-            'tokens_used' => $result['tokens_used'],
-            'finish_reason' => $result['finish_reason'],
-            'model_version' => $model,
-            'sequence' => $result['sequence'],
+            'role'            => 'assistant',
+            'content'         => $result['content'],
+            'tokens_used'     => $result['tokens_used'],
+            'finish_reason'   => $result['finish_reason'],
+            'model_version'   => $model,
+            'sequence'        => $result['sequence'],
         ]);
 
         $conversation->increment('context_window_used', $tokensUsed);
@@ -97,8 +100,8 @@ class StreamInferenceJob implements ShouldQueue
     {
         Log::error('[StreamInferenceJob] Job failed', [
             'conversation_id' => $this->conversationId,
-            'message_id' => $this->messageId,
-            'error' => $exception->getMessage(),
+            'message_id'      => $this->messageId,
+            'error'           => $exception->getMessage(),
         ]);
 
         $userMessage = Message::find($this->messageId);

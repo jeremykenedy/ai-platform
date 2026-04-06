@@ -16,10 +16,10 @@ class StartTrainingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'dataset_id' => ['required', 'string', 'exists:training_datasets,id'],
-            'base_model_id' => ['required', 'string', 'exists:ai_models,id'],
+            'dataset_id'        => ['required', 'string', 'exists:training_datasets,id'],
+            'base_model_id'     => ['required', 'string', 'exists:ai_models,id'],
             'output_model_name' => ['required', 'string', 'max:255'],
-            'config' => ['nullable', 'array'],
+            'config'            => ['nullable', 'array'],
         ];
     }
 }

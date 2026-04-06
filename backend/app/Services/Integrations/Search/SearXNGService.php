@@ -21,29 +21,29 @@ class SearXNGService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'web_search',
+                'name'        => 'web_search',
                 'description' => 'Search the web via a self-hosted SearXNG instance.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The search query.',
                         ],
                         'categories' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Comma-separated search categories (e.g. "general,science").',
                         ],
                         'engines' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Comma-separated search engines to use (e.g. "google,bing").',
                         ],
                         'language' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Language code for results (e.g. "en-US").',
                         ],
                         'pageno' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Page number for pagination (default 1).',
                         ],
                     ],
@@ -51,17 +51,17 @@ class SearXNGService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'news_search',
+                'name'        => 'news_search',
                 'description' => 'Search news articles via a self-hosted SearXNG instance.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The news search query.',
                         ],
                         'language' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Language code for results (e.g. "en-US").',
                         ],
                     ],
@@ -74,9 +74,9 @@ class SearXNGService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'web_search' => $this->webSearch($params),
+            'web_search'  => $this->webSearch($params),
             'news_search' => $this->newsSearch($params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default       => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -108,7 +108,8 @@ class SearXNGService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function webSearch(array $params): array
@@ -116,10 +117,10 @@ class SearXNGService extends AbstractIntegrationService
         $query = $params['query'] ?? throw new RuntimeException('query is required.');
 
         $queryParams = [
-            'q' => $query,
-            'format' => 'json',
+            'q'          => $query,
+            'format'     => 'json',
             'categories' => $params['categories'] ?? 'general',
-            'pageno' => (int) ($params['pageno'] ?? 1),
+            'pageno'     => (int) ($params['pageno'] ?? 1),
         ];
 
         if (isset($params['engines'])) {
@@ -137,7 +138,8 @@ class SearXNGService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function newsSearch(array $params): array
@@ -145,10 +147,10 @@ class SearXNGService extends AbstractIntegrationService
         $query = $params['query'] ?? throw new RuntimeException('query is required.');
 
         $queryParams = [
-            'q' => $query,
-            'format' => 'json',
+            'q'          => $query,
+            'format'     => 'json',
             'categories' => 'news',
-            'pageno' => 1,
+            'pageno'     => 1,
         ];
 
         if (isset($params['language'])) {

@@ -23,30 +23,30 @@ class DiceService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search_jobs',
+                'name'        => 'search_jobs',
                 'description' => 'Search for technology and engineering jobs on Dice.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Job title, keywords, or skills.',
                         ],
                         'location' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'City, state, or zip code.',
                         ],
                         'radius' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Search radius in miles (default 30).',
                         ],
                         'sort' => [
-                            'type' => 'string',
-                            'enum' => ['relevance', 'date'],
+                            'type'        => 'string',
+                            'enum'        => ['relevance', 'date'],
                             'description' => 'Sort order (default "relevance").',
                         ],
                         'page' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Page number for pagination (default 1).',
                         ],
                     ],
@@ -60,12 +60,13 @@ class DiceService extends AbstractIntegrationService
     {
         return match ($toolName) {
             'search_jobs' => $this->searchJobs($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default       => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchJobs(User $user, array $params): array
@@ -73,14 +74,14 @@ class DiceService extends AbstractIntegrationService
         $query = $params['query'] ?? throw new RuntimeException('query is required.');
 
         $queryParams = [
-            'q' => $query,
+            'q'            => $query,
             'countryCode2' => 'US',
-            'radius' => (int) ($params['radius'] ?? 30),
-            'radiusUnit' => 'mi',
-            'page' => (int) ($params['page'] ?? 1),
-            'pageSize' => 20,
-            'facets' => 'employmentType|postedDate|workFromHomeAvailability|employerType|easyApply|isRemote',
-            'sort' => $params['sort'] ?? 'relevance',
+            'radius'       => (int) ($params['radius'] ?? 30),
+            'radiusUnit'   => 'mi',
+            'page'         => (int) ($params['page'] ?? 1),
+            'pageSize'     => 20,
+            'facets'       => 'employmentType|postedDate|workFromHomeAvailability|employerType|easyApply|isRemote',
+            'sort'         => $params['sort'] ?? 'relevance',
         ];
 
         if (isset($params['location'])) {

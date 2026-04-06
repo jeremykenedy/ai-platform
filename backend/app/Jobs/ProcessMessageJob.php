@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Log;
 
 class ProcessMessageJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     /** @var array<int, array{role: string, content: string}> */
     public array $context;
@@ -31,8 +34,8 @@ class ProcessMessageJob implements ShouldQueue
     public int $timeout = 300;
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $context
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $context
+     * @param array<string, mixed>                             $options
      */
     public function __construct(
         public readonly string $conversationId,
@@ -61,11 +64,11 @@ class ProcessMessageJob implements ShouldQueue
         /** @var Message $assistantMessage */
         $assistantMessage = Message::create([
             'conversation_id' => $this->conversationId,
-            'role' => 'assistant',
-            'content' => $result['content'],
-            'tokens_used' => $result['tokens_used'],
-            'finish_reason' => $result['finish_reason'],
-            'model_version' => $resolvedModel,
+            'role'            => 'assistant',
+            'content'         => $result['content'],
+            'tokens_used'     => $result['tokens_used'],
+            'finish_reason'   => $result['finish_reason'],
+            'model_version'   => $resolvedModel,
         ]);
 
         broadcast(new MessageCreated(
@@ -90,7 +93,7 @@ class ProcessMessageJob implements ShouldQueue
         Log::error('[ProcessMessageJob] Job failed', [
             'conversation_id' => $this->conversationId,
             'user_message_id' => $this->userMessageId,
-            'error' => $exception->getMessage(),
+            'error'           => $exception->getMessage(),
         ]);
 
         $conversation = Conversation::find($this->conversationId);

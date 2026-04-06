@@ -13,7 +13,8 @@ class SyncModelsAction
 {
     public function __construct(
         private readonly ModelRouterService $modelRouterService,
-    ) {}
+    ) {
+    }
 
     /**
      * Sync models from all active providers (or a specific one) into ai_models.
@@ -38,7 +39,7 @@ class SyncModelsAction
             try {
                 $providerService = $this->modelRouterService->resolveProvider($provider->name);
 
-                if (! $providerService->isAvailable()) {
+                if (!$providerService->isAvailable()) {
                     continue;
                 }
 
@@ -54,20 +55,20 @@ class SyncModelsAction
 
                     if ($existing !== null) {
                         $existing->update([
-                            'is_active' => true,
-                            'ollama_digest' => $remoteModel['digest'] ?? $existing->ollama_digest,
+                            'is_active'       => true,
+                            'ollama_digest'   => $remoteModel['digest'] ?? $existing->ollama_digest,
                             'last_updated_at' => now(),
                         ]);
                         $updated++;
                     } else {
                         AiModel::create([
-                            'provider_id' => $provider->id,
-                            'name' => $modelName,
-                            'display_name' => $modelName,
+                            'provider_id'     => $provider->id,
+                            'name'            => $modelName,
+                            'display_name'    => $modelName,
                             'ollama_model_id' => $provider->name === 'ollama' ? $modelName : null,
-                            'is_active' => true,
-                            'is_local' => $provider->name === 'ollama',
-                            'ollama_digest' => $remoteModel['digest'] ?? null,
+                            'is_active'       => true,
+                            'is_local'        => $provider->name === 'ollama',
+                            'ollama_digest'   => $remoteModel['digest'] ?? null,
                             'last_updated_at' => now(),
                         ]);
                         $added++;
@@ -86,7 +87,7 @@ class SyncModelsAction
         }
 
         return [
-            'added' => $added,
+            'added'   => $added,
             'updated' => $updated,
             'removed' => $removed,
         ];

@@ -16,10 +16,10 @@ class StoreDatasetRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name'        => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'file' => ['required', 'file', 'max:1048576', 'mimes:json,csv,jsonl'],
-            'format' => ['required', 'string', 'in:sharegpt,alpaca'],
+            'file'        => ['required', 'file', 'max:1048576', 'mimes:json,csv,jsonl'],
+            'format'      => ['required', 'string', 'in:sharegpt,alpaca'],
         ];
     }
 }

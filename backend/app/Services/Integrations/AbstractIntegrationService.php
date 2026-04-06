@@ -27,7 +27,7 @@ abstract class AbstractIntegrationService implements IntegrationServiceInterface
     {
         $integration = $this->getUserIntegration($user);
 
-        if ($integration === null || ! $integration->is_enabled) {
+        if ($integration === null || !$integration->is_enabled) {
             return false;
         }
 
@@ -46,12 +46,12 @@ abstract class AbstractIntegrationService implements IntegrationServiceInterface
         }
 
         $integration->update([
-            'is_enabled' => false,
-            'credentials' => null,
-            'oauth_token' => null,
+            'is_enabled'          => false,
+            'credentials'         => null,
+            'oauth_token'         => null,
             'oauth_refresh_token' => null,
-            'oauth_expires_at' => null,
-            'scopes_granted' => null,
+            'oauth_expires_at'    => null,
+            'scopes_granted'      => null,
         ]);
     }
 
@@ -96,9 +96,11 @@ abstract class AbstractIntegrationService implements IntegrationServiceInterface
      * No-op default for integrations that do not use OAuth callbacks.
      * Override in OAuth-based subclasses.
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
-    public function handleCallback(User $user, array $params): void {}
+    public function handleCallback(User $user, array $params): void
+    {
+    }
 
     /**
      * Find the user's UserIntegration record for this integration, or null.
@@ -147,7 +149,7 @@ abstract class AbstractIntegrationService implements IntegrationServiceInterface
     /**
      * Persist a record of a tool call to the integration_tool_calls table.
      *
-     * @param  array<string, mixed>  $input
+     * @param array<string, mixed> $input
      */
     protected function logToolCall(
         User $user,
@@ -164,16 +166,16 @@ abstract class AbstractIntegrationService implements IntegrationServiceInterface
             $definition = $this->getDefinition();
 
             IntegrationToolCall::create([
-                'user_id' => $user->getKey(),
+                'user_id'         => $user->getKey(),
                 'conversation_id' => $conversationId,
-                'message_id' => $messageId,
-                'integration_id' => $definition->getKey(),
-                'tool_name' => $toolName,
-                'input' => $input,
-                'output' => is_array($output) ? $output : ['result' => $output],
-                'status' => $status,
-                'duration_ms' => $durationMs,
-                'error_message' => $error,
+                'message_id'      => $messageId,
+                'integration_id'  => $definition->getKey(),
+                'tool_name'       => $toolName,
+                'input'           => $input,
+                'output'          => is_array($output) ? $output : ['result' => $output],
+                'status'          => $status,
+                'duration_ms'     => $durationMs,
+                'error_message'   => $error,
             ]);
         } catch (\Throwable $e) {
             Log::error(sprintf(

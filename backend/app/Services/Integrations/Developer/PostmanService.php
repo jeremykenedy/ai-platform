@@ -22,19 +22,19 @@ class PostmanService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_collections',
+                'name'        => 'list_collections',
                 'description' => 'List all Postman collections in the user account.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'get_collection',
+                'name'        => 'get_collection',
                 'description' => 'Get a specific Postman collection by ID.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'collectionId' => ['type' => 'string', 'description' => 'The collection UID (e.g. "12345678-abcd-efgh-ijkl-mnopqrstuvwx").'],
                     ],
@@ -42,19 +42,19 @@ class PostmanService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_environments',
+                'name'        => 'list_environments',
                 'description' => 'List all Postman environments in the user account.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'get_environment',
+                'name'        => 'get_environment',
                 'description' => 'Get a specific Postman environment by ID.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'environmentId' => ['type' => 'string', 'description' => 'The environment UID.'],
                     ],
@@ -62,31 +62,31 @@ class PostmanService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_workspaces',
+                'name'        => 'list_workspaces',
                 'description' => 'List all Postman workspaces.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'create_collection',
+                'name'        => 'create_collection',
                 'description' => 'Create a new Postman collection.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'name' => ['type' => 'string', 'description' => 'Name for the new collection.'],
+                        'name'        => ['type' => 'string', 'description' => 'Name for the new collection.'],
                         'description' => ['type' => 'string', 'description' => 'Optional description for the collection.'],
                     ],
                     'required' => ['name'],
                 ],
             ],
             [
-                'name' => 'run_collection',
+                'name'        => 'run_collection',
                 'description' => 'Trigger a collection run via the Postman API.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'collectionId' => ['type' => 'string', 'description' => 'The collection UID to run.'],
                     ],
@@ -99,14 +99,14 @@ class PostmanService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_collections' => $this->listCollections($params, $user),
-            'get_collection' => $this->getCollection($params, $user),
+            'list_collections'  => $this->listCollections($params, $user),
+            'get_collection'    => $this->getCollection($params, $user),
             'list_environments' => $this->listEnvironments($params, $user),
-            'get_environment' => $this->getEnvironment($params, $user),
-            'list_workspaces' => $this->listWorkspaces($params, $user),
+            'get_environment'   => $this->getEnvironment($params, $user),
+            'list_workspaces'   => $this->listWorkspaces($params, $user),
             'create_collection' => $this->createCollection($params, $user),
-            'run_collection' => $this->runCollection($params, $user),
-            default => ['error' => "Unknown tool: {$toolName}"],
+            'run_collection'    => $this->runCollection($params, $user),
+            default             => ['error' => "Unknown tool: {$toolName}"],
         };
     }
 
@@ -124,7 +124,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listCollections(array $params, User $user): array
@@ -143,7 +144,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getCollection(array $params, User $user): array
@@ -162,7 +164,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listEnvironments(array $params, User $user): array
@@ -181,7 +184,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getEnvironment(array $params, User $user): array
@@ -200,7 +204,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listWorkspaces(array $params, User $user): array
@@ -219,7 +224,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createCollection(array $params, User $user): array
@@ -228,7 +234,7 @@ class PostmanService extends AbstractIntegrationService
             $body = [
                 'collection' => [
                     'info' => [
-                        'name' => $params['name'],
+                        'name'   => $params['name'],
                         'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
                     ],
                 ],
@@ -251,7 +257,8 @@ class PostmanService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function runCollection(array $params, User $user): array

@@ -26,8 +26,8 @@ class SuperAdminSeeder extends Seeder
         $user = User::firstOrCreate(
             ['email' => $email],
             [
-                'name' => $name,
-                'password' => Hash::make($password),
+                'name'              => $name,
+                'password'          => Hash::make($password),
                 'email_verified_at' => now(),
             ],
         );

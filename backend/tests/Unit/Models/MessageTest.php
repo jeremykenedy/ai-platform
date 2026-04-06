@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Pgvector\Laravel\HasNeighbors;
 
 it('has correct fillable attributes', function (): void {
-    $message = new Message;
+    $message = new Message();
     expect($message->getFillable())->toContain(
         'conversation_id',
         'role',
@@ -21,7 +21,7 @@ it('has correct fillable attributes', function (): void {
 });
 
 it('has correct hidden attributes', function (): void {
-    $message = new Message;
+    $message = new Message();
     expect($message->getHidden())->toContain('embedding');
 });
 

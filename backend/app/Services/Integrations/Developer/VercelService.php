@@ -22,19 +22,19 @@ class VercelService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_projects',
+                'name'        => 'list_projects',
                 'description' => 'List all Vercel projects in the account.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'get_project',
+                'name'        => 'get_project',
                 'description' => 'Get details for a specific Vercel project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Vercel project ID or name.'],
                     ],
@@ -42,22 +42,22 @@ class VercelService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_deployments',
+                'name'        => 'list_deployments',
                 'description' => 'List deployments for a Vercel project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Vercel project ID or name.'],
-                        'limit' => ['type' => 'integer', 'description' => 'Maximum number of deployments to return.', 'default' => 20],
+                        'limit'     => ['type' => 'integer', 'description' => 'Maximum number of deployments to return.', 'default' => 20],
                     ],
                     'required' => ['projectId'],
                 ],
             ],
             [
-                'name' => 'get_deployment',
+                'name'        => 'get_deployment',
                 'description' => 'Get details for a specific Vercel deployment.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'deploymentId' => ['type' => 'string', 'description' => 'Vercel deployment ID or URL.'],
                     ],
@@ -65,10 +65,10 @@ class VercelService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_domains',
+                'name'        => 'list_domains',
                 'description' => 'List domains associated with a Vercel project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Vercel project ID or name.'],
                     ],
@@ -76,10 +76,10 @@ class VercelService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_env_vars',
+                'name'        => 'list_env_vars',
                 'description' => 'List environment variables for a Vercel project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Vercel project ID or name.'],
                     ],
@@ -92,13 +92,13 @@ class VercelService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_projects' => $this->listProjects($params, $user),
-            'get_project' => $this->getProject($params, $user),
+            'list_projects'    => $this->listProjects($params, $user),
+            'get_project'      => $this->getProject($params, $user),
             'list_deployments' => $this->listDeployments($params, $user),
-            'get_deployment' => $this->getDeployment($params, $user),
-            'list_domains' => $this->listDomains($params, $user),
-            'list_env_vars' => $this->listEnvVars($params, $user),
-            default => ['error' => "Unknown tool: {$toolName}"],
+            'get_deployment'   => $this->getDeployment($params, $user),
+            'list_domains'     => $this->listDomains($params, $user),
+            'list_env_vars'    => $this->listEnvVars($params, $user),
+            default            => ['error' => "Unknown tool: {$toolName}"],
         };
     }
 
@@ -114,7 +114,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listProjects(array $params, User $user): array
@@ -133,7 +134,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getProject(array $params, User $user): array
@@ -152,7 +154,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listDeployments(array $params, User $user): array
@@ -160,7 +163,7 @@ class VercelService extends AbstractIntegrationService
         try {
             $response = $this->makeClient($user)->get('/v6/deployments', [
                 'projectId' => $params['projectId'],
-                'limit' => $params['limit'] ?? 20,
+                'limit'     => $params['limit'] ?? 20,
             ]);
 
             if ($response->failed()) {
@@ -174,7 +177,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getDeployment(array $params, User $user): array
@@ -193,7 +197,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listDomains(array $params, User $user): array
@@ -212,7 +217,8 @@ class VercelService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listEnvVars(array $params, User $user): array

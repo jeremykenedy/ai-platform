@@ -14,18 +14,18 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'avatar' => $this->avatar,
-            'locale' => $this->locale,
-            'timezone' => $this->timezone,
+            'id'                => $this->id,
+            'name'              => $this->name,
+            'email'             => $this->email,
+            'avatar'            => $this->avatar,
+            'locale'            => $this->locale,
+            'timezone'          => $this->timezone,
             'subscription_tier' => $this->subscription_tier,
             'email_verified_at' => $this->email_verified_at,
-            'last_active_at' => $this->last_active_at,
-            'created_at' => $this->created_at,
-            'settings' => new SettingsResource($this->whenLoaded('settings')),
-            'roles' => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
+            'last_active_at'    => $this->last_active_at,
+            'created_at'        => $this->created_at,
+            'settings'          => new SettingsResource($this->whenLoaded('settings')),
+            'roles'             => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
         ];
     }
 }

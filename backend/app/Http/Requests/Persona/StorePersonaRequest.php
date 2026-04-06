@@ -18,13 +18,13 @@ class StorePersonaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'system_prompt' => ['required', 'string'],
-            'model_name' => ['nullable', 'string'],
-            'temperature' => ['nullable', 'numeric', 'between:0,2'],
-            'top_p' => ['nullable', 'numeric', 'between:0,1'],
-            'top_k' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'name'           => ['required', 'string', 'max:255'],
+            'description'    => ['nullable', 'string'],
+            'system_prompt'  => ['required', 'string'],
+            'model_name'     => ['nullable', 'string'],
+            'temperature'    => ['nullable', 'numeric', 'between:0,2'],
+            'top_p'          => ['nullable', 'numeric', 'between:0,1'],
+            'top_k'          => ['nullable', 'integer', 'min:1', 'max:200'],
             'repeat_penalty' => ['nullable', 'numeric', 'between:0.5,2'],
         ];
     }

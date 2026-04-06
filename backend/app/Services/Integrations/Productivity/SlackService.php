@@ -30,17 +30,17 @@ class SlackService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.slack.client_id'),
+            'client_id'    => config('services.slack.client_id'),
             'redirect_uri' => config('services.slack.redirect_uri'),
-            'scope' => implode(',', self::SCOPES),
-            'state' => $user->getKey(),
+            'scope'        => implode(',', self::SCOPES),
+            'state'        => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -50,10 +50,10 @@ class SlackService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.slack.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.slack.client_id'),
                 'client_secret' => config('services.slack.client_secret'),
-                'redirect_uri' => config('services.slack.redirect_uri'),
+                'redirect_uri'  => config('services.slack.redirect_uri'),
             ]);
 
         $response->throw();
@@ -64,16 +64,16 @@ class SlackService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'     => true,
+                'oauth_token'    => $data['access_token'] ?? null,
                 'scopes_granted' => self::SCOPES,
-                'metadata' => [
-                    'team_id' => $data['team']['id'] ?? null,
-                    'team_name' => $data['team']['name'] ?? null,
+                'metadata'       => [
+                    'team_id'     => $data['team']['id'] ?? null,
+                    'team_name'   => $data['team']['name'] ?? null,
                     'bot_user_id' => $data['bot_user_id'] ?? null,
                 ],
             ],
@@ -87,62 +87,62 @@ class SlackService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_channels',
+                'name'        => 'list_channels',
                 'description' => 'List all Slack channels the bot has access to.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'read_messages',
+                'name'        => 'read_messages',
                 'description' => 'Read recent messages from a Slack channel.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['channel'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['channel'],
                     'properties' => [
                         'channel' => ['type' => 'string', 'description' => 'Channel ID or name.'],
-                        'limit' => ['type' => 'integer', 'description' => 'Number of messages to retrieve (default 20).'],
+                        'limit'   => ['type' => 'integer', 'description' => 'Number of messages to retrieve (default 20).'],
                     ],
                 ],
             ],
             [
-                'name' => 'send_message',
+                'name'        => 'send_message',
                 'description' => 'Send a message to a Slack channel.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['channel', 'text'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['channel', 'text'],
                     'properties' => [
                         'channel' => ['type' => 'string', 'description' => 'Channel ID or name.'],
-                        'text' => ['type' => 'string', 'description' => 'Message text to send.'],
+                        'text'    => ['type' => 'string', 'description' => 'Message text to send.'],
                     ],
                 ],
             ],
             [
-                'name' => 'search_messages',
+                'name'        => 'search_messages',
                 'description' => 'Search for messages across Slack.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['query'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['query'],
                     'properties' => [
                         'query' => ['type' => 'string', 'description' => 'Search query string.'],
                     ],
                 ],
             ],
             [
-                'name' => 'list_users',
+                'name'        => 'list_users',
                 'description' => 'List users in the Slack workspace.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'get_channel_info',
+                'name'        => 'get_channel_info',
                 'description' => 'Get detailed information about a Slack channel.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['channel'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['channel'],
                     'properties' => [
                         'channel' => ['type' => 'string', 'description' => 'Channel ID.'],
                     ],
@@ -152,18 +152,18 @@ class SlackService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_channels' => $this->listChannels($user),
-            'read_messages' => $this->readMessages($params, $user),
-            'send_message' => $this->sendMessage($params, $user),
-            'search_messages' => $this->searchMessages($params, $user),
-            'list_users' => $this->listUsers($user),
+            'list_channels'    => $this->listChannels($user),
+            'read_messages'    => $this->readMessages($params, $user),
+            'send_message'     => $this->sendMessage($params, $user),
+            'search_messages'  => $this->searchMessages($params, $user),
+            'list_users'       => $this->listUsers($user),
             'get_channel_info' => $this->getChannelInfo($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            default            => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -190,8 +190,8 @@ class SlackService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->get(self::BASE_URL.'/conversations.list', [
-                'types' => 'public_channel,private_channel',
-                'limit' => 100,
+                'types'            => 'public_channel,private_channel',
+                'limit'            => 100,
                 'exclude_archived' => 'true',
             ]);
 
@@ -201,7 +201,8 @@ class SlackService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function readMessages(array $params, User $user): array
@@ -214,7 +215,7 @@ class SlackService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->get(self::BASE_URL.'/conversations.history', [
                 'channel' => $channel,
-                'limit' => $limit,
+                'limit'   => $limit,
             ]);
 
         $response->throw();
@@ -223,7 +224,8 @@ class SlackService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function sendMessage(array $params, User $user): array
@@ -233,7 +235,7 @@ class SlackService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->post(self::BASE_URL.'/chat.postMessage', [
                 'channel' => (string) $params['channel'],
-                'text' => (string) $params['text'],
+                'text'    => (string) $params['text'],
             ]);
 
         $response->throw();
@@ -242,7 +244,8 @@ class SlackService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchMessages(array $params, User $user): array
@@ -276,7 +279,8 @@ class SlackService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getChannelInfo(array $params, User $user): array

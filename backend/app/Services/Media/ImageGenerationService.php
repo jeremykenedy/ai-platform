@@ -12,7 +12,8 @@ class ImageGenerationService
 {
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Generate an image from a text prompt using the best available provider.
@@ -24,6 +25,7 @@ class ImageGenerationService
      *     quality?: string,
      *     style?: string,
      * }  $options
+     *
      * @return array{image_data: string, provider: string, model: string, metadata: array<string, mixed>}
      */
     public function generate(string $prompt, array $options = []): array
@@ -35,11 +37,11 @@ class ImageGenerationService
         }
 
         return match ($provider) {
-            'comfyui' => $this->generateViaComfyUi($prompt, $options),
+            'comfyui'   => $this->generateViaComfyUi($prompt, $options),
             'replicate' => $this->generateViaReplicate($prompt, $options),
             'stability' => $this->generateViaStability($prompt, $options),
-            'openai' => $this->generateViaOpenAi($prompt, $options),
-            default => throw new \RuntimeException("Unknown provider: {$provider}"),
+            'openai'    => $this->generateViaOpenAi($prompt, $options),
+            default     => throw new \RuntimeException("Unknown provider: {$provider}"),
         };
     }
 
@@ -51,10 +53,10 @@ class ImageGenerationService
     public function getAvailableProviders(): array
     {
         return [
-            'comfyui' => $this->isComfyUiAvailable(),
+            'comfyui'   => $this->isComfyUiAvailable(),
             'replicate' => $this->isReplicateConfigured(),
             'stability' => $this->isStabilityConfigured(),
-            'openai' => $this->isOpenAiConfigured(),
+            'openai'    => $this->isOpenAiConfigured(),
         ];
     }
 
@@ -75,7 +77,8 @@ class ImageGenerationService
     /**
      * Generate an image via a locally running ComfyUI instance.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{image_data: string, provider: string, model: string, metadata: array<string, mixed>}
      */
     private function generateViaComfyUi(string $prompt, array $options): array
@@ -89,47 +92,47 @@ class ImageGenerationService
         $workflow = [
             '3' => [
                 'inputs' => [
-                    'seed' => random_int(0, 2147483647),
-                    'steps' => $options['quality'] === 'ultra' ? 40 : ($options['quality'] === 'high' ? 30 : 20),
-                    'cfg' => 7.0,
+                    'seed'         => random_int(0, 2147483647),
+                    'steps'        => $options['quality'] === 'ultra' ? 40 : ($options['quality'] === 'high' ? 30 : 20),
+                    'cfg'          => 7.0,
                     'sampler_name' => 'euler',
-                    'scheduler' => 'normal',
-                    'denoise' => 1.0,
-                    'model' => ['4', 0],
-                    'positive' => ['6', 0],
-                    'negative' => ['7', 0],
+                    'scheduler'    => 'normal',
+                    'denoise'      => 1.0,
+                    'model'        => ['4', 0],
+                    'positive'     => ['6', 0],
+                    'negative'     => ['7', 0],
                     'latent_image' => ['5', 0],
                 ],
                 'class_type' => 'KSampler',
             ],
             '4' => [
-                'inputs' => ['ckpt_name' => $model],
+                'inputs'     => ['ckpt_name' => $model],
                 'class_type' => 'CheckpointLoaderSimple',
             ],
             '5' => [
                 'inputs' => [
-                    'width' => $dimensions['width'],
-                    'height' => $dimensions['height'],
+                    'width'      => $dimensions['width'],
+                    'height'     => $dimensions['height'],
                     'batch_size' => 1,
                 ],
                 'class_type' => 'EmptyLatentImage',
             ],
             '6' => [
-                'inputs' => ['text' => $prompt, 'clip' => ['4', 1]],
+                'inputs'     => ['text' => $prompt, 'clip' => ['4', 1]],
                 'class_type' => 'CLIPTextEncode',
             ],
             '7' => [
-                'inputs' => ['text' => $negativePrompt, 'clip' => ['4', 1]],
+                'inputs'     => ['text' => $negativePrompt, 'clip' => ['4', 1]],
                 'class_type' => 'CLIPTextEncode',
             ],
             '8' => [
-                'inputs' => ['samples' => ['3', 0], 'vae' => ['4', 2]],
+                'inputs'     => ['samples' => ['3', 0], 'vae' => ['4', 2]],
                 'class_type' => 'VAEDecode',
             ],
             '9' => [
                 'inputs' => [
                     'filename_prefix' => 'ai_platform_',
-                    'images' => ['8', 0],
+                    'images'          => ['8', 0],
                 ],
                 'class_type' => 'SaveImage',
             ],
@@ -143,7 +146,7 @@ class ImageGenerationService
 
         $promptId = $queueResponse->json('prompt_id');
 
-        if (! $promptId) {
+        if (!$promptId) {
             throw new \RuntimeException('ComfyUI did not return a prompt_id');
         }
 
@@ -152,13 +155,13 @@ class ImageGenerationService
 
         return [
             'image_data' => $imageData,
-            'provider' => 'comfyui',
-            'model' => $model,
-            'metadata' => [
-                'width' => $dimensions['width'],
-                'height' => $dimensions['height'],
+            'provider'   => 'comfyui',
+            'model'      => $model,
+            'metadata'   => [
+                'width'        => $dimensions['width'],
+                'height'       => $dimensions['height'],
                 'aspect_ratio' => $options['aspect_ratio'] ?? '1:1',
-                'prompt_id' => $promptId,
+                'prompt_id'    => $promptId,
             ],
         ];
     }
@@ -180,13 +183,13 @@ class ImageGenerationService
                     ->connectTimeout(5)
                     ->get("{$baseUrl}/history/{$promptId}");
 
-                if (! $historyResponse->successful()) {
+                if (!$historyResponse->successful()) {
                     continue;
                 }
 
                 $history = $historyResponse->json();
 
-                if (! isset($history[$promptId]['outputs'][$outputNodeId]['images'][0])) {
+                if (!isset($history[$promptId]['outputs'][$outputNodeId]['images'][0])) {
                     continue;
                 }
 
@@ -198,9 +201,9 @@ class ImageGenerationService
                 $imageResponse = Http::timeout(30)
                     ->connectTimeout(5)
                     ->get("{$baseUrl}/view", [
-                        'filename' => $filename,
+                        'filename'  => $filename,
                         'subfolder' => $subfolder,
-                        'type' => $type,
+                        'type'      => $type,
                     ]);
 
                 $imageResponse->throw();
@@ -209,7 +212,7 @@ class ImageGenerationService
             } catch (\Throwable $e) {
                 Log::warning('[ImageGenerationService] ComfyUI poll attempt failed', [
                     'attempt' => $attempt,
-                    'error' => $e->getMessage(),
+                    'error'   => $e->getMessage(),
                 ]);
             }
         }
@@ -220,7 +223,8 @@ class ImageGenerationService
     /**
      * Generate an image via the Replicate API.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{image_data: string, provider: string, model: string, metadata: array<string, mixed>}
      */
     private function generateViaReplicate(string $prompt, array $options): array
@@ -231,11 +235,11 @@ class ImageGenerationService
 
         $payload = [
             'input' => [
-                'prompt' => $prompt,
+                'prompt'          => $prompt,
                 'negative_prompt' => $options['negative_prompt'] ?? '',
-                'width' => $dimensions['width'],
-                'height' => $dimensions['height'],
-                'num_outputs' => 1,
+                'width'           => $dimensions['width'],
+                'height'          => $dimensions['height'],
+                'num_outputs'     => 1,
             ],
         ];
 
@@ -248,7 +252,7 @@ class ImageGenerationService
 
         $predictionId = $createResponse->json('id');
 
-        if (! $predictionId) {
+        if (!$predictionId) {
             throw new \RuntimeException('Replicate did not return a prediction ID');
         }
 
@@ -266,7 +270,7 @@ class ImageGenerationService
                 ->connectTimeout(5)
                 ->get("https://api.replicate.com/v1/predictions/{$predictionId}");
 
-            if (! $statusResponse->successful()) {
+            if (!$statusResponse->successful()) {
                 continue;
             }
 
@@ -292,12 +296,12 @@ class ImageGenerationService
 
         return [
             'image_data' => base64_encode($imageResponse->body()),
-            'provider' => 'replicate',
-            'model' => $model,
-            'metadata' => [
-                'width' => $dimensions['width'],
-                'height' => $dimensions['height'],
-                'aspect_ratio' => $options['aspect_ratio'] ?? '1:1',
+            'provider'   => 'replicate',
+            'model'      => $model,
+            'metadata'   => [
+                'width'         => $dimensions['width'],
+                'height'        => $dimensions['height'],
+                'aspect_ratio'  => $options['aspect_ratio'] ?? '1:1',
                 'prediction_id' => $predictionId,
             ],
         ];
@@ -306,7 +310,8 @@ class ImageGenerationService
     /**
      * Generate an image via the Stability AI API.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{image_data: string, provider: string, model: string, metadata: array<string, mixed>}
      */
     private function generateViaStability(string $prompt, array $options): array
@@ -317,19 +322,19 @@ class ImageGenerationService
 
         $stylePresets = [
             'photorealistic' => 'photographic',
-            'artistic' => 'enhance',
-            'illustration' => 'digital-art',
-            'cinematic' => 'cinematic',
+            'artistic'       => 'enhance',
+            'illustration'   => 'digital-art',
+            'cinematic'      => 'cinematic',
         ];
 
         $payload = [
             'text_prompts' => [
                 ['text' => $prompt, 'weight' => 1.0],
             ],
-            'width' => $dimensions['width'],
-            'height' => $dimensions['height'],
-            'samples' => 1,
-            'steps' => $options['quality'] === 'ultra' ? 50 : ($options['quality'] === 'high' ? 35 : 20),
+            'width'     => $dimensions['width'],
+            'height'    => $dimensions['height'],
+            'samples'   => 1,
+            'steps'     => $options['quality'] === 'ultra' ? 50 : ($options['quality'] === 'high' ? 35 : 20),
             'cfg_scale' => 7.0,
         ];
 
@@ -343,7 +348,7 @@ class ImageGenerationService
 
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$apiKey}",
-            'Accept' => 'application/json',
+            'Accept'        => 'application/json',
         ])
             ->timeout(120)
             ->connectTimeout(10)
@@ -353,7 +358,7 @@ class ImageGenerationService
 
         $artifacts = $response->json('artifacts');
 
-        if (! is_array($artifacts) || empty($artifacts)) {
+        if (!is_array($artifacts) || empty($artifacts)) {
             throw new \RuntimeException('Stability AI returned no image artifacts');
         }
 
@@ -365,14 +370,14 @@ class ImageGenerationService
 
         return [
             'image_data' => $imageData,
-            'provider' => 'stability',
-            'model' => $model,
-            'metadata' => [
-                'width' => $dimensions['width'],
-                'height' => $dimensions['height'],
-                'aspect_ratio' => $options['aspect_ratio'] ?? '1:1',
+            'provider'   => 'stability',
+            'model'      => $model,
+            'metadata'   => [
+                'width'         => $dimensions['width'],
+                'height'        => $dimensions['height'],
+                'aspect_ratio'  => $options['aspect_ratio'] ?? '1:1',
                 'finish_reason' => $artifacts[0]['finishReason'] ?? null,
-                'seed' => $artifacts[0]['seed'] ?? null,
+                'seed'          => $artifacts[0]['seed'] ?? null,
             ],
         ];
     }
@@ -380,7 +385,8 @@ class ImageGenerationService
     /**
      * Generate an image via OpenAI DALL-E.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{image_data: string, provider: string, model: string, metadata: array<string, mixed>}
      */
     private function generateViaOpenAi(string $prompt, array $options): array
@@ -390,25 +396,25 @@ class ImageGenerationService
         $aspectRatio = $options['aspect_ratio'] ?? '1:1';
 
         $sizeMap = [
-            '1:1' => '1024x1024',
+            '1:1'  => '1024x1024',
             '16:9' => '1792x1024',
             '9:16' => '1024x1792',
-            '4:3' => '1024x1024',
-            '3:2' => '1792x1024',
+            '4:3'  => '1024x1024',
+            '3:2'  => '1792x1024',
         ];
 
         $qualityMap = [
             'standard' => 'standard',
-            'high' => 'hd',
-            'ultra' => 'hd',
+            'high'     => 'hd',
+            'ultra'    => 'hd',
         ];
 
         $payload = [
-            'model' => $model,
-            'prompt' => $prompt,
-            'n' => 1,
-            'size' => $sizeMap[$aspectRatio] ?? '1024x1024',
-            'quality' => $qualityMap[$options['quality'] ?? 'standard'] ?? 'standard',
+            'model'           => $model,
+            'prompt'          => $prompt,
+            'n'               => 1,
+            'size'            => $sizeMap[$aspectRatio] ?? '1024x1024',
+            'quality'         => $qualityMap[$options['quality'] ?? 'standard'] ?? 'standard',
             'response_format' => 'b64_json',
         ];
 
@@ -427,17 +433,17 @@ class ImageGenerationService
 
         $imageData = $response->json('data.0.b64_json');
 
-        if (! $imageData) {
+        if (!$imageData) {
             throw new \RuntimeException('OpenAI DALL-E returned no image data');
         }
 
         return [
             'image_data' => $imageData,
-            'provider' => 'openai',
-            'model' => $model,
-            'metadata' => [
-                'size' => $sizeMap[$aspectRatio] ?? '1024x1024',
-                'aspect_ratio' => $aspectRatio,
+            'provider'   => 'openai',
+            'model'      => $model,
+            'metadata'   => [
+                'size'           => $sizeMap[$aspectRatio] ?? '1024x1024',
+                'aspect_ratio'   => $aspectRatio,
                 'revised_prompt' => $response->json('data.0.revised_prompt'),
             ],
         ];
@@ -451,10 +457,10 @@ class ImageGenerationService
     private function mapAspectRatio(string $ratio): array
     {
         return match ($ratio) {
-            '16:9' => ['width' => 1344, 'height' => 768],
-            '9:16' => ['width' => 768, 'height' => 1344],
-            '4:3' => ['width' => 1152, 'height' => 896],
-            '3:2' => ['width' => 1216, 'height' => 832],
+            '16:9'  => ['width' => 1344, 'height' => 768],
+            '9:16'  => ['width' => 768, 'height' => 1344],
+            '4:3'   => ['width' => 1152, 'height' => 896],
+            '3:2'   => ['width' => 1216, 'height' => 832],
             default => ['width' => 1024, 'height' => 1024], // 1:1
         };
     }

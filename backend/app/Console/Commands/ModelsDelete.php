@@ -26,13 +26,13 @@ class ModelsDelete extends Command
     {
         $model = (string) $this->argument('model');
 
-        if (! $this->confirm("Are you sure you want to delete [{$model}]?")) {
+        if (!$this->confirm("Are you sure you want to delete [{$model}]?")) {
             $this->info('Aborted.');
 
             return self::SUCCESS;
         }
 
-        if (! $this->ollamaProvider->isAvailable()) {
+        if (!$this->ollamaProvider->isAvailable()) {
             $this->error('Ollama is not available. Ensure the Ollama service is running and reachable.');
 
             return self::FAILURE;
@@ -46,7 +46,7 @@ class ModelsDelete extends Command
             return self::FAILURE;
         }
 
-        if (! $deleted) {
+        if (!$deleted) {
             $this->error("Ollama reported failure when deleting [{$model}].");
 
             return self::FAILURE;

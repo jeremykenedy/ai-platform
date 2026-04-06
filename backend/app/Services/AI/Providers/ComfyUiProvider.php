@@ -20,8 +20,9 @@ class ComfyUiProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -30,8 +31,8 @@ class ComfyUiProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -102,7 +103,8 @@ class ComfyUiProvider extends AbstractAiProvider
     /**
      * Queue a ComfyUI workflow and poll until images are ready.
      *
-     * @param  array<string, mixed>  $workflow  Full ComfyUI workflow JSON (prompt graph)
+     * @param array<string, mixed> $workflow Full ComfyUI workflow JSON (prompt graph)
+     *
      * @return array<string, mixed> Output image filenames and metadata
      */
     public function generateImage(array $workflow, string $prompt): array
@@ -176,8 +178,8 @@ class ComfyUiProvider extends AbstractAiProvider
 
                         return [
                             'prompt_id' => $promptId,
-                            'outputs' => $outputs,
-                            'status' => $result['status'] ?? [],
+                            'outputs'   => $outputs,
+                            'status'    => $result['status'] ?? [],
                         ];
                     }
                 }
@@ -194,12 +196,12 @@ class ComfyUiProvider extends AbstractAiProvider
     /**
      * Walk the workflow graph and inject the user prompt into text nodes.
      *
-     * @param  array<string, mixed>  $workflow
+     * @param array<string, mixed> $workflow
      */
     private function injectPromptIntoWorkflow(array &$workflow, string $prompt): void
     {
         foreach ($workflow as &$node) {
-            if (! is_array($node)) {
+            if (!is_array($node)) {
                 continue;
             }
 

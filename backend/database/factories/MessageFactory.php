@@ -20,12 +20,12 @@ class MessageFactory extends Factory
     {
         return [
             'conversation_id' => Conversation::factory(),
-            'role' => fake()->randomElement(['user', 'assistant']),
-            'content' => fake()->paragraph(),
-            'tokens_used' => fake()->numberBetween(10, 500),
-            'finish_reason' => 'stop',
-            'model_version' => null,
-            'sequence' => fake()->numberBetween(1, 100),
+            'role'            => fake()->randomElement(['user', 'assistant']),
+            'content'         => fake()->paragraph(),
+            'tokens_used'     => fake()->numberBetween(10, 500),
+            'finish_reason'   => 'stop',
+            'model_version'   => null,
+            'sequence'        => fake()->numberBetween(1, 100),
         ];
     }
 }

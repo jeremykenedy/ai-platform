@@ -13,13 +13,16 @@ use Illuminate\Queue\SerializesModels;
 
 class MessageStreamChunk implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $conversationId,
         public string $token,
         public int $sequence,
-    ) {}
+    ) {
+    }
 
     /**
      * @return Channel|array<int, Channel>
@@ -35,7 +38,7 @@ class MessageStreamChunk implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'token' => $this->token,
+            'token'    => $this->token,
             'sequence' => $this->sequence,
         ];
     }

@@ -31,13 +31,13 @@ class IntegrationsClearExpired extends Command
         $disabled = 0;
 
         foreach ($expired as $integration) {
-            if (! empty($integration->oauth_refresh_token)) {
+            if (!empty($integration->oauth_refresh_token)) {
                 // Refresh token exists: flag for reconnection (provider-specific refresh
                 // logic belongs in each integration service; mark as needing reconnection).
                 Log::info('[IntegrationsClearExpired] Integration requires refresh.', [
                     'user_integration_id' => $integration->id,
-                    'user_id' => $integration->user_id,
-                    'integration_id' => $integration->integration_id,
+                    'user_id'             => $integration->user_id,
+                    'integration_id'      => $integration->integration_id,
                 ]);
 
                 $integration->update([

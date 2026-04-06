@@ -25,7 +25,8 @@ class TrainingController extends Controller
     public function __construct(
         private readonly StartTrainingAction $startTrainingAction,
         private readonly CancelTrainingAction $cancelTrainingAction,
-    ) {}
+    ) {
+    }
 
     public function datasetsIndex(Request $request): JsonResponse
     {
@@ -50,11 +51,11 @@ class TrainingController extends Controller
         $path = $file->store("training-datasets/{$user->id}", 'local');
 
         $dataset = $user->trainingDatasets()->create([
-            'name' => $request->validated('name'),
-            'description' => $request->validated('description'),
-            'format' => $request->validated('format'),
-            'file_path' => $path,
-            'file_size' => $file->getSize(),
+            'name'              => $request->validated('name'),
+            'description'       => $request->validated('description'),
+            'format'            => $request->validated('format'),
+            'file_path'         => $path,
+            'file_size'         => $file->getSize(),
             'original_filename' => $file->getClientOriginalName(),
         ]);
 

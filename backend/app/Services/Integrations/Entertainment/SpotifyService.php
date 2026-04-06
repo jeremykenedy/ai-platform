@@ -25,21 +25,21 @@ class SpotifyService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search',
+                'name'        => 'search',
                 'description' => 'Search for tracks, albums, artists, or playlists on Spotify.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The search query.',
                         ],
                         'type' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Comma-separated types to search (e.g. "track,artist,album"). Default "track".',
                         ],
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of results per type (default 10, max 50).',
                         ],
                     ],
@@ -47,13 +47,13 @@ class SpotifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_track',
+                'name'        => 'get_track',
                 'description' => 'Retrieve details of a Spotify track.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'trackId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Spotify track ID.',
                         ],
                     ],
@@ -61,13 +61,13 @@ class SpotifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_playlist',
+                'name'        => 'get_playlist',
                 'description' => 'Retrieve a Spotify playlist with its tracks.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'playlistId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Spotify playlist ID.',
                         ],
                     ],
@@ -75,32 +75,32 @@ class SpotifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_currently_playing',
+                'name'        => 'get_currently_playing',
                 'description' => "Retrieve the track currently playing on the user's Spotify account.",
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'get_top_items',
+                'name'        => 'get_top_items',
                 'description' => "Get the user's top tracks or artists over a time range.",
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'type' => [
-                            'type' => 'string',
-                            'enum' => ['tracks', 'artists'],
+                            'type'        => 'string',
+                            'enum'        => ['tracks', 'artists'],
                             'description' => 'Whether to return top tracks or top artists.',
                         ],
                         'timeRange' => [
-                            'type' => 'string',
-                            'enum' => ['short_term', 'medium_term', 'long_term'],
+                            'type'        => 'string',
+                            'enum'        => ['short_term', 'medium_term', 'long_term'],
                             'description' => 'Time range: short_term (~4 weeks), medium_term (~6 months), long_term (all time). Default "medium_term".',
                         ],
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of items to return (default 20, max 50).',
                         ],
                     ],
@@ -108,28 +108,28 @@ class SpotifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_recommendations',
+                'name'        => 'get_recommendations',
                 'description' => 'Get track recommendations based on seed tracks, artists, and/or genres.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'seedTracks' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'Up to 5 Spotify track IDs to use as seeds.',
                         ],
                         'seedArtists' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'Up to 5 Spotify artist IDs to use as seeds.',
                         ],
                         'seedGenres' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'Up to 5 genre strings to use as seeds.',
                         ],
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of recommendations to return (default 20, max 100).',
                         ],
                     ],
@@ -142,13 +142,13 @@ class SpotifyService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'search' => $this->search($user, $params),
-            'get_track' => $this->getTrack($user, $params),
-            'get_playlist' => $this->getPlaylist($user, $params),
+            'search'                => $this->search($user, $params),
+            'get_track'             => $this->getTrack($user, $params),
+            'get_playlist'          => $this->getPlaylist($user, $params),
             'get_currently_playing' => $this->getCurrentlyPlaying($user),
-            'get_top_items' => $this->getTopItems($user, $params),
-            'get_recommendations' => $this->getRecommendations($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'get_top_items'         => $this->getTopItems($user, $params),
+            'get_recommendations'   => $this->getRecommendations($user, $params),
+            default                 => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -167,10 +167,10 @@ class SpotifyService extends AbstractIntegrationService
 
         return 'https://accounts.spotify.com/authorize?'.http_build_query([
             'response_type' => 'code',
-            'client_id' => $clientId,
-            'redirect_uri' => $redirectUri,
-            'state' => $state,
-            'scope' => $scopes,
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'state'         => $state,
+            'scope'         => $scopes,
         ]);
     }
 
@@ -185,8 +185,8 @@ class SpotifyService extends AbstractIntegrationService
             ->timeout(15)
             ->asForm()
             ->post('https://accounts.spotify.com/api/token', [
-                'grant_type' => 'authorization_code',
-                'code' => $code,
+                'grant_type'   => 'authorization_code',
+                'code'         => $code,
                 'redirect_uri' => config('services.spotify.redirect_uri'),
             ]);
 
@@ -199,11 +199,11 @@ class SpotifyService extends AbstractIntegrationService
             $definition = $this->getDefinition();
 
             $user->integrations()->create([
-                'integration_id' => $definition->getKey(),
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'],
+                'integration_id'      => $definition->getKey(),
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'],
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => isset($data['scope'])
@@ -212,10 +212,10 @@ class SpotifyService extends AbstractIntegrationService
             ]);
         } else {
             $integration->update([
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'],
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'],
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => isset($data['scope'])
@@ -226,7 +226,8 @@ class SpotifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function search(User $user, array $params): array
@@ -236,8 +237,8 @@ class SpotifyService extends AbstractIntegrationService
         $limit = min((int) ($params['limit'] ?? 10), 50);
 
         $response = $this->client($user)->get(self::BASE_URL.'/search', [
-            'q' => $query,
-            'type' => $type,
+            'q'     => $query,
+            'type'  => $type,
             'limit' => $limit,
         ]);
 
@@ -247,7 +248,8 @@ class SpotifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getTrack(User $user, array $params): array
@@ -263,7 +265,8 @@ class SpotifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getPlaylist(User $user, array $params): array
@@ -296,20 +299,21 @@ class SpotifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getTopItems(User $user, array $params): array
     {
         $type = $params['type'] ?? throw new RuntimeException('type is required.');
 
-        if (! in_array($type, ['tracks', 'artists'], true)) {
+        if (!in_array($type, ['tracks', 'artists'], true)) {
             throw new RuntimeException('type must be "tracks" or "artists".');
         }
 
         $response = $this->client($user)->get(self::BASE_URL.'/me/top/'.$type, [
             'time_range' => $params['timeRange'] ?? 'medium_term',
-            'limit' => min((int) ($params['limit'] ?? 20), 50),
+            'limit'      => min((int) ($params['limit'] ?? 20), 50),
         ]);
 
         $response->throw();
@@ -318,7 +322,8 @@ class SpotifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getRecommendations(User $user, array $params): array
@@ -327,15 +332,15 @@ class SpotifyService extends AbstractIntegrationService
             'limit' => min((int) ($params['limit'] ?? 20), 100),
         ];
 
-        if (! empty($params['seedTracks']) && is_array($params['seedTracks'])) {
+        if (!empty($params['seedTracks']) && is_array($params['seedTracks'])) {
             $queryParams['seed_tracks'] = implode(',', array_slice($params['seedTracks'], 0, 5));
         }
 
-        if (! empty($params['seedArtists']) && is_array($params['seedArtists'])) {
+        if (!empty($params['seedArtists']) && is_array($params['seedArtists'])) {
             $queryParams['seed_artists'] = implode(',', array_slice($params['seedArtists'], 0, 5));
         }
 
-        if (! empty($params['seedGenres']) && is_array($params['seedGenres'])) {
+        if (!empty($params['seedGenres']) && is_array($params['seedGenres'])) {
             $queryParams['seed_genres'] = implode(',', array_slice($params['seedGenres'], 0, 5));
         }
 
@@ -391,7 +396,7 @@ class SpotifyService extends AbstractIntegrationService
             ->timeout(15)
             ->asForm()
             ->post('https://accounts.spotify.com/api/token', [
-                'grant_type' => 'refresh_token',
+                'grant_type'    => 'refresh_token',
                 'refresh_token' => $integration->oauth_refresh_token,
             ]);
 
@@ -402,7 +407,7 @@ class SpotifyService extends AbstractIntegrationService
         $expiresIn = (int) ($data['expires_in'] ?? 3600);
 
         $integration->update([
-            'oauth_token' => $newToken,
+            'oauth_token'      => $newToken,
             'oauth_expires_at' => now()->addSeconds($expiresIn),
         ]);
 

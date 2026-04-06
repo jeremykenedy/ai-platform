@@ -28,7 +28,7 @@ class ModelsPull extends Command
         $model = (string) $this->argument('model');
         $quiet = (bool) $this->option('silent');
 
-        if (! $this->ollamaProvider->isAvailable()) {
+        if (!$this->ollamaProvider->isAvailable()) {
             $this->error('Ollama is not available. Ensure the Ollama service is running and reachable.');
 
             return self::FAILURE;
@@ -41,13 +41,13 @@ class ModelsPull extends Command
             $lastStatus = '';
 
             foreach ($this->ollamaProvider->pullModel($model) as $chunk) {
-                if (! is_array($chunk)) {
+                if (!is_array($chunk)) {
                     continue;
                 }
 
                 $status = (string) ($chunk['status'] ?? '');
 
-                if (! $quiet && $status !== '') {
+                if (!$quiet && $status !== '') {
                     if (isset($chunk['total'], $chunk['completed']) && $chunk['total'] > 0) {
                         $pct = (int) round(($chunk['completed'] / $chunk['total']) * 100);
                         $this->line("  {$status}: {$pct}%");
@@ -91,11 +91,11 @@ class ModelsPull extends Command
         AiModel::updateOrCreate(
             ['name' => $modelName, 'provider_id' => $provider->id],
             [
-                'display_name' => $modelName,
+                'display_name'    => $modelName,
                 'ollama_model_id' => $modelName,
-                'is_active' => true,
-                'is_local' => true,
-                'ollama_digest' => $modelDetails['digest'] ?? null,
+                'is_active'       => true,
+                'is_local'        => true,
+                'ollama_digest'   => $modelDetails['digest'] ?? null,
                 'last_updated_at' => now(),
             ],
         );

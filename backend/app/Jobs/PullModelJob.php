@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Log;
 
 class PullModelJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 1;
 
@@ -32,7 +35,7 @@ class PullModelJob implements ShouldQueue
     public function handle(OllamaProvider $ollamaProvider): void
     {
         Log::info('[PullModelJob] Starting model pull', [
-            'model' => $this->modelName,
+            'model'   => $this->modelName,
             'user_id' => $this->userId,
         ]);
 
@@ -57,8 +60,8 @@ class PullModelJob implements ShouldQueue
         AiModel::updateOrCreate(
             ['name' => $this->modelName],
             [
-                'is_active' => true,
-                'is_local' => true,
+                'is_active'       => true,
+                'is_local'        => true,
                 'last_updated_at' => now(),
             ],
         );
@@ -77,9 +80,9 @@ class PullModelJob implements ShouldQueue
     public function failed(\Throwable $exception): void
     {
         Log::error('[PullModelJob] Job failed', [
-            'model' => $this->modelName,
+            'model'   => $this->modelName,
             'user_id' => $this->userId,
-            'error' => $exception->getMessage(),
+            'error'   => $exception->getMessage(),
         ]);
 
         broadcast(new ModelPullProgress(

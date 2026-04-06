@@ -12,7 +12,8 @@ class AudioTranscriptionService
 {
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Transcribe an audio file to text using the best available provider.
@@ -22,6 +23,7 @@ class AudioTranscriptionService
      *     language?: string,
      *     response_format?: string,
      * }  $options
+     *
      * @return array{text: string, language: string|null, duration: float|null, provider: string}
      */
     public function transcribe(string $audioPath, array $options = []): array
@@ -33,10 +35,10 @@ class AudioTranscriptionService
         }
 
         return match ($provider) {
-            'openai' => $this->transcribeViaOpenAi($audioPath, $options),
-            'groq' => $this->transcribeViaGroq($audioPath, $options),
+            'openai'   => $this->transcribeViaOpenAi($audioPath, $options),
+            'groq'     => $this->transcribeViaGroq($audioPath, $options),
             'deepgram' => $this->transcribeViaDeepgram($audioPath, $options),
-            default => throw new \RuntimeException("Unknown transcription provider: {$provider}"),
+            default    => throw new \RuntimeException("Unknown transcription provider: {$provider}"),
         };
     }
 
@@ -48,8 +50,8 @@ class AudioTranscriptionService
     public function getAvailableProviders(): array
     {
         return [
-            'openai' => $this->isOpenAiConfigured(),
-            'groq' => $this->isGroqConfigured(),
+            'openai'   => $this->isOpenAiConfigured(),
+            'groq'     => $this->isGroqConfigured(),
             'deepgram' => $this->isDeepgramConfigured(),
         ];
     }
@@ -57,7 +59,8 @@ class AudioTranscriptionService
     /**
      * Transcribe via OpenAI Whisper.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{text: string, language: string|null, duration: float|null, provider: string}
      */
     private function transcribeViaOpenAi(string $audioPath, array $options): array
@@ -72,9 +75,9 @@ class AudioTranscriptionService
                 ->connectTimeout(10)
                 ->attach('file', (string) file_get_contents($audioPath), basename($audioPath))
                 ->post('https://api.openai.com/v1/audio/transcriptions', [
-                    'model' => $model,
+                    'model'           => $model,
                     'response_format' => $responseFormat,
-                    'language' => $options['language'] ?? null,
+                    'language'        => $options['language'] ?? null,
                 ]);
 
             $response->throw();
@@ -82,14 +85,14 @@ class AudioTranscriptionService
             $data = $response->json();
 
             return [
-                'text' => $data['text'] ?? '',
+                'text'     => $data['text'] ?? '',
                 'language' => $data['language'] ?? null,
                 'duration' => isset($data['duration']) ? (float) $data['duration'] : null,
                 'provider' => 'openai',
             ];
         } catch (\Throwable $e) {
             Log::error('[AudioTranscriptionService] OpenAI transcription failed', [
-                'file' => $audioPath,
+                'file'  => $audioPath,
                 'error' => $e->getMessage(),
             ]);
 
@@ -100,7 +103,8 @@ class AudioTranscriptionService
     /**
      * Transcribe via Groq Whisper (same API format as OpenAI, different base URL).
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{text: string, language: string|null, duration: float|null, provider: string}
      */
     private function transcribeViaGroq(string $audioPath, array $options): array
@@ -115,9 +119,9 @@ class AudioTranscriptionService
                 ->connectTimeout(10)
                 ->attach('file', (string) file_get_contents($audioPath), basename($audioPath))
                 ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
-                    'model' => $model,
+                    'model'           => $model,
                     'response_format' => $responseFormat,
-                    'language' => $options['language'] ?? null,
+                    'language'        => $options['language'] ?? null,
                 ]);
 
             $response->throw();
@@ -125,14 +129,14 @@ class AudioTranscriptionService
             $data = $response->json();
 
             return [
-                'text' => $data['text'] ?? '',
+                'text'     => $data['text'] ?? '',
                 'language' => $data['language'] ?? null,
                 'duration' => isset($data['duration']) ? (float) $data['duration'] : null,
                 'provider' => 'groq',
             ];
         } catch (\Throwable $e) {
             Log::error('[AudioTranscriptionService] Groq transcription failed', [
-                'file' => $audioPath,
+                'file'  => $audioPath,
                 'error' => $e->getMessage(),
             ]);
 
@@ -143,7 +147,8 @@ class AudioTranscriptionService
     /**
      * Transcribe via Deepgram Nova.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{text: string, language: string|null, duration: float|null, provider: string}
      */
     private function transcribeViaDeepgram(string $audioPath, array $options): array
@@ -160,9 +165,9 @@ class AudioTranscriptionService
         $mimeType = $this->detectAudioMimeType($audioPath);
 
         $queryParams = [
-            'model' => $model,
+            'model'        => $model,
             'smart_format' => 'true',
-            'punctuate' => 'true',
+            'punctuate'    => 'true',
         ];
 
         if (isset($options['language'])) {
@@ -174,7 +179,7 @@ class AudioTranscriptionService
         try {
             $response = Http::withHeaders([
                 'Authorization' => "Token {$apiKey}",
-                'Content-Type' => $mimeType,
+                'Content-Type'  => $mimeType,
             ])
                 ->withBody($audioData, $mimeType)
                 ->timeout(120)
@@ -192,14 +197,14 @@ class AudioTranscriptionService
             $duration = $data['metadata']['duration'] ?? null;
 
             return [
-                'text' => $transcript,
+                'text'     => $transcript,
                 'language' => $detectedLanguage,
                 'duration' => $duration !== null ? (float) $duration : null,
                 'provider' => 'deepgram',
             ];
         } catch (\Throwable $e) {
             Log::error('[AudioTranscriptionService] Deepgram transcription failed', [
-                'file' => $audioPath,
+                'file'  => $audioPath,
                 'error' => $e->getMessage(),
             ]);
 
@@ -229,13 +234,13 @@ class AudioTranscriptionService
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         return match ($ext) {
-            'mp3' => 'audio/mpeg',
-            'wav' => 'audio/wav',
-            'flac' => 'audio/flac',
-            'ogg' => 'audio/ogg',
-            'webm' => 'audio/webm',
-            'm4a' => 'audio/mp4',
-            'aac' => 'audio/aac',
+            'mp3'   => 'audio/mpeg',
+            'wav'   => 'audio/wav',
+            'flac'  => 'audio/flac',
+            'ogg'   => 'audio/ogg',
+            'webm'  => 'audio/webm',
+            'm4a'   => 'audio/mp4',
+            'aac'   => 'audio/aac',
             default => 'audio/mpeg',
         };
     }

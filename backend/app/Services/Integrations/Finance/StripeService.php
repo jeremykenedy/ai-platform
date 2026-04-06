@@ -23,17 +23,17 @@ class StripeService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_charges',
+                'name'        => 'list_charges',
                 'description' => 'List Stripe charges, optionally filtering by creation date.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of charges to return (default 10, max 100).',
                         ],
                         'created_after' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Unix timestamp; only return charges created after this time.',
                         ],
                     ],
@@ -41,13 +41,13 @@ class StripeService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_charge',
+                'name'        => 'get_charge',
                 'description' => 'Retrieve details of a specific Stripe charge.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'chargeId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Stripe charge ID (e.g. ch_...).',
                         ],
                     ],
@@ -55,17 +55,17 @@ class StripeService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_customers',
+                'name'        => 'list_customers',
                 'description' => 'List Stripe customers, optionally filtering by email.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of customers to return (default 10, max 100).',
                         ],
                         'email' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Filter customers by exact email address.',
                         ],
                     ],
@@ -73,13 +73,13 @@ class StripeService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_customer',
+                'name'        => 'get_customer',
                 'description' => 'Retrieve details of a specific Stripe customer.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'customerId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Stripe customer ID (e.g. cus_...).',
                         ],
                     ],
@@ -87,22 +87,22 @@ class StripeService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_invoices',
+                'name'        => 'list_invoices',
                 'description' => 'List Stripe invoices, optionally filtered by customer and/or status.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'customerId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Filter invoices by Stripe customer ID.',
                         ],
                         'status' => [
-                            'type' => 'string',
-                            'enum' => ['draft', 'open', 'paid', 'uncollectible', 'void'],
+                            'type'        => 'string',
+                            'enum'        => ['draft', 'open', 'paid', 'uncollectible', 'void'],
                             'description' => 'Filter invoices by status.',
                         ],
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of invoices to return (default 10, max 100).',
                         ],
                     ],
@@ -110,17 +110,17 @@ class StripeService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_payment_link',
+                'name'        => 'create_payment_link',
                 'description' => 'Create a Stripe payment link for a price and quantity.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'priceId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Stripe price ID (e.g. price_...).',
                         ],
                         'quantity' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Quantity of the item (default 1).',
                         ],
                     ],
@@ -133,18 +133,19 @@ class StripeService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_charges' => $this->listCharges($user, $params),
-            'get_charge' => $this->getCharge($user, $params),
-            'list_customers' => $this->listCustomers($user, $params),
-            'get_customer' => $this->getCustomer($user, $params),
-            'list_invoices' => $this->listInvoices($user, $params),
+            'list_charges'        => $this->listCharges($user, $params),
+            'get_charge'          => $this->getCharge($user, $params),
+            'list_customers'      => $this->listCustomers($user, $params),
+            'get_customer'        => $this->getCustomer($user, $params),
+            'list_invoices'       => $this->listInvoices($user, $params),
             'create_payment_link' => $this->createPaymentLink($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default               => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listCharges(User $user, array $params): array
@@ -162,7 +163,8 @@ class StripeService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getCharge(User $user, array $params): array
@@ -178,7 +180,8 @@ class StripeService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listCustomers(User $user, array $params): array
@@ -196,7 +199,8 @@ class StripeService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getCustomer(User $user, array $params): array
@@ -212,7 +216,8 @@ class StripeService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listInvoices(User $user, array $params): array
@@ -234,7 +239,8 @@ class StripeService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createPaymentLink(User $user, array $params): array
@@ -243,7 +249,7 @@ class StripeService extends AbstractIntegrationService
         $quantity = isset($params['quantity']) ? max(1, (int) $params['quantity']) : 1;
 
         $response = $this->client($user)->asForm()->post(self::BASE_URL.'/payment_links', [
-            'line_items[0][price]' => $priceId,
+            'line_items[0][price]'    => $priceId,
             'line_items[0][quantity]' => $quantity,
         ]);
 

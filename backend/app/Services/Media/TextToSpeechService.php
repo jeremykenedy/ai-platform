@@ -12,7 +12,8 @@ class TextToSpeechService
 {
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Synthesize speech from text using the best available provider.
@@ -23,6 +24,7 @@ class TextToSpeechService
      *     speed?: float,
      *     format?: string,
      * }  $options
+     *
      * @return array{audio_data: string, format: string, provider: string, duration: float|null}
      */
     public function synthesize(string $text, array $options = []): array
@@ -35,8 +37,8 @@ class TextToSpeechService
 
         return match ($provider) {
             'elevenlabs' => $this->synthesizeViaElevenLabs($text, $options),
-            'openai' => $this->synthesizeViaOpenAi($text, $options),
-            default => throw new \RuntimeException("Unknown TTS provider: {$provider}"),
+            'openai'     => $this->synthesizeViaOpenAi($text, $options),
+            default      => throw new \RuntimeException("Unknown TTS provider: {$provider}"),
         };
     }
 
@@ -74,14 +76,15 @@ class TextToSpeechService
     {
         return [
             'elevenlabs' => $this->isElevenLabsConfigured(),
-            'openai' => $this->isOpenAiConfigured(),
+            'openai'     => $this->isOpenAiConfigured(),
         ];
     }
 
     /**
      * Synthesize speech via ElevenLabs.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{audio_data: string, format: string, provider: string, duration: float|null}
      */
     private function synthesizeViaElevenLabs(string $text, array $options): array
@@ -93,26 +96,26 @@ class TextToSpeechService
         $speed = isset($options['speed']) ? (float) $options['speed'] : 1.0;
 
         $outputFormat = match ($format) {
-            'mp3' => 'mp3_44100_128',
-            'wav' => 'pcm_44100',
-            'ogg' => 'ulaw_8000',
+            'mp3'   => 'mp3_44100_128',
+            'wav'   => 'pcm_44100',
+            'ogg'   => 'ulaw_8000',
             default => 'mp3_44100_128',
         };
 
         $payload = [
-            'text' => $text,
-            'model_id' => $modelId,
+            'text'           => $text,
+            'model_id'       => $modelId,
             'voice_settings' => [
-                'stability' => 0.5,
+                'stability'        => 0.5,
                 'similarity_boost' => 0.75,
-                'speed' => max(0.25, min(4.0, $speed)),
+                'speed'            => max(0.25, min(4.0, $speed)),
             ],
         ];
 
         try {
             $response = Http::withHeaders([
                 'xi-api-key' => $apiKey,
-                'Accept' => 'audio/'.($format === 'wav' ? 'wav' : 'mpeg'),
+                'Accept'     => 'audio/'.($format === 'wav' ? 'wav' : 'mpeg'),
             ])
                 ->timeout(60)
                 ->connectTimeout(10)
@@ -128,14 +131,14 @@ class TextToSpeechService
 
             return [
                 'audio_data' => $audioData,
-                'format' => $format,
-                'provider' => 'elevenlabs',
-                'duration' => $duration,
+                'format'     => $format,
+                'provider'   => 'elevenlabs',
+                'duration'   => $duration,
             ];
         } catch (\Throwable $e) {
             Log::error('[TextToSpeechService] ElevenLabs synthesis failed', [
                 'voice_id' => $voiceId,
-                'error' => $e->getMessage(),
+                'error'    => $e->getMessage(),
             ]);
 
             throw $e;
@@ -145,7 +148,8 @@ class TextToSpeechService
     /**
      * Synthesize speech via OpenAI TTS.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array{audio_data: string, format: string, provider: string, duration: float|null}
      */
     private function synthesizeViaOpenAi(string $text, array $options): array
@@ -158,22 +162,22 @@ class TextToSpeechService
 
         $validVoices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
 
-        if (! in_array($voice, $validVoices, true)) {
+        if (!in_array($voice, $validVoices, true)) {
             $voice = 'alloy';
         }
 
         $validFormats = ['mp3', 'opus', 'aac', 'flac', 'wav', 'pcm'];
 
-        if (! in_array($format, $validFormats, true)) {
+        if (!in_array($format, $validFormats, true)) {
             $format = 'mp3';
         }
 
         $payload = [
-            'model' => $model,
-            'input' => $text,
-            'voice' => $voice,
+            'model'           => $model,
+            'input'           => $text,
+            'voice'           => $voice,
             'response_format' => $format,
-            'speed' => max(0.25, min(4.0, $speed)),
+            'speed'           => max(0.25, min(4.0, $speed)),
         ];
 
         try {
@@ -189,9 +193,9 @@ class TextToSpeechService
 
             return [
                 'audio_data' => $audioData,
-                'format' => $format,
-                'provider' => 'openai',
-                'duration' => $duration,
+                'format'     => $format,
+                'provider'   => 'openai',
+                'duration'   => $duration,
             ];
         } catch (\Throwable $e) {
             Log::error('[TextToSpeechService] OpenAI TTS synthesis failed', [
@@ -223,10 +227,10 @@ class TextToSpeechService
         $voices = $response->json('voices') ?? [];
 
         return array_map(fn (array $voice): array => [
-            'id' => $voice['voice_id'] ?? '',
-            'name' => $voice['name'] ?? '',
-            'provider' => 'elevenlabs',
-            'language' => $voice['labels']['language'] ?? null,
+            'id'          => $voice['voice_id'] ?? '',
+            'name'        => $voice['name'] ?? '',
+            'provider'    => 'elevenlabs',
+            'language'    => $voice['labels']['language'] ?? null,
             'preview_url' => $voice['preview_url'] ?? null,
         ], $voices);
     }
@@ -239,20 +243,20 @@ class TextToSpeechService
     private function listOpenAiVoices(): array
     {
         $voiceNames = [
-            'alloy' => 'Alloy',
-            'echo' => 'Echo',
-            'fable' => 'Fable',
-            'onyx' => 'Onyx',
-            'nova' => 'Nova',
+            'alloy'   => 'Alloy',
+            'echo'    => 'Echo',
+            'fable'   => 'Fable',
+            'onyx'    => 'Onyx',
+            'nova'    => 'Nova',
             'shimmer' => 'Shimmer',
         ];
 
         return array_map(
             fn (string $id, string $name): array => [
-                'id' => $id,
-                'name' => $name,
-                'provider' => 'openai',
-                'language' => null,
+                'id'          => $id,
+                'name'        => $name,
+                'provider'    => 'openai',
+                'language'    => null,
                 'preview_url' => null,
             ],
             array_keys($voiceNames),
@@ -288,13 +292,13 @@ class TextToSpeechService
 
         // Approximate bitrates in kbps.
         $bitrates = [
-            'mp3' => 128,
+            'mp3'  => 128,
             'opus' => 64,
-            'aac' => 128,
+            'aac'  => 128,
             'flac' => 800,
-            'wav' => 1411,
-            'pcm' => 1411,
-            'ogg' => 96,
+            'wav'  => 1411,
+            'pcm'  => 1411,
+            'ogg'  => 96,
         ];
 
         $kbps = $bitrates[$format] ?? 128;

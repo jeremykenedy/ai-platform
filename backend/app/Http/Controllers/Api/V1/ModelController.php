@@ -21,7 +21,8 @@ class ModelController extends Controller
     public function __construct(
         private readonly PullModelAction $pullModelAction,
         private readonly SyncModelsAction $syncModelsAction,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): AiModelCollection
     {

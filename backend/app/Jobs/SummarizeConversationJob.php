@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Log;
 
 class SummarizeConversationJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 2;
 
@@ -44,8 +47,8 @@ class SummarizeConversationJob implements ShouldBeUnique, ShouldQueue
         if ($summary instanceof ConversationSummary) {
             Log::info('[SummarizeConversationJob] Summary created', [
                 'conversation_id' => $this->conversationId,
-                'summary_id' => (string) $summary->id,
-                'message_count' => $summary->message_count,
+                'summary_id'      => (string) $summary->id,
+                'message_count'   => $summary->message_count,
             ]);
         } else {
             Log::info('[SummarizeConversationJob] No summary created (too few messages)', [

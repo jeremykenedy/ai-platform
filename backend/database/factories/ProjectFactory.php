@@ -19,10 +19,10 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'name' => fake()->words(3, true),
+            'user_id'     => User::factory(),
+            'name'        => fake()->words(3, true),
             'description' => fake()->sentence(),
-            'persona_id' => null,
+            'persona_id'  => null,
         ];
     }
 }

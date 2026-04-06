@@ -17,7 +17,8 @@ class MemoryExtractionService
     public function __construct(
         private readonly ModelRouterService $modelRouter,
         private readonly EmbeddingService $embeddingService,
-    ) {}
+    ) {
+    }
 
     /**
      * Extract memories from a conversation and persist them.
@@ -51,14 +52,14 @@ class MemoryExtractionService
 
                 if ($attempt > 1 && $lastError !== null) {
                     $llmMessages[] = [
-                        'role' => 'user',
+                        'role'    => 'user',
                         'content' => 'Your previous response could not be parsed as valid JSON. Please respond with ONLY a valid JSON array matching the schema: [{"content": "string", "category": "preference|fact|instruction|context|personality", "importance": 1-10}].',
                     ];
                 }
 
                 $response = $route['provider']->chat($llmMessages, $route['model'], [
-                    'system' => $systemPrompt,
-                    'format' => 'json',
+                    'system'     => $systemPrompt,
+                    'format'     => 'json',
                     'max_tokens' => 2048,
                 ]);
 
@@ -107,15 +108,15 @@ class MemoryExtractionService
     /**
      * Parse and validate that the JSON response matches the expected schema.
      *
-     * @return array<int, array{content: string, category: string, importance: int}>
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array<int, array{content: string, category: string, importance: int}>
      */
     public function validateExtractionResponse(string $json): array
     {
         $decoded = json_decode(trim($json), true);
 
-        if (! is_array($decoded)) {
+        if (!is_array($decoded)) {
             throw new \InvalidArgumentException('Response is not a JSON array.');
         }
 
@@ -123,15 +124,15 @@ class MemoryExtractionService
         $validated = [];
 
         foreach ($decoded as $index => $item) {
-            if (! is_array($item)) {
+            if (!is_array($item)) {
                 throw new \InvalidArgumentException("Item at index {$index} is not an object.");
             }
 
-            if (! isset($item['content']) || ! is_string($item['content']) || trim($item['content']) === '') {
+            if (!isset($item['content']) || !is_string($item['content']) || trim($item['content']) === '') {
                 throw new \InvalidArgumentException("Item at index {$index} missing or empty 'content'.");
             }
 
-            if (! isset($item['category']) || ! in_array($item['category'], $validCategories, true)) {
+            if (!isset($item['category']) || !in_array($item['category'], $validCategories, true)) {
                 throw new \InvalidArgumentException("Item at index {$index} has invalid 'category': ".($item['category'] ?? 'missing'));
             }
 
@@ -139,8 +140,8 @@ class MemoryExtractionService
             $importance = max(1, min(10, $importance));
 
             $validated[] = [
-                'content' => trim($item['content']),
-                'category' => $item['category'],
+                'content'    => trim($item['content']),
+                'category'   => $item['category'],
                 'importance' => $importance,
             ];
         }
@@ -151,7 +152,7 @@ class MemoryExtractionService
     /**
      * Build the extraction prompt from conversation messages.
      *
-     * @param  array<int, array<string, mixed>>  $messages
+     * @param array<int, array<string, mixed>> $messages
      */
     private function buildExtractionPrompt(array $messages): string
     {
@@ -188,7 +189,7 @@ class MemoryExtractionService
      *
      * Uses raw pgvector query for performance.
      *
-     * @param  float[]  $embedding
+     * @param float[] $embedding
      */
     private function findDuplicateByEmbedding(string $userId, array $embedding, float $threshold = 0.92): ?Memory
     {
@@ -221,7 +222,7 @@ class MemoryExtractionService
     /**
      * Detect a conflicting memory (similarity in the 0.7-0.92 range).
      *
-     * @param  float[]  $embedding
+     * @param float[] $embedding
      */
     private function detectConflicts(string $userId, array $embedding): ?Memory
     {
@@ -254,8 +255,8 @@ class MemoryExtractionService
     /**
      * Create a new memory or update an existing one, handling duplicate/conflict detection.
      *
-     * @param  array{content: string, category: string, importance: int}  $memoryData
-     * @param  float[]  $embedding
+     * @param array{content: string, category: string, importance: int} $memoryData
+     * @param float[]                                                   $embedding
      */
     private function createOrUpdateMemory(
         string $userId,
@@ -268,8 +269,8 @@ class MemoryExtractionService
 
         if ($duplicate !== null) {
             $duplicate->update([
-                'content' => $memoryData['content'],
-                'importance' => max($duplicate->importance, $memoryData['importance']),
+                'content'          => $memoryData['content'],
+                'importance'       => max($duplicate->importance, $memoryData['importance']),
                 'last_accessed_at' => now(),
             ]);
 
@@ -282,24 +283,24 @@ class MemoryExtractionService
 
         /** @var Memory $memory */
         $memory = Memory::create([
-            'user_id' => $userId,
-            'content' => $memoryData['content'],
-            'category' => $memoryData['category'],
-            'importance' => $memoryData['importance'],
+            'user_id'                => $userId,
+            'content'                => $memoryData['content'],
+            'category'               => $memoryData['category'],
+            'importance'             => $memoryData['importance'],
             'source_conversation_id' => $conversationId,
-            'source_message_id' => $messageId,
-            'embedding' => $vectorLiteral,
-            'is_active' => true,
-            'last_accessed_at' => now(),
-            'access_count' => 0,
+            'source_message_id'      => $messageId,
+            'embedding'              => $vectorLiteral,
+            'is_active'              => true,
+            'last_accessed_at'       => now(),
+            'access_count'           => 0,
         ]);
 
         if ($conflict !== null) {
             MemoryConflict::create([
-                'user_id' => $userId,
-                'memory_id' => (string) $memory->id,
+                'user_id'        => $userId,
+                'memory_id'      => (string) $memory->id,
                 'conflicts_with' => (string) $conflict->id,
-                'resolved' => false,
+                'resolved'       => false,
             ]);
         }
 

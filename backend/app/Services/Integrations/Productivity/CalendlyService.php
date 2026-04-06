@@ -22,17 +22,17 @@ class CalendlyService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.calendly.client_id'),
-            'redirect_uri' => config('services.calendly.redirect_uri'),
+            'client_id'     => config('services.calendly.client_id'),
+            'redirect_uri'  => config('services.calendly.redirect_uri'),
             'response_type' => 'code',
-            'state' => $user->getKey(),
+            'state'         => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -42,11 +42,11 @@ class CalendlyService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.calendly.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.calendly.client_id'),
                 'client_secret' => config('services.calendly.client_secret'),
-                'redirect_uri' => config('services.calendly.redirect_uri'),
-                'grant_type' => 'authorization_code',
+                'redirect_uri'  => config('services.calendly.redirect_uri'),
+                'grant_type'    => 'authorization_code',
             ]);
 
         $response->throw();
@@ -57,14 +57,14 @@ class CalendlyService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'] ?? null,
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
             ],
@@ -78,44 +78,44 @@ class CalendlyService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_event_types',
+                'name'        => 'list_event_types',
                 'description' => 'List all Calendly event types for the user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'get_availability',
+                'name'        => 'get_availability',
                 'description' => 'Get available time slots for a Calendly event type.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventTypeUri'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventTypeUri'],
                     'properties' => [
                         'eventTypeUri' => ['type' => 'string', 'description' => 'Calendly event type URI.'],
                     ],
                 ],
             ],
             [
-                'name' => 'create_scheduling_link',
+                'name'        => 'create_scheduling_link',
                 'description' => 'Create a single-use Calendly scheduling link.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventTypeUri'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventTypeUri'],
                     'properties' => [
                         'eventTypeUri' => ['type' => 'string', 'description' => 'Calendly event type URI.'],
                     ],
                 ],
             ],
             [
-                'name' => 'list_events',
+                'name'        => 'list_events',
                 'description' => 'List scheduled Calendly events.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'status' => [
-                            'type' => 'string',
-                            'enum' => ['active', 'canceled'],
+                            'type'        => 'string',
+                            'enum'        => ['active', 'canceled'],
                             'description' => 'Filter by event status.',
                         ],
                         'minStartTime' => ['type' => 'string', 'description' => 'Minimum start time (ISO8601).'],
@@ -124,23 +124,23 @@ class CalendlyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'cancel_event',
+                'name'        => 'cancel_event',
                 'description' => 'Cancel a scheduled Calendly event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventUri'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventUri'],
                     'properties' => [
                         'eventUri' => ['type' => 'string', 'description' => 'Calendly event URI.'],
-                        'reason' => ['type' => 'string', 'description' => 'Reason for cancellation.'],
+                        'reason'   => ['type' => 'string', 'description' => 'Reason for cancellation.'],
                     ],
                 ],
             ],
             [
-                'name' => 'list_invitees',
+                'name'        => 'list_invitees',
                 'description' => 'List invitees for a Calendly event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventUri'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventUri'],
                     'properties' => [
                         'eventUri' => ['type' => 'string', 'description' => 'Calendly event URI.'],
                     ],
@@ -150,18 +150,18 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_event_types' => $this->listEventTypes($user),
-            'get_availability' => $this->getAvailability($params, $user),
+            'list_event_types'       => $this->listEventTypes($user),
+            'get_availability'       => $this->getAvailability($params, $user),
             'create_scheduling_link' => $this->createSchedulingLink($params, $user),
-            'list_events' => $this->listEvents($params, $user),
-            'cancel_event' => $this->cancelEvent($params, $user),
-            'list_invitees' => $this->listInvitees($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            'list_events'            => $this->listEvents($params, $user),
+            'cancel_event'           => $this->cancelEvent($params, $user),
+            'list_invitees'          => $this->listInvitees($params, $user),
+            default                  => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -203,7 +203,7 @@ class CalendlyService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->get(self::BASE_URL.'/event_types', [
-                'user' => $userUri,
+                'user'   => $userUri,
                 'active' => 'true',
             ]);
 
@@ -213,7 +213,8 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getAvailability(array $params, User $user): array
@@ -226,7 +227,7 @@ class CalendlyService extends AbstractIntegrationService
             ->get(self::BASE_URL.'/event_type_available_times', [
                 'event_type' => $eventTypeUri,
                 'start_time' => now()->toIso8601String(),
-                'end_time' => now()->addDays(14)->toIso8601String(),
+                'end_time'   => now()->addDays(14)->toIso8601String(),
             ]);
 
         $response->throw();
@@ -235,7 +236,8 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createSchedulingLink(array $params, User $user): array
@@ -245,8 +247,8 @@ class CalendlyService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->post(self::BASE_URL.'/scheduling_links', [
                 'max_event_count' => 1,
-                'owner' => (string) $params['eventTypeUri'],
-                'owner_type' => 'EventType',
+                'owner'           => (string) $params['eventTypeUri'],
+                'owner_type'      => 'EventType',
             ]);
 
         $response->throw();
@@ -255,7 +257,8 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listEvents(array $params, User $user): array
@@ -264,11 +267,11 @@ class CalendlyService extends AbstractIntegrationService
         $userUri = $me['resource']['uri'] ?? '';
 
         $query = array_filter([
-            'user' => $userUri,
-            'status' => $params['status'] ?? null,
+            'user'           => $userUri,
+            'status'         => $params['status'] ?? null,
             'min_start_time' => $params['minStartTime'] ?? null,
             'max_start_time' => $params['maxStartTime'] ?? null,
-            'count' => 20,
+            'count'          => 20,
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -282,7 +285,8 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function cancelEvent(array $params, User $user): array
@@ -305,7 +309,8 @@ class CalendlyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listInvitees(array $params, User $user): array

@@ -54,7 +54,7 @@ class IntegrationsTest extends Command
 
         $isConnected = $service->isConnected($user);
 
-        if (! $isConnected) {
+        if (!$isConnected) {
             $this->warn('Status: not connected');
 
             return self::FAILURE;

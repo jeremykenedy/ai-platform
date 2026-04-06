@@ -19,14 +19,14 @@ class PersonaFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'name' => fake()->words(3, true),
-            'description' => fake()->sentence(),
-            'system_prompt' => fake()->paragraph(),
-            'model_name' => null,
-            'temperature' => 0.70,
-            'top_p' => 0.90,
-            'top_k' => 40,
+            'user_id'        => User::factory(),
+            'name'           => fake()->words(3, true),
+            'description'    => fake()->sentence(),
+            'system_prompt'  => fake()->paragraph(),
+            'model_name'     => null,
+            'temperature'    => 0.70,
+            'top_p'          => 0.90,
+            'top_k'          => 40,
             'repeat_penalty' => 1.10,
         ];
     }

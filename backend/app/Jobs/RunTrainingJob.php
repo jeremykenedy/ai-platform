@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Log;
 
 class RunTrainingJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 1;
 
@@ -35,9 +38,9 @@ class RunTrainingJob implements ShouldQueue
         $job = TrainingJob::with(['dataset', 'baseModel'])->findOrFail($this->trainingJobId);
 
         $job->update([
-            'status' => 'running',
+            'status'     => 'running',
             'started_at' => now(),
-            'progress' => 0,
+            'progress'   => 0,
         ]);
 
         broadcast(new TrainingJobStatusChanged(
@@ -48,9 +51,9 @@ class RunTrainingJob implements ShouldQueue
         ));
 
         Log::info('[RunTrainingJob] Training started', [
-            'training_job_id' => $this->trainingJobId,
-            'base_model' => $job->baseModel?->name,
-            'dataset' => $job->dataset?->id,
+            'training_job_id'   => $this->trainingJobId,
+            'base_model'        => $job->baseModel?->name,
+            'dataset'           => $job->dataset?->id,
             'output_model_name' => $job->output_model_name,
         ]);
 
@@ -61,7 +64,7 @@ class RunTrainingJob implements ShouldQueue
             $progress = (int) round(($step / $steps) * 100);
 
             $job->update([
-                'progress' => $progress,
+                'progress'   => $progress,
                 'log_output' => ($job->log_output ?? '')."Step {$step}/{$steps} completed.\n",
             ]);
 
@@ -74,15 +77,15 @@ class RunTrainingJob implements ShouldQueue
 
             Log::info('[RunTrainingJob] Step completed', [
                 'training_job_id' => $this->trainingJobId,
-                'step' => $step,
-                'progress' => $progress,
+                'step'            => $step,
+                'progress'        => $progress,
             ]);
         }
 
         $job->update([
-            'status' => 'completed',
+            'status'       => 'completed',
             'completed_at' => now(),
-            'progress' => 100,
+            'progress'     => 100,
         ]);
 
         broadcast(new TrainingJobStatusChanged(
@@ -101,14 +104,14 @@ class RunTrainingJob implements ShouldQueue
     {
         Log::error('[RunTrainingJob] Job failed', [
             'training_job_id' => $this->trainingJobId,
-            'error' => $exception->getMessage(),
+            'error'           => $exception->getMessage(),
         ]);
 
         $job = TrainingJob::find($this->trainingJobId);
 
         if ($job !== null) {
             $job->update([
-                'status' => 'failed',
+                'status'     => 'failed',
                 'log_output' => ($job->log_output ?? '')."Error: {$exception->getMessage()}\n",
             ]);
 

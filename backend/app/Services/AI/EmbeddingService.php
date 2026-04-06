@@ -14,7 +14,8 @@ class EmbeddingService
 {
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Generate an embedding vector for the given text.
@@ -33,9 +34,9 @@ class EmbeddingService
             return $provider->embed($text, $embeddingModel);
         } catch (\Throwable $e) {
             Log::error('[EmbeddingService] Failed to generate embedding', [
-                'model' => $embeddingModel,
+                'model'       => $embeddingModel,
                 'text_length' => strlen($text),
-                'error' => $e->getMessage(),
+                'error'       => $e->getMessage(),
             ]);
 
             throw $e;
@@ -67,7 +68,7 @@ class EmbeddingService
         } catch (\Throwable $e) {
             Log::error('[EmbeddingService] Failed to store message embedding', [
                 'message_id' => $message->id,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ]);
         }
     }
@@ -97,7 +98,7 @@ class EmbeddingService
         } catch (\Throwable $e) {
             Log::error('[EmbeddingService] Failed to store memory embedding', [
                 'memory_id' => $memory->id,
-                'error' => $e->getMessage(),
+                'error'     => $e->getMessage(),
             ]);
         }
     }
@@ -105,7 +106,8 @@ class EmbeddingService
     /**
      * Find similar records in the given table using pgvector cosine distance.
      *
-     * @param  float[]  $queryEmbedding
+     * @param float[] $queryEmbedding
+     *
      * @return Collection<int, object>
      */
     public function findSimilar(array $queryEmbedding, string $table, string $userId, int $limit = 15): Collection
@@ -127,9 +129,9 @@ class EmbeddingService
             return collect($results);
         } catch (\Throwable $e) {
             Log::error('[EmbeddingService] Similarity search failed', [
-                'table' => $table,
+                'table'   => $table,
                 'user_id' => $userId,
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ]);
 
             return collect();
@@ -141,8 +143,8 @@ class EmbeddingService
      *
      * Returns a value between -1.0 and 1.0 (1.0 = identical direction).
      *
-     * @param  float[]  $a
-     * @param  float[]  $b
+     * @param float[] $a
+     * @param float[] $b
      */
     public function cosineSimilarity(array $a, array $b): float
     {
@@ -174,7 +176,7 @@ class EmbeddingService
     /**
      * Format a float array as a pgvector-compatible string literal.
      *
-     * @param  float[]  $embedding
+     * @param float[] $embedding
      */
     private function formatVector(array $embedding): string
     {

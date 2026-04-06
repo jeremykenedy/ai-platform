@@ -11,25 +11,26 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string $integration_id
- * @property bool $is_enabled
- * @property string|null $credentials
- * @property string|null $oauth_token
- * @property string|null $oauth_refresh_token
- * @property Carbon|null $oauth_expires_at
+ * @property string            $id
+ * @property string            $user_id
+ * @property string            $integration_id
+ * @property bool              $is_enabled
+ * @property string|null       $credentials
+ * @property string|null       $oauth_token
+ * @property string|null       $oauth_refresh_token
+ * @property Carbon|null       $oauth_expires_at
  * @property array<mixed>|null $scopes_granted
- * @property Carbon|null $last_used_at
- * @property string|null $last_error
+ * @property Carbon|null       $last_used_at
+ * @property string|null       $last_error
  * @property array<mixed>|null $metadata
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Carbon|null $deleted_at
+ * @property Carbon|null       $created_at
+ * @property Carbon|null       $updated_at
+ * @property Carbon|null       $deleted_at
  */
 class UserIntegration extends Model
 {
-    use HasUlids, SoftDeletes;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>
@@ -63,14 +64,14 @@ class UserIntegration extends Model
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'credentials' => 'encrypted',
-            'oauth_token' => 'encrypted',
+            'is_enabled'          => 'boolean',
+            'credentials'         => 'encrypted',
+            'oauth_token'         => 'encrypted',
             'oauth_refresh_token' => 'encrypted',
-            'oauth_expires_at' => 'datetime',
-            'scopes_granted' => 'array',
-            'last_used_at' => 'datetime',
-            'metadata' => 'array',
+            'oauth_expires_at'    => 'datetime',
+            'scopes_granted'      => 'array',
+            'last_used_at'        => 'datetime',
+            'metadata'            => 'array',
         ];
     }
 

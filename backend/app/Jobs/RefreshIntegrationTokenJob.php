@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Log;
 
 class RefreshIntegrationTokenJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 3;
 
@@ -48,7 +51,7 @@ class RefreshIntegrationTokenJob implements ShouldQueue
         if ($integration->oauth_refresh_token === null) {
             Log::warning('[RefreshIntegrationTokenJob] No refresh token available', [
                 'user_integration_id' => $this->userIntegrationId,
-                'integration_name' => $definition->name,
+                'integration_name'    => $definition->name,
             ]);
 
             $integration->update([
@@ -74,13 +77,13 @@ class RefreshIntegrationTokenJob implements ShouldQueue
                 ->timeout(20)
                 ->connectTimeout(10)
                 ->post($tokenEndpoint, [
-                    'grant_type' => 'refresh_token',
+                    'grant_type'    => 'refresh_token',
                     'refresh_token' => $integration->oauth_refresh_token,
-                    'client_id' => config("services.{$definition->name}.client_id"),
+                    'client_id'     => config("services.{$definition->name}.client_id"),
                     'client_secret' => config("services.{$definition->name}.client_secret"),
                 ]);
 
-            if (! $response->successful()) {
+            if (!$response->successful()) {
                 throw new \RuntimeException(
                     "Token refresh failed with HTTP {$response->status()}: {$response->body()}"
                 );
@@ -89,9 +92,9 @@ class RefreshIntegrationTokenJob implements ShouldQueue
             $data = $response->json();
 
             $integration->update([
-                'oauth_token' => $data['access_token'],
+                'oauth_token'         => $data['access_token'],
                 'oauth_refresh_token' => $data['refresh_token'] ?? $integration->oauth_refresh_token,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'last_error' => null,
@@ -99,13 +102,13 @@ class RefreshIntegrationTokenJob implements ShouldQueue
 
             Log::info('[RefreshIntegrationTokenJob] Token refreshed successfully', [
                 'user_integration_id' => $this->userIntegrationId,
-                'integration_name' => $definition->name,
+                'integration_name'    => $definition->name,
             ]);
         } catch (\Throwable $e) {
             Log::error('[RefreshIntegrationTokenJob] Token refresh failed', [
                 'user_integration_id' => $this->userIntegrationId,
-                'integration_name' => $definition->name,
-                'error' => $e->getMessage(),
+                'integration_name'    => $definition->name,
+                'error'               => $e->getMessage(),
             ]);
 
             $integration->update([
@@ -121,7 +124,7 @@ class RefreshIntegrationTokenJob implements ShouldQueue
     {
         Log::error('[RefreshIntegrationTokenJob] Job exhausted all retries', [
             'user_integration_id' => $this->userIntegrationId,
-            'error' => $exception->getMessage(),
+            'error'               => $exception->getMessage(),
         ]);
 
         $integration = UserIntegration::find($this->userIntegrationId);
@@ -138,14 +141,14 @@ class RefreshIntegrationTokenJob implements ShouldQueue
     {
         /** @var array<string, string> $endpoints */
         $endpoints = [
-            'google' => 'https://oauth2.googleapis.com/token',
-            'github' => 'https://github.com/login/oauth/access_token',
-            'slack' => 'https://slack.com/api/oauth.v2.access',
-            'notion' => 'https://api.notion.com/v1/oauth/token',
-            'discord' => 'https://discord.com/api/oauth2/token',
+            'google'    => 'https://oauth2.googleapis.com/token',
+            'github'    => 'https://github.com/login/oauth/access_token',
+            'slack'     => 'https://slack.com/api/oauth.v2.access',
+            'notion'    => 'https://api.notion.com/v1/oauth/token',
+            'discord'   => 'https://discord.com/api/oauth2/token',
             'microsoft' => 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-            'spotify' => 'https://accounts.spotify.com/api/token',
-            'dropbox' => 'https://api.dropboxapi.com/oauth2/token',
+            'spotify'   => 'https://accounts.spotify.com/api/token',
+            'dropbox'   => 'https://api.dropboxapi.com/oauth2/token',
         ];
 
         return $endpoints[$integrationName] ?? null;

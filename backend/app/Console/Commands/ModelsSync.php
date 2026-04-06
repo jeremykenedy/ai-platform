@@ -30,7 +30,7 @@ class ModelsSync extends Command
         if ($providerName !== null) {
             $exists = AiProvider::where('name', $providerName)->exists();
 
-            if (! $exists) {
+            if (!$exists) {
                 $this->error("Provider [{$providerName}] not found.");
 
                 return self::FAILURE;

@@ -17,7 +17,8 @@ class RegenerateMessageAction
         private readonly ContextWindowService $contextWindowService,
         private readonly MemoryRetrievalService $memoryRetrievalService,
         private readonly EmbeddingService $embeddingService,
-    ) {}
+    ) {
+    }
 
     /**
      * Soft-delete the last assistant message and re-dispatch inference.

@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Log;
 
 class ExtractMemoriesJob implements ShouldBeUnique, ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 2;
 
@@ -42,8 +45,8 @@ class ExtractMemoriesJob implements ShouldBeUnique, ShouldQueue
 
         Log::info('[ExtractMemoriesJob] Memories extracted', [
             'conversation_id' => $this->conversationId,
-            'memory_count' => count($extractedIds),
-            'memory_ids' => $extractedIds,
+            'memory_count'    => count($extractedIds),
+            'memory_ids'      => $extractedIds,
         ]);
     }
 
@@ -51,7 +54,7 @@ class ExtractMemoriesJob implements ShouldBeUnique, ShouldQueue
     {
         Log::error('[ExtractMemoriesJob] Job failed', [
             'conversation_id' => $this->conversationId,
-            'error' => $exception->getMessage(),
+            'error'           => $exception->getMessage(),
         ]);
     }
 }

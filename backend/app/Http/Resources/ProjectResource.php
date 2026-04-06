@@ -14,13 +14,13 @@ class ProjectResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'description' => $this->description,
-            'persona_id' => $this->persona_id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'persona' => new PersonaResource($this->whenLoaded('persona')),
+            'id'                  => $this->id,
+            'name'                => $this->name,
+            'description'         => $this->description,
+            'persona_id'          => $this->persona_id,
+            'created_at'          => $this->created_at,
+            'updated_at'          => $this->updated_at,
+            'persona'             => new PersonaResource($this->whenLoaded('persona')),
             'conversations_count' => $this->whenCounted('conversations'),
         ];
     }

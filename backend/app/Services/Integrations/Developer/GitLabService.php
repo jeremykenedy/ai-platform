@@ -27,10 +27,10 @@ class GitLabService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_projects',
+                'name'        => 'list_projects',
                 'description' => 'List GitLab projects accessible to the authenticated user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'per_page' => ['type' => 'integer', 'description' => 'Results per page (max 100).', 'default' => 20],
                     ],
@@ -38,10 +38,10 @@ class GitLabService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_project',
+                'name'        => 'get_project',
                 'description' => 'Get details for a specific GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path (e.g. "group/project").'],
                     ],
@@ -49,75 +49,75 @@ class GitLabService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_issues',
+                'name'        => 'list_issues',
                 'description' => 'List issues for a GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
-                        'state' => ['type' => 'string', 'description' => 'Issue state: opened, closed, all.', 'default' => 'opened'],
+                        'state'     => ['type' => 'string', 'description' => 'Issue state: opened, closed, all.', 'default' => 'opened'],
                     ],
                     'required' => ['projectId'],
                 ],
             ],
             [
-                'name' => 'create_issue',
+                'name'        => 'create_issue',
                 'description' => 'Create a new issue in a GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
-                        'title' => ['type' => 'string', 'description' => 'Issue title.'],
+                        'projectId'   => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
+                        'title'       => ['type' => 'string', 'description' => 'Issue title.'],
                         'description' => ['type' => 'string', 'description' => 'Issue description.'],
                     ],
                     'required' => ['projectId', 'title'],
                 ],
             ],
             [
-                'name' => 'list_merge_requests',
+                'name'        => 'list_merge_requests',
                 'description' => 'List merge requests for a GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
-                        'state' => ['type' => 'string', 'description' => 'MR state: opened, closed, locked, merged, all.', 'default' => 'opened'],
+                        'state'     => ['type' => 'string', 'description' => 'MR state: opened, closed, locked, merged, all.', 'default' => 'opened'],
                     ],
                     'required' => ['projectId'],
                 ],
             ],
             [
-                'name' => 'create_merge_request',
+                'name'        => 'create_merge_request',
                 'description' => 'Create a new merge request in a GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
-                        'title' => ['type' => 'string', 'description' => 'Merge request title.'],
+                        'projectId'     => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
+                        'title'         => ['type' => 'string', 'description' => 'Merge request title.'],
                         'source_branch' => ['type' => 'string', 'description' => 'The branch containing your changes.'],
                         'target_branch' => ['type' => 'string', 'description' => 'The branch to merge into.'],
-                        'description' => ['type' => 'string', 'description' => 'Merge request description.'],
+                        'description'   => ['type' => 'string', 'description' => 'Merge request description.'],
                     ],
                     'required' => ['projectId', 'title', 'source_branch', 'target_branch'],
                 ],
             ],
             [
-                'name' => 'get_file',
+                'name'        => 'get_file',
                 'description' => 'Get the contents of a file in a GitLab repository.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
-                        'filePath' => ['type' => 'string', 'description' => 'URL-encoded path to the file (e.g. "src%2Fmain.php").'],
-                        'ref' => ['type' => 'string', 'description' => 'Branch, tag, or commit SHA.', 'default' => 'main'],
+                        'filePath'  => ['type' => 'string', 'description' => 'URL-encoded path to the file (e.g. "src%2Fmain.php").'],
+                        'ref'       => ['type' => 'string', 'description' => 'Branch, tag, or commit SHA.', 'default' => 'main'],
                     ],
                     'required' => ['projectId', 'filePath'],
                 ],
             ],
             [
-                'name' => 'list_branches',
+                'name'        => 'list_branches',
                 'description' => 'List branches in a GitLab repository.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
                     ],
@@ -125,10 +125,10 @@ class GitLabService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_pipelines',
+                'name'        => 'list_pipelines',
                 'description' => 'List CI/CD pipelines for a GitLab project.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'projectId' => ['type' => 'string', 'description' => 'Project ID or URL-encoded path.'],
                     ],
@@ -141,16 +141,16 @@ class GitLabService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_projects' => $this->listProjects($params, $user),
-            'get_project' => $this->getProject($params, $user),
-            'list_issues' => $this->listIssues($params, $user),
-            'create_issue' => $this->createIssue($params, $user),
-            'list_merge_requests' => $this->listMergeRequests($params, $user),
+            'list_projects'        => $this->listProjects($params, $user),
+            'get_project'          => $this->getProject($params, $user),
+            'list_issues'          => $this->listIssues($params, $user),
+            'create_issue'         => $this->createIssue($params, $user),
+            'list_merge_requests'  => $this->listMergeRequests($params, $user),
             'create_merge_request' => $this->createMergeRequest($params, $user),
-            'get_file' => $this->getFile($params, $user),
-            'list_branches' => $this->listBranches($params, $user),
-            'list_pipelines' => $this->listPipelines($params, $user),
-            default => ['error' => "Unknown tool: {$toolName}"],
+            'get_file'             => $this->getFile($params, $user),
+            'list_branches'        => $this->listBranches($params, $user),
+            'list_pipelines'       => $this->listPipelines($params, $user),
+            default                => ['error' => "Unknown tool: {$toolName}"],
         };
     }
 
@@ -159,18 +159,18 @@ class GitLabService extends AbstractIntegrationService
         $state = bin2hex(random_bytes(16));
 
         $query = http_build_query([
-            'client_id' => config('services.gitlab.client_id'),
-            'redirect_uri' => config('services.gitlab.redirect'),
+            'client_id'     => config('services.gitlab.client_id'),
+            'redirect_uri'  => config('services.gitlab.redirect'),
             'response_type' => 'code',
-            'scope' => 'read_api write_repository',
-            'state' => $state,
+            'scope'         => 'read_api write_repository',
+            'state'         => $state,
         ]);
 
         return self::OAUTH_AUTHORIZE_URL.'?'.$query;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -178,11 +178,11 @@ class GitLabService extends AbstractIntegrationService
 
         $response = Http::timeout(15)
             ->post(self::OAUTH_TOKEN_URL, [
-                'client_id' => config('services.gitlab.client_id'),
+                'client_id'     => config('services.gitlab.client_id'),
                 'client_secret' => config('services.gitlab.client_secret'),
-                'code' => $code,
-                'grant_type' => 'authorization_code',
-                'redirect_uri' => config('services.gitlab.redirect'),
+                'code'          => $code,
+                'grant_type'    => 'authorization_code',
+                'redirect_uri'  => config('services.gitlab.redirect'),
             ]);
 
         if ($response->failed()) {
@@ -205,10 +205,10 @@ class GitLabService extends AbstractIntegrationService
         );
 
         $integration->update([
-            'is_enabled' => true,
-            'oauth_token' => $token,
+            'is_enabled'          => true,
+            'oauth_token'         => $token,
             'oauth_refresh_token' => $data['refresh_token'] ?? null,
-            'oauth_expires_at' => isset($data['expires_in'])
+            'oauth_expires_at'    => isset($data['expires_in'])
                 ? now()->addSeconds((int) $data['expires_in'])
                 : null,
         ]);
@@ -228,7 +228,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listProjects(array $params, User $user): array
@@ -236,7 +237,7 @@ class GitLabService extends AbstractIntegrationService
         try {
             $response = $this->makeClient($user)->get('/projects', [
                 'membership' => true,
-                'per_page' => $params['per_page'] ?? 20,
+                'per_page'   => $params['per_page'] ?? 20,
             ]);
 
             if ($response->failed()) {
@@ -250,7 +251,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getProject(array $params, User $user): array
@@ -270,7 +272,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listIssues(array $params, User $user): array
@@ -292,7 +295,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createIssue(array $params, User $user): array
@@ -318,7 +322,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listMergeRequests(array $params, User $user): array
@@ -340,7 +345,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createMergeRequest(array $params, User $user): array
@@ -348,7 +354,7 @@ class GitLabService extends AbstractIntegrationService
         try {
             $projectId = urlencode((string) $params['projectId']);
             $body = [
-                'title' => $params['title'],
+                'title'         => $params['title'],
                 'source_branch' => $params['source_branch'],
                 'target_branch' => $params['target_branch'],
             ];
@@ -370,7 +376,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getFile(array $params, User $user): array
@@ -402,7 +409,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listBranches(array $params, User $user): array
@@ -422,7 +430,8 @@ class GitLabService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listPipelines(array $params, User $user): array

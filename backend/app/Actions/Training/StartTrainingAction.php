@@ -15,7 +15,7 @@ class StartTrainingAction
     public function handle(TrainingJob $job): void
     {
         $job->update([
-            'status' => 'running',
+            'status'     => 'running',
             'started_at' => now(),
         ]);
 

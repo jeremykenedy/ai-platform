@@ -23,9 +23,11 @@ class AppleNotesService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
-    public function handleCallback(User $user, array $params): void {}
+    public function handleCallback(User $user, array $params): void
+    {
+    }
 
     public function testConnection(User $user): bool
     {
@@ -46,48 +48,48 @@ class AppleNotesService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_notes',
+                'name'        => 'list_notes',
                 'description' => 'List notes from Apple Notes, optionally filtered by folder.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'folder' => ['type' => 'string', 'description' => 'Folder name to list notes from. Omit for all notes.'],
                     ],
                 ],
             ],
             [
-                'name' => 'get_note',
+                'name'        => 'get_note',
                 'description' => 'Get the full content of an Apple Note by name.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['noteId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['noteId'],
                     'properties' => [
                         'noteId' => ['type' => 'string', 'description' => 'Name of the note to retrieve.'],
                     ],
                 ],
             ],
             [
-                'name' => 'add_note',
+                'name'        => 'add_note',
                 'description' => 'Create a new note in Apple Notes.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['title', 'body'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['title', 'body'],
                     'properties' => [
-                        'title' => ['type' => 'string', 'description' => 'Title for the new note.'],
-                        'body' => ['type' => 'string', 'description' => 'Body text of the note.'],
+                        'title'  => ['type' => 'string', 'description' => 'Title for the new note.'],
+                        'body'   => ['type' => 'string', 'description' => 'Body text of the note.'],
                         'folder' => ['type' => 'string', 'description' => 'Folder to create the note in (defaults to Notes).'],
                     ],
                 ],
             ],
             [
-                'name' => 'update_note',
+                'name'        => 'update_note',
                 'description' => 'Append text to an existing Apple Note.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['noteId', 'body'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['noteId', 'body'],
                     'properties' => [
                         'noteId' => ['type' => 'string', 'description' => 'Name of the note to update.'],
-                        'body' => ['type' => 'string', 'description' => 'Text to append to the note body.'],
+                        'body'   => ['type' => 'string', 'description' => 'Text to append to the note body.'],
                     ],
                 ],
             ],
@@ -95,7 +97,7 @@ class AppleNotesService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
@@ -104,16 +106,17 @@ class AppleNotesService extends AbstractIntegrationService
         }
 
         return match ($toolName) {
-            'list_notes' => $this->listNotes($params),
-            'get_note' => $this->getNote($params),
-            'add_note' => $this->addNote($params),
+            'list_notes'  => $this->listNotes($params),
+            'get_note'    => $this->getNote($params),
+            'add_note'    => $this->addNote($params),
             'update_note' => $this->updateNote($params),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            default       => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listNotes(array $params): array
@@ -146,7 +149,7 @@ class AppleNotesService extends AbstractIntegrationService
 
         $result = Process::run(['osascript', '-e', $script]);
 
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             throw new \RuntimeException('Failed to list Apple Notes: '.$result->errorOutput());
         }
 
@@ -157,7 +160,8 @@ class AppleNotesService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getNote(array $params): array
@@ -173,7 +177,7 @@ class AppleNotesService extends AbstractIntegrationService
 
         $result = Process::run(['osascript', '-e', $script]);
 
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             throw new \RuntimeException('Failed to get note: '.$result->errorOutput());
         }
 
@@ -184,7 +188,8 @@ class AppleNotesService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function addNote(array $params): array
@@ -210,7 +215,7 @@ class AppleNotesService extends AbstractIntegrationService
 
         $result = Process::run(['osascript', '-e', $script]);
 
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             throw new \RuntimeException('Failed to add note: '.$result->errorOutput());
         }
 
@@ -218,7 +223,8 @@ class AppleNotesService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updateNote(array $params): array
@@ -235,7 +241,7 @@ class AppleNotesService extends AbstractIntegrationService
 
         $result = Process::run(['osascript', '-e', $script]);
 
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             throw new \RuntimeException('Failed to update note: '.$result->errorOutput());
         }
 

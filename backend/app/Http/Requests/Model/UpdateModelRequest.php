@@ -18,10 +18,10 @@ class UpdateModelRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'is_active' => ['nullable', 'boolean'],
-            'is_default' => ['nullable', 'boolean'],
+            'is_active'    => ['nullable', 'boolean'],
+            'is_default'   => ['nullable', 'boolean'],
             'display_name' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'description'  => ['nullable', 'string'],
         ];
     }
 }

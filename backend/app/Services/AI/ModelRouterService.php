@@ -25,21 +25,22 @@ class ModelRouterService
 
     /** @var array<string, class-string<AiProviderInterface>> */
     private array $providerMap = [
-        'ollama' => OllamaProvider::class,
-        'anthropic' => AnthropicProvider::class,
-        'openai' => OpenAiProvider::class,
-        'gemini' => GoogleProvider::class,
-        'mistral' => MistralProvider::class,
-        'groq' => GroqProvider::class,
-        'together' => TogetherProvider::class,
+        'ollama'     => OllamaProvider::class,
+        'anthropic'  => AnthropicProvider::class,
+        'openai'     => OpenAiProvider::class,
+        'gemini'     => GoogleProvider::class,
+        'mistral'    => MistralProvider::class,
+        'groq'       => GroqProvider::class,
+        'together'   => TogetherProvider::class,
         'openrouter' => OpenRouterProvider::class,
-        'replicate' => ReplicateProvider::class,
+        'replicate'  => ReplicateProvider::class,
     ];
 
     /**
      * Route to the optimal provider and model for the given request.
      *
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
+     *
      * @return array{provider: AiProviderInterface, model: string}
      */
     public function route(string $requestedModel, array $context = []): array
@@ -62,13 +63,13 @@ class ModelRouterService
             return $this->providerCache[$providerName];
         }
 
-        if (! isset($this->providerMap[$providerName])) {
+        if (!isset($this->providerMap[$providerName])) {
             throw new \InvalidArgumentException("Unknown provider: {$providerName}");
         }
 
         $class = $this->providerMap[$providerName];
 
-        if (! class_exists($class)) {
+        if (!class_exists($class)) {
             throw new \RuntimeException("Provider class not found: {$class}");
         }
 
@@ -124,7 +125,8 @@ class ModelRouterService
     /**
      * Auto-route based on context signals.
      *
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
+     *
      * @return array{provider: AiProviderInterface, model: string}
      */
     private function autoRoute(array $context): array
@@ -310,7 +312,7 @@ class ModelRouterService
             try {
                 $provider = $this->resolveProvider($providerName);
 
-                if (! $provider->isAvailable()) {
+                if (!$provider->isAvailable()) {
                     continue;
                 }
 
@@ -328,13 +330,13 @@ class ModelRouterService
     private function getDefaultModelForProvider(string $providerName): string
     {
         $defaults = [
-            'ollama' => (string) config('ai.default_local_model', 'llama3.2:latest'),
-            'groq' => 'llama-3.3-70b-versatile',
+            'ollama'     => (string) config('ai.default_local_model', 'llama3.2:latest'),
+            'groq'       => 'llama-3.3-70b-versatile',
             'openrouter' => 'meta-llama/llama-3.3-70b-instruct',
-            'anthropic' => 'claude-sonnet-4-5',
-            'openai' => 'gpt-4o',
-            'gemini' => 'gemini-2.0-flash',
-            'mistral' => 'mistral-large-latest',
+            'anthropic'  => 'claude-sonnet-4-5',
+            'openai'     => 'gpt-4o',
+            'gemini'     => 'gemini-2.0-flash',
+            'mistral'    => 'mistral-large-latest',
         ];
 
         return $defaults[$providerName] ?? (string) config('ai.default_local_model', 'llama3.2:latest');

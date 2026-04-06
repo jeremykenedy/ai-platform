@@ -26,20 +26,20 @@ class GoogleDriveService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.google.client_id'),
-            'redirect_uri' => config('services.google.redirect_uri'),
+            'client_id'     => config('services.google.client_id'),
+            'redirect_uri'  => config('services.google.redirect_uri'),
             'response_type' => 'code',
-            'scope' => implode(' ', self::SCOPES),
-            'access_type' => 'offline',
-            'prompt' => 'consent',
-            'state' => $user->getKey(),
+            'scope'         => implode(' ', self::SCOPES),
+            'access_type'   => 'offline',
+            'prompt'        => 'consent',
+            'state'         => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -49,11 +49,11 @@ class GoogleDriveService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.google.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
-                'redirect_uri' => config('services.google.redirect_uri'),
-                'grant_type' => 'authorization_code',
+                'redirect_uri'  => config('services.google.redirect_uri'),
+                'grant_type'    => 'authorization_code',
             ]);
 
         $response->throw();
@@ -64,14 +64,14 @@ class GoogleDriveService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'] ?? null,
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => self::SCOPES,
@@ -86,44 +86,44 @@ class GoogleDriveService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search_files',
+                'name'        => 'search_files',
                 'description' => 'Search for files in Google Drive.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['query'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['query'],
                     'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Drive search query (e.g. "name contains \'report\'").'],
+                        'query'    => ['type' => 'string', 'description' => 'Drive search query (e.g. "name contains \'report\'").'],
                         'mimeType' => ['type' => 'string', 'description' => 'Filter by MIME type (e.g. "application/vnd.google-apps.document").'],
                     ],
                 ],
             ],
             [
-                'name' => 'read_file',
+                'name'        => 'read_file',
                 'description' => 'Read the content of a Google Drive file (exported as plain text).',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['fileId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['fileId'],
                     'properties' => [
                         'fileId' => ['type' => 'string', 'description' => 'Google Drive file ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'list_directory',
+                'name'        => 'list_directory',
                 'description' => 'List files in a Google Drive folder.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'folderId' => ['type' => 'string', 'description' => 'Folder ID (defaults to root).'],
                     ],
                 ],
             ],
             [
-                'name' => 'get_file_info',
+                'name'        => 'get_file_info',
                 'description' => 'Get metadata for a Google Drive file.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['fileId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['fileId'],
                     'properties' => [
                         'fileId' => ['type' => 'string', 'description' => 'Google Drive file ID.'],
                     ],
@@ -133,16 +133,16 @@ class GoogleDriveService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'search_files' => $this->searchFiles($params, $user),
-            'read_file' => $this->readFile($params, $user),
+            'search_files'   => $this->searchFiles($params, $user),
+            'read_file'      => $this->readFile($params, $user),
             'list_directory' => $this->listDirectory($params, $user),
-            'get_file_info' => $this->getFileInfo($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            'get_file_info'  => $this->getFileInfo($params, $user),
+            default          => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -158,7 +158,8 @@ class GoogleDriveService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchFiles(array $params, User $user): array
@@ -173,8 +174,8 @@ class GoogleDriveService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->get(self::BASE_URL.'/files', [
-                'q' => implode(' and ', $queryParts),
-                'fields' => 'files(id,name,mimeType,size,modifiedTime,webViewLink,parents)',
+                'q'        => implode(' and ', $queryParts),
+                'fields'   => 'files(id,name,mimeType,size,modifiedTime,webViewLink,parents)',
                 'pageSize' => 20,
             ]);
 
@@ -184,7 +185,8 @@ class GoogleDriveService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function readFile(array $params, User $user): array
@@ -202,9 +204,9 @@ class GoogleDriveService extends AbstractIntegrationService
 
         if (str_starts_with($mimeType, 'application/vnd.google-apps.')) {
             $exportMime = match ($mimeType) {
-                'application/vnd.google-apps.spreadsheet' => 'text/csv',
+                'application/vnd.google-apps.spreadsheet'  => 'text/csv',
                 'application/vnd.google-apps.presentation' => 'text/plain',
-                default => 'text/plain',
+                default                                    => 'text/plain',
             };
 
             $content = Http::withToken($this->getOauthToken($user))
@@ -228,7 +230,8 @@ class GoogleDriveService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listDirectory(array $params, User $user): array
@@ -239,10 +242,10 @@ class GoogleDriveService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->get(self::BASE_URL.'/files', [
-                'q' => "'{$folderId}' in parents and trashed = false",
-                'fields' => 'files(id,name,mimeType,size,modifiedTime,webViewLink)',
+                'q'        => "'{$folderId}' in parents and trashed = false",
+                'fields'   => 'files(id,name,mimeType,size,modifiedTime,webViewLink)',
                 'pageSize' => 50,
-                'orderBy' => 'name',
+                'orderBy'  => 'name',
             ]);
 
         $response->throw();
@@ -251,7 +254,8 @@ class GoogleDriveService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getFileInfo(array $params, User $user): array

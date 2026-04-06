@@ -14,12 +14,13 @@ class ConnectIntegrationAction
 {
     public function __construct(
         private readonly IntegrationManager $integrationManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Connect or reconnect the named integration for the user with the provided credentials.
      *
-     * @param  array<string, mixed>  $credentials
+     * @param array<string, mixed> $credentials
      *
      * @throws ValidationException
      */
@@ -38,13 +39,13 @@ class ConnectIntegrationAction
         /** @var UserIntegration $integration */
         $integration = UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->id,
+                'user_id'        => $user->id,
                 'integration_id' => $definition->id,
             ],
             [
                 'credentials' => $credentials,
-                'is_enabled' => true,
-                'last_error' => null,
+                'is_enabled'  => true,
+                'last_error'  => null,
             ],
         );
 

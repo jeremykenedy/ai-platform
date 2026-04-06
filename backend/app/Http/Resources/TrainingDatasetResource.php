@@ -14,14 +14,14 @@ class TrainingDatasetResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'          => $this->id,
+            'name'        => $this->name,
             'description' => $this->description,
-            'format' => $this->format,
-            'row_count' => $this->row_count,
-            'created_at' => $this->created_at,
-            'user' => $this->whenLoaded('user', fn () => [
-                'id' => $this->user?->id,
+            'format'      => $this->format,
+            'row_count'   => $this->row_count,
+            'created_at'  => $this->created_at,
+            'user'        => $this->whenLoaded('user', fn () => [
+                'id'   => $this->user?->id,
                 'name' => $this->user?->name,
             ]),
         ];

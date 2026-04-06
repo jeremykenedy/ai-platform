@@ -10,16 +10,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $message_id
- * @property string $disk
- * @property string $path
- * @property string $filename
- * @property string $mime_type
- * @property int $size
+ * @property string      $id
+ * @property string      $message_id
+ * @property string      $disk
+ * @property string      $path
+ * @property string      $filename
+ * @property string      $mime_type
+ * @property int         $size
  * @property string|null $extracted_text
- * @property string $extraction_status
- * @property int|null $token_estimate
+ * @property string      $extraction_status
+ * @property int|null    $token_estimate
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -48,7 +48,7 @@ class MessageAttachment extends Model
     protected function casts(): array
     {
         return [
-            'size' => 'integer',
+            'size'           => 'integer',
             'token_estimate' => 'integer',
         ];
     }

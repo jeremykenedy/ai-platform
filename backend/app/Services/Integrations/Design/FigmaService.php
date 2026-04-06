@@ -23,13 +23,13 @@ class FigmaService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'get_file',
+                'name'        => 'get_file',
                 'description' => 'Retrieve a Figma file by its key, including all document nodes.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'fileKey' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Figma file key (found in the file URL).',
                         ],
                     ],
@@ -37,18 +37,18 @@ class FigmaService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_file_nodes',
+                'name'        => 'get_file_nodes',
                 'description' => 'Retrieve specific nodes from a Figma file by their IDs.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'fileKey' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Figma file key.',
                         ],
                         'nodeIds' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'Array of node IDs to retrieve.',
                         ],
                     ],
@@ -56,13 +56,13 @@ class FigmaService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_projects',
+                'name'        => 'list_projects',
                 'description' => 'List all projects within a Figma team.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'teamId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Figma team ID.',
                         ],
                     ],
@@ -70,13 +70,13 @@ class FigmaService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_comments',
+                'name'        => 'get_comments',
                 'description' => 'Retrieve all comments on a Figma file.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'fileKey' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Figma file key.',
                         ],
                     ],
@@ -84,25 +84,25 @@ class FigmaService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'post_comment',
+                'name'        => 'post_comment',
                 'description' => 'Post a comment on a Figma file at a specific canvas position.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'fileKey' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Figma file key.',
                         ],
                         'message' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The text content of the comment.',
                         ],
                         'x' => [
-                            'type' => 'number',
+                            'type'        => 'number',
                             'description' => 'Canvas X coordinate for the comment pin.',
                         ],
                         'y' => [
-                            'type' => 'number',
+                            'type'        => 'number',
                             'description' => 'Canvas Y coordinate for the comment pin.',
                         ],
                     ],
@@ -115,17 +115,18 @@ class FigmaService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'get_file' => $this->getFile($user, $params),
+            'get_file'       => $this->getFile($user, $params),
             'get_file_nodes' => $this->getFileNodes($user, $params),
-            'list_projects' => $this->listProjects($user, $params),
-            'get_comments' => $this->getComments($user, $params),
-            'post_comment' => $this->postComment($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'list_projects'  => $this->listProjects($user, $params),
+            'get_comments'   => $this->getComments($user, $params),
+            'post_comment'   => $this->postComment($user, $params),
+            default          => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getFile(User $user, array $params): array
@@ -141,7 +142,8 @@ class FigmaService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getFileNodes(User $user, array $params): array
@@ -149,7 +151,7 @@ class FigmaService extends AbstractIntegrationService
         $fileKey = $params['fileKey'] ?? throw new RuntimeException('fileKey is required.');
         $nodeIds = $params['nodeIds'] ?? throw new RuntimeException('nodeIds is required.');
 
-        if (! is_array($nodeIds) || $nodeIds === []) {
+        if (!is_array($nodeIds) || $nodeIds === []) {
             throw new RuntimeException('nodeIds must be a non-empty array.');
         }
 
@@ -164,7 +166,8 @@ class FigmaService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listProjects(User $user, array $params): array
@@ -180,7 +183,8 @@ class FigmaService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getComments(User $user, array $params): array
@@ -196,7 +200,8 @@ class FigmaService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function postComment(User $user, array $params): array

@@ -19,10 +19,10 @@ class ConversationFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'title' => fake()->sentence(4),
-            'model_name' => 'llama3.2:latest',
-            'context_window_used' => 0,
+            'user_id'              => User::factory(),
+            'title'                => fake()->sentence(4),
+            'model_name'           => 'llama3.2:latest',
+            'context_window_used'  => 0,
             'enabled_integrations' => null,
         ];
     }

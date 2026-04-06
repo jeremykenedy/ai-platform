@@ -23,9 +23,11 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
-    public function handleCallback(User $user, array $params): void {}
+    public function handleCallback(User $user, array $params): void
+    {
+    }
 
     public function isConnected(User $user): bool
     {
@@ -37,7 +39,7 @@ class NotionService extends AbstractIntegrationService
     /**
      * Store Notion API token for the user.
      *
-     * @param  array<string, mixed>  $params  Must contain 'api_token'.
+     * @param array<string, mixed> $params Must contain 'api_token'.
      */
     public function connect(User $user, array $params): void
     {
@@ -45,11 +47,11 @@ class NotionService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
+                'is_enabled'  => true,
                 'credentials' => ['api_token' => (string) $params['api_token']],
             ],
         );
@@ -62,83 +64,83 @@ class NotionService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search',
+                'name'        => 'search',
                 'description' => 'Search across all pages and databases in Notion.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['query'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['query'],
                     'properties' => [
                         'query' => ['type' => 'string', 'description' => 'Search query string.'],
                     ],
                 ],
             ],
             [
-                'name' => 'get_page',
+                'name'        => 'get_page',
                 'description' => 'Retrieve a Notion page by ID.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['pageId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['pageId'],
                     'properties' => [
                         'pageId' => ['type' => 'string', 'description' => 'Notion page ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'create_page',
+                'name'        => 'create_page',
                 'description' => 'Create a new page in Notion.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['parentId', 'title'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['parentId', 'title'],
                     'properties' => [
                         'parentId' => ['type' => 'string', 'description' => 'Parent page or database ID.'],
-                        'title' => ['type' => 'string', 'description' => 'Page title.'],
-                        'content' => ['type' => 'string', 'description' => 'Page body text content.'],
+                        'title'    => ['type' => 'string', 'description' => 'Page title.'],
+                        'content'  => ['type' => 'string', 'description' => 'Page body text content.'],
                     ],
                 ],
             ],
             [
-                'name' => 'update_page',
+                'name'        => 'update_page',
                 'description' => 'Update properties of a Notion page.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['pageId', 'properties'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['pageId', 'properties'],
                     'properties' => [
-                        'pageId' => ['type' => 'string', 'description' => 'Notion page ID.'],
+                        'pageId'     => ['type' => 'string', 'description' => 'Notion page ID.'],
                         'properties' => [
-                            'type' => 'object',
-                            'description' => 'Properties to update as key-value pairs.',
+                            'type'                 => 'object',
+                            'description'          => 'Properties to update as key-value pairs.',
                             'additionalProperties' => true,
                         ],
                     ],
                 ],
             ],
             [
-                'name' => 'query_database',
+                'name'        => 'query_database',
                 'description' => 'Query a Notion database with optional filters.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['databaseId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['databaseId'],
                     'properties' => [
                         'databaseId' => ['type' => 'string', 'description' => 'Notion database ID.'],
-                        'filter' => [
-                            'type' => 'object',
-                            'description' => 'Notion filter object.',
+                        'filter'     => [
+                            'type'                 => 'object',
+                            'description'          => 'Notion filter object.',
                             'additionalProperties' => true,
                         ],
                     ],
                 ],
             ],
             [
-                'name' => 'create_database_entry',
+                'name'        => 'create_database_entry',
                 'description' => 'Create a new entry (row) in a Notion database.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['databaseId', 'properties'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['databaseId', 'properties'],
                     'properties' => [
                         'databaseId' => ['type' => 'string', 'description' => 'Notion database ID.'],
                         'properties' => [
-                            'type' => 'object',
-                            'description' => 'Database entry properties matching the database schema.',
+                            'type'                 => 'object',
+                            'description'          => 'Database entry properties matching the database schema.',
                             'additionalProperties' => true,
                         ],
                     ],
@@ -148,18 +150,18 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'search' => $this->search($params, $user),
-            'get_page' => $this->getPage($params, $user),
-            'create_page' => $this->createPage($params, $user),
-            'update_page' => $this->updatePage($params, $user),
-            'query_database' => $this->queryDatabase($params, $user),
+            'search'                => $this->search($params, $user),
+            'get_page'              => $this->getPage($params, $user),
+            'create_page'           => $this->createPage($params, $user),
+            'update_page'           => $this->updatePage($params, $user),
+            'query_database'        => $this->queryDatabase($params, $user),
             'create_database_entry' => $this->createDatabaseEntry($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            default                 => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -175,7 +177,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function search(array $params, User $user): array
@@ -185,7 +188,7 @@ class NotionService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::BASE_URL.'/search', [
-                'query' => (string) $params['query'],
+                'query'     => (string) $params['query'],
                 'page_size' => 20,
             ]);
 
@@ -195,7 +198,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getPage(array $params, User $user): array
@@ -214,7 +218,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createPage(array $params, User $user): array
@@ -223,7 +228,7 @@ class NotionService extends AbstractIntegrationService
         $title = (string) $params['title'];
 
         $body = [
-            'parent' => ['page_id' => $parentId],
+            'parent'     => ['page_id' => $parentId],
             'properties' => [
                 'title' => [
                     'title' => [
@@ -236,8 +241,8 @@ class NotionService extends AbstractIntegrationService
         if (isset($params['content'])) {
             $body['children'] = [
                 [
-                    'object' => 'block',
-                    'type' => 'paragraph',
+                    'object'    => 'block',
+                    'type'      => 'paragraph',
                     'paragraph' => [
                         'rich_text' => [
                             ['type' => 'text', 'text' => ['content' => (string) $params['content']]],
@@ -259,7 +264,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updatePage(array $params, User $user): array
@@ -279,7 +285,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function queryDatabase(array $params, User $user): array
@@ -287,7 +294,7 @@ class NotionService extends AbstractIntegrationService
         $databaseId = $this->formatId((string) $params['databaseId']);
 
         $body = array_filter([
-            'filter' => $params['filter'] ?? null,
+            'filter'    => $params['filter'] ?? null,
             'page_size' => 50,
         ]);
 
@@ -303,7 +310,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createDatabaseEntry(array $params, User $user): array
@@ -316,7 +324,7 @@ class NotionService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::BASE_URL.'/pages', [
-                'parent' => ['database_id' => $databaseId],
+                'parent'     => ['database_id' => $databaseId],
                 'properties' => $properties,
             ]);
 
@@ -326,7 +334,8 @@ class NotionService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function makeRequest(string $method, string $path, User $user, array $params = []): array
@@ -337,8 +346,8 @@ class NotionService extends AbstractIntegrationService
             ->connectTimeout(10);
 
         $response = match ($method) {
-            'get' => $request->get(self::BASE_URL.$path, $params),
-            'post' => $request->post(self::BASE_URL.$path, $params),
+            'get'   => $request->get(self::BASE_URL.$path, $params),
+            'post'  => $request->post(self::BASE_URL.$path, $params),
             'patch' => $request->patch(self::BASE_URL.$path, $params),
             default => throw new \InvalidArgumentException("Unsupported method: {$method}"),
         };

@@ -13,13 +13,16 @@ use Illuminate\Queue\SerializesModels;
 
 class ConversationUpdated implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $userId,
         public string $conversationId,
         public ?string $title,
-    ) {}
+    ) {
+    }
 
     /**
      * @return Channel|array<int, Channel>

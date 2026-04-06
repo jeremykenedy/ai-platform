@@ -21,21 +21,21 @@ class PayPalService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_transactions',
+                'name'        => 'list_transactions',
                 'description' => 'List PayPal transactions within a date range.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'startDate' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Start date in ISO 8601 format (e.g. 2024-01-01T00:00:00Z).',
                         ],
                         'endDate' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'End date in ISO 8601 format (e.g. 2024-01-31T23:59:59Z).',
                         ],
                         'page' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Page number for pagination (default 1).',
                         ],
                     ],
@@ -43,13 +43,13 @@ class PayPalService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_transaction',
+                'name'        => 'get_transaction',
                 'description' => 'Retrieve details of a specific PayPal transaction.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'transactionId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The PayPal transaction ID.',
                         ],
                     ],
@@ -57,31 +57,31 @@ class PayPalService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_invoice',
+                'name'        => 'create_invoice',
                 'description' => 'Create a PayPal invoice for a recipient with line items.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'items' => [
-                            'type' => 'array',
+                            'type'        => 'array',
                             'description' => 'Array of invoice line items.',
-                            'items' => [
-                                'type' => 'object',
+                            'items'       => [
+                                'type'       => 'object',
                                 'properties' => [
-                                    'name' => ['type' => 'string'],
-                                    'quantity' => ['type' => 'string'],
+                                    'name'        => ['type' => 'string'],
+                                    'quantity'    => ['type' => 'string'],
                                     'unit_amount' => [
-                                        'type' => 'object',
+                                        'type'       => 'object',
                                         'properties' => [
                                             'currency_code' => ['type' => 'string'],
-                                            'value' => ['type' => 'string'],
+                                            'value'         => ['type' => 'string'],
                                         ],
                                     ],
                                 ],
                             ],
                         ],
                         'recipientEmail' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Email address of the invoice recipient.',
                         ],
                     ],
@@ -89,13 +89,13 @@ class PayPalService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'send_invoice',
+                'name'        => 'send_invoice',
                 'description' => 'Send a previously created PayPal invoice to the recipient.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'invoiceId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The ID of the invoice to send.',
                         ],
                     ],
@@ -109,15 +109,16 @@ class PayPalService extends AbstractIntegrationService
     {
         return match ($toolName) {
             'list_transactions' => $this->listTransactions($user, $params),
-            'get_transaction' => $this->getTransaction($user, $params),
-            'create_invoice' => $this->createInvoice($user, $params),
-            'send_invoice' => $this->sendInvoice($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'get_transaction'   => $this->getTransaction($user, $params),
+            'create_invoice'    => $this->createInvoice($user, $params),
+            'send_invoice'      => $this->sendInvoice($user, $params),
+            default             => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listTransactions(User $user, array $params): array
@@ -131,10 +132,10 @@ class PayPalService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->get($this->baseUrl().'/v1/reporting/transactions', [
                 'start_date' => $startDate,
-                'end_date' => $endDate,
-                'page' => $page,
-                'page_size' => 100,
-                'fields' => 'all',
+                'end_date'   => $endDate,
+                'page'       => $page,
+                'page_size'  => 100,
+                'fields'     => 'all',
             ]);
 
         $response->throw();
@@ -143,7 +144,8 @@ class PayPalService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getTransaction(User $user, array $params): array
@@ -155,9 +157,9 @@ class PayPalService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->get($this->baseUrl().'/v1/reporting/transactions', [
                 'transaction_id' => $transactionId,
-                'start_date' => now()->subYears(2)->toIso8601String(),
-                'end_date' => now()->toIso8601String(),
-                'fields' => 'all',
+                'start_date'     => now()->subYears(2)->toIso8601String(),
+                'end_date'       => now()->toIso8601String(),
+                'fields'         => 'all',
             ]);
 
         $response->throw();
@@ -173,7 +175,8 @@ class PayPalService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createInvoice(User $user, array $params): array
@@ -181,14 +184,14 @@ class PayPalService extends AbstractIntegrationService
         $items = $params['items'] ?? throw new RuntimeException('items is required.');
         $recipientEmail = $params['recipientEmail'] ?? throw new RuntimeException('recipientEmail is required.');
 
-        if (! is_array($items) || $items === []) {
+        if (!is_array($items) || $items === []) {
             throw new RuntimeException('items must be a non-empty array.');
         }
 
         $body = [
             'detail' => [
                 'invoice_number' => uniqid('INV-', true),
-                'currency_code' => 'USD',
+                'currency_code'  => 'USD',
             ],
             'primary_recipients' => [
                 [
@@ -211,7 +214,8 @@ class PayPalService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function sendInvoice(User $user, array $params): array
