@@ -11,7 +11,8 @@ Self-hosted AI chat platform with local LLM inference, 13 AI providers, and 30 i
 </p>
 
 <p align="center">
-<a href="LICENSE"><img src="https://img.shields.io/badge/License-Private-blue.svg" alt="License"></a>
+<a href="https://github.com/jeremykenedy/ai-platform/actions/workflows/tests.yml"><img src="https://github.com/jeremykenedy/ai-platform/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
 </p>
 
 ## Table of Contents
@@ -505,4 +506,4 @@ npm run lint:style
 
 ## License
 
-This project is private software. All rights reserved.
+This project is open-sourced software licensed under the [MIT license](LICENSE).
