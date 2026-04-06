@@ -15,14 +15,14 @@ use Illuminate\Support\Carbon;
 use Pgvector\Laravel\HasNeighbors;
 
 /**
- * @property string $id
- * @property string $conversation_id
- * @property string $role
- * @property string $content
- * @property int|null $tokens_used
+ * @property string      $id
+ * @property string      $conversation_id
+ * @property string      $role
+ * @property string      $content
+ * @property int|null    $tokens_used
  * @property string|null $finish_reason
  * @property string|null $model_version
- * @property int|null $sequence
+ * @property int|null    $sequence
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -31,7 +31,10 @@ use Pgvector\Laravel\HasNeighbors;
 class Message extends Model
 {
     /** @use HasFactory<MessageFactory> */
-    use HasFactory, HasNeighbors, HasUlids, SoftDeletes;
+    use HasFactory;
+    use HasNeighbors;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>
@@ -61,7 +64,7 @@ class Message extends Model
     {
         return [
             'tokens_used' => 'integer',
-            'sequence' => 'integer',
+            'sequence'    => 'integer',
         ];
     }
 

@@ -19,13 +19,13 @@ class UpdatePersonaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['nullable', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'system_prompt' => ['nullable', 'string'],
-            'model_name' => ['nullable', 'string'],
-            'temperature' => ['nullable', 'numeric', 'between:0,2'],
-            'top_p' => ['nullable', 'numeric', 'between:0,1'],
-            'top_k' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'name'           => ['nullable', 'string', 'max:255'],
+            'description'    => ['nullable', 'string'],
+            'system_prompt'  => ['nullable', 'string'],
+            'model_name'     => ['nullable', 'string'],
+            'temperature'    => ['nullable', 'numeric', 'between:0,2'],
+            'top_p'          => ['nullable', 'numeric', 'between:0,1'],
+            'top_k'          => ['nullable', 'integer', 'min:1', 'max:200'],
             'repeat_penalty' => ['nullable', 'numeric', 'between:0.5,2'],
         ];
     }

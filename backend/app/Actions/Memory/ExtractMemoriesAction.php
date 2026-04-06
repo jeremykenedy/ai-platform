@@ -11,7 +11,8 @@ class ExtractMemoriesAction
 {
     public function __construct(
         private readonly MemoryExtractionService $memoryExtractionService,
-    ) {}
+    ) {
+    }
 
     /**
      * Extract and persist memories from the given conversation.

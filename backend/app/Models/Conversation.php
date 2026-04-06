@@ -15,22 +15,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string|null $project_id
- * @property string|null $persona_id
- * @property string|null $title
- * @property string|null $model_name
- * @property int $context_window_used
+ * @property string            $id
+ * @property string            $user_id
+ * @property string|null       $project_id
+ * @property string|null       $persona_id
+ * @property string|null       $title
+ * @property string|null       $model_name
+ * @property int               $context_window_used
  * @property array<mixed>|null $enabled_integrations
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Carbon|null $deleted_at
+ * @property Carbon|null       $created_at
+ * @property Carbon|null       $updated_at
+ * @property Carbon|null       $deleted_at
  */
 class Conversation extends Model
 {
     /** @use HasFactory<ConversationFactory> */
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>
@@ -51,7 +53,7 @@ class Conversation extends Model
     protected function casts(): array
     {
         return [
-            'context_window_used' => 'integer',
+            'context_window_used'  => 'integer',
             'enabled_integrations' => 'array',
         ];
     }
@@ -87,7 +89,8 @@ class Conversation extends Model
     }
 
     /**
-     * @param  Builder<Conversation>  $query
+     * @param Builder<Conversation> $query
+     *
      * @return Builder<Conversation>
      */
     public function scopeForUser($query, string $userId): Builder
@@ -96,7 +99,8 @@ class Conversation extends Model
     }
 
     /**
-     * @param  Builder<Conversation>  $query
+     * @param Builder<Conversation> $query
+     *
      * @return Builder<Conversation>
      */
     public function scopeRecent($query): Builder

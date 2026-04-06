@@ -17,8 +17,8 @@ class ExecuteToolRequest extends FormRequest
     {
         return [
             'integration_name' => ['required', 'string'],
-            'tool_name' => ['required', 'string'],
-            'params' => ['nullable', 'array'],
+            'tool_name'        => ['required', 'string'],
+            'params'           => ['nullable', 'array'],
         ];
     }
 }

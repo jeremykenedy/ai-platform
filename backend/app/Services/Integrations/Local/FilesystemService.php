@@ -20,17 +20,17 @@ class FilesystemService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_files',
+                'name'        => 'list_files',
                 'description' => 'List files and directories at the given storage path.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'path' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Relative path within storage/app (default "/").',
                         ],
                         'recursive' => [
-                            'type' => 'boolean',
+                            'type'        => 'boolean',
                             'description' => 'Whether to list files recursively (default false).',
                         ],
                     ],
@@ -38,13 +38,13 @@ class FilesystemService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'read_file',
+                'name'        => 'read_file',
                 'description' => 'Read the contents of a file from local storage.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'path' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Relative path to the file within storage/app.',
                         ],
                     ],
@@ -52,17 +52,17 @@ class FilesystemService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'write_file',
+                'name'        => 'write_file',
                 'description' => 'Write content to a file in local storage, creating it if it does not exist.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'path' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Relative path to write within storage/app.',
                         ],
                         'content' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Text content to write to the file.',
                         ],
                     ],
@@ -70,13 +70,13 @@ class FilesystemService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'file_info',
+                'name'        => 'file_info',
                 'description' => 'Get metadata about a file (size, last modified, mime type).',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'path' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Relative path to the file within storage/app.',
                         ],
                     ],
@@ -84,17 +84,17 @@ class FilesystemService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'search_files',
+                'name'        => 'search_files',
                 'description' => 'Search for files matching a glob pattern within a storage path.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'path' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Base directory to search within storage/app (default "/").',
                         ],
                         'pattern' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Glob pattern to match filenames (e.g. "*.txt", "report_*").',
                         ],
                     ],
@@ -107,12 +107,12 @@ class FilesystemService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_files' => $this->listFiles($params),
-            'read_file' => $this->readFile($params),
-            'write_file' => $this->writeFile($params),
-            'file_info' => $this->fileInfo($params),
+            'list_files'   => $this->listFiles($params),
+            'read_file'    => $this->readFile($params),
+            'write_file'   => $this->writeFile($params),
+            'file_info'    => $this->fileInfo($params),
             'search_files' => $this->searchFiles($params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default        => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -127,7 +127,8 @@ class FilesystemService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listFiles(array $params): array
@@ -141,14 +142,15 @@ class FilesystemService extends AbstractIntegrationService
         $directories = $recursive ? $disk->allDirectories($path) : $disk->directories($path);
 
         return [
-            'path' => $path,
-            'files' => $files,
+            'path'        => $path,
+            'files'       => $files,
             'directories' => $directories,
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function readFile(array $params): array
@@ -157,21 +159,22 @@ class FilesystemService extends AbstractIntegrationService
 
         $disk = Storage::disk('local');
 
-        if (! $disk->exists($path)) {
+        if (!$disk->exists($path)) {
             throw new RuntimeException("File not found: {$path}");
         }
 
         $content = $disk->get($path);
 
         return [
-            'path' => $path,
+            'path'    => $path,
             'content' => $content,
-            'size' => $disk->size($path),
+            'size'    => $disk->size($path),
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function writeFile(array $params): array
@@ -182,14 +185,15 @@ class FilesystemService extends AbstractIntegrationService
         Storage::disk('local')->put($path, (string) $content);
 
         return [
-            'path' => $path,
+            'path'    => $path,
             'written' => true,
-            'size' => Storage::disk('local')->size($path),
+            'size'    => Storage::disk('local')->size($path),
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function fileInfo(array $params): array
@@ -198,20 +202,21 @@ class FilesystemService extends AbstractIntegrationService
 
         $disk = Storage::disk('local');
 
-        if (! $disk->exists($path)) {
+        if (!$disk->exists($path)) {
             throw new RuntimeException("File not found: {$path}");
         }
 
         return [
-            'path' => $path,
-            'size' => $disk->size($path),
+            'path'          => $path,
+            'size'          => $disk->size($path),
             'last_modified' => $disk->lastModified($path),
-            'mime_type' => $disk->mimeType($path),
+            'mime_type'     => $disk->mimeType($path),
         ];
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchFiles(array $params): array
@@ -228,10 +233,10 @@ class FilesystemService extends AbstractIntegrationService
         ));
 
         return [
-            'path' => $basePath,
+            'path'    => $basePath,
             'pattern' => $pattern,
             'matches' => $matched,
-            'count' => count($matched),
+            'count'   => count($matched),
         ];
     }
 

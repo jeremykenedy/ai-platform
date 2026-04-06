@@ -12,7 +12,7 @@ it('can login with valid credentials', function (): void {
     $user = User::factory()->create(['password' => bcrypt('password')]);
 
     $this->postJson('/api/v1/auth/login', [
-        'email' => $user->email,
+        'email'    => $user->email,
         'password' => 'password',
     ])->assertStatus(200)
         ->assertJsonStructure(['data' => ['id', 'name', 'email']]);
@@ -22,7 +22,7 @@ it('rejects login with invalid credentials', function (): void {
     $user = User::factory()->create();
 
     $this->postJson('/api/v1/auth/login', [
-        'email' => $user->email,
+        'email'    => $user->email,
         'password' => 'wrong-password',
     ])->assertStatus(422);
 });
@@ -52,19 +52,19 @@ it('rejects login with missing fields', function (): void {
 
 it('rejects registration without invite token', function (): void {
     $this->postJson('/api/v1/auth/register', [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password123',
+        'name'                  => 'Test User',
+        'email'                 => 'test@example.com',
+        'password'              => 'password123',
         'password_confirmation' => 'password123',
     ])->assertStatus(422);
 });
 
 it('rejects registration with invalid invite token', function (): void {
     $this->postJson('/api/v1/auth/register', [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password123',
+        'name'                  => 'Test User',
+        'email'                 => 'test@example.com',
+        'password'              => 'password123',
         'password_confirmation' => 'password123',
-        'invite_token' => 'invalid-token-that-does-not-exist',
+        'invite_token'          => 'invalid-token-that-does-not-exist',
     ])->assertStatus(422);
 });

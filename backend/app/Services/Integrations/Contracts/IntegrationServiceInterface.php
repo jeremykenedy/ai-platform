@@ -23,7 +23,7 @@ interface IntegrationServiceInterface
     /**
      * Execute a named tool call and return its result.
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed;
 
@@ -41,7 +41,7 @@ interface IntegrationServiceInterface
     /**
      * Handle the OAuth callback and persist the returned tokens for the user.
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void;
 

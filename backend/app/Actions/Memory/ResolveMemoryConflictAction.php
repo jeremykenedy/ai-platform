@@ -25,7 +25,7 @@ class ResolveMemoryConflictAction
     {
         $validResolutions = ['keep_new', 'keep_old', 'merge', 'dismiss'];
 
-        if (! in_array($resolution, $validResolutions, true)) {
+        if (!in_array($resolution, $validResolutions, true)) {
             throw ValidationException::withMessages([
                 'resolution' => ['Invalid resolution. Must be one of: '.implode(', ', $validResolutions).'.'],
             ]);
@@ -42,12 +42,12 @@ class ResolveMemoryConflictAction
         match ($resolution) {
             'keep_new' => $this->keepNew($newMemory, $oldMemory),
             'keep_old' => $this->keepOld($newMemory, $oldMemory),
-            'merge' => $this->merge($newMemory, $oldMemory),
-            'dismiss' => null,
+            'merge'    => $this->merge($newMemory, $oldMemory),
+            'dismiss'  => null,
         };
 
         $conflict->update([
-            'resolved' => true,
+            'resolved'   => true,
             'resolution' => $resolution,
         ]);
     }
@@ -71,7 +71,7 @@ class ResolveMemoryConflictAction
         $mergedContent = $newMemory->content.' '.$oldMemory->content;
 
         $newMemory->update([
-            'content' => trim($mergedContent),
+            'content'    => trim($mergedContent),
             'importance' => max($newMemory->importance, $oldMemory->importance),
         ]);
 

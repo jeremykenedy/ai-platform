@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Log;
 
 class GenerateEmbeddingJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 3;
 
@@ -27,7 +30,7 @@ class GenerateEmbeddingJob implements ShouldQueue
     public array $backoff = [2, 5, 10];
 
     /**
-     * @param  class-string<Model>  $modelClass
+     * @param class-string<Model> $modelClass
      */
     public function __construct(
         public readonly string $modelClass,
@@ -56,7 +59,7 @@ class GenerateEmbeddingJob implements ShouldQueue
 
         Log::warning('[GenerateEmbeddingJob] Unsupported model class', [
             'model_class' => $this->modelClass,
-            'model_id' => $this->modelId,
+            'model_id'    => $this->modelId,
         ]);
     }
 
@@ -64,8 +67,8 @@ class GenerateEmbeddingJob implements ShouldQueue
     {
         Log::error('[GenerateEmbeddingJob] Job failed', [
             'model_class' => $this->modelClass,
-            'model_id' => $this->modelId,
-            'error' => $exception->getMessage(),
+            'model_id'    => $this->modelId,
+            'error'       => $exception->getMessage(),
         ]);
     }
 }

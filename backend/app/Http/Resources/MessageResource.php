@@ -14,17 +14,17 @@ class MessageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id'              => $this->id,
             'conversation_id' => $this->conversation_id,
-            'role' => $this->role,
-            'content' => $this->content,
-            'tokens_used' => $this->tokens_used,
-            'finish_reason' => $this->finish_reason,
-            'model_version' => $this->model_version,
-            'sequence' => $this->sequence,
-            'created_at' => $this->created_at,
-            'attachments' => $this->whenLoaded('attachments'),
-            'edits_count' => $this->whenCounted('edits'),
+            'role'            => $this->role,
+            'content'         => $this->content,
+            'tokens_used'     => $this->tokens_used,
+            'finish_reason'   => $this->finish_reason,
+            'model_version'   => $this->model_version,
+            'sequence'        => $this->sequence,
+            'created_at'      => $this->created_at,
+            'attachments'     => $this->whenLoaded('attachments'),
+            'edits_count'     => $this->whenCounted('edits'),
         ];
     }
 }

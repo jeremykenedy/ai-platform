@@ -14,9 +14,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string $name
+ * @property string      $id
+ * @property string      $user_id
+ * @property string      $name
  * @property string|null $description
  * @property string|null $persona_id
  * @property Carbon|null $created_at
@@ -26,7 +26,9 @@ use Illuminate\Support\Carbon;
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
-    use HasFactory, HasUlids, SoftDeletes;
+    use HasFactory;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>

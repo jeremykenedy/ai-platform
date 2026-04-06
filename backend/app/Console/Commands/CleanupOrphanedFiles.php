@@ -24,7 +24,7 @@ class CleanupOrphanedFiles extends Command
 
         $orphaned = array_values(array_filter(
             $storageFiles,
-            fn (string $path) => ! isset($knownPaths[$path]),
+            fn (string $path) => !isset($knownPaths[$path]),
         ));
 
         $count = count($orphaned);

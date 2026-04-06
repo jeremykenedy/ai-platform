@@ -21,9 +21,9 @@ class UpdateUserRequest extends FormRequest
         $userId = ($routeUser instanceof User) ? $routeUser->id : $this->route('id');
 
         return [
-            'name' => ['nullable', 'string', 'max:255'],
-            'email' => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
-            'role' => ['nullable', 'string', 'in:user,admin,super-admin'],
+            'name'              => ['nullable', 'string', 'max:255'],
+            'email'             => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
+            'role'              => ['nullable', 'string', 'in:user,admin,super-admin'],
             'subscription_tier' => ['nullable', 'string'],
         ];
     }

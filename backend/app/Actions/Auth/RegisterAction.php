@@ -15,7 +15,7 @@ class RegisterAction
     /**
      * Register a new user via an invite token.
      *
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      *
      * @throws ValidationException
      */
@@ -35,9 +35,9 @@ class RegisterAction
 
         /** @var User $user */
         $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'       => $data['name'],
+            'email'      => $data['email'],
+            'password'   => Hash::make($data['password']),
             'invited_by' => (string) $invitingUser->id,
         ]);
 

@@ -19,7 +19,7 @@ class IntegrationsSeed extends Command
     {
         $this->info('Seeding integration definitions...');
 
-        (new IntegrationDefinitionsSeeder)->run();
+        (new IntegrationDefinitionsSeeder())->run();
 
         $count = IntegrationDefinition::count();
 

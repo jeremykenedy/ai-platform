@@ -14,7 +14,7 @@ class CancelTrainingAction
     public function handle(TrainingJob $job): void
     {
         $job->update([
-            'status' => 'cancelled',
+            'status'       => 'cancelled',
             'completed_at' => now(),
         ]);
     }

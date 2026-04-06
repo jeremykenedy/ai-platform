@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Pgvector\Laravel\HasNeighbors;
 
 it('has correct fillable attributes', function (): void {
-    $memory = new Memory;
+    $memory = new Memory();
     expect($memory->getFillable())->toContain(
         'user_id',
         'content',
@@ -21,12 +21,12 @@ it('has correct fillable attributes', function (): void {
 });
 
 it('has correct hidden attributes', function (): void {
-    $memory = new Memory;
+    $memory = new Memory();
     expect($memory->getHidden())->toContain('embedding');
 });
 
 it('has correct casts', function (): void {
-    $memory = new Memory;
+    $memory = new Memory();
     $casts = $memory->getCasts();
     expect($casts)
         ->toHaveKey('importance', 'integer')

@@ -25,8 +25,8 @@ class HealthController extends Controller
         $overallStatus = collect($services)->every(fn (string $s): bool => $s === 'ok') ? 'ok' : 'degraded';
 
         return response()->json([
-            'status' => $overallStatus,
-            'services' => $services,
+            'status'    => $overallStatus,
+            'services'  => $services,
             'timestamp' => now()->toIso8601String(),
         ], $overallStatus === 'ok' ? 200 : 503);
     }

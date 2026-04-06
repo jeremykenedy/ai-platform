@@ -12,7 +12,8 @@ class PullModelAction
 {
     public function __construct(
         private readonly OllamaProvider $ollamaProvider,
-    ) {}
+    ) {
+    }
 
     /**
      * Pull a model from the Ollama registry, yielding progress updates.
@@ -46,11 +47,11 @@ class PullModelAction
         AiModel::updateOrCreate(
             ['name' => $modelName, 'provider_id' => $provider->id],
             [
-                'display_name' => $modelName,
+                'display_name'    => $modelName,
                 'ollama_model_id' => $modelName,
-                'is_active' => true,
-                'is_local' => true,
-                'ollama_digest' => $modelDetails['digest'] ?? null,
+                'is_active'       => true,
+                'is_local'        => true,
+                'ollama_digest'   => $modelDetails['digest'] ?? null,
                 'last_updated_at' => now(),
             ],
         );

@@ -11,7 +11,8 @@ class StreamingService
 {
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Stream a chat completion for the given conversation.
@@ -20,8 +21,9 @@ class StreamingService
      * a summary array. Callers (jobs) are responsible for broadcasting each
      * token via events.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string, sequence: int}
      */
     public function streamChat(string $conversationId, array $messages, string $model, array $options = []): array
@@ -63,8 +65,8 @@ class StreamingService
         } catch (\Throwable $e) {
             Log::error('[StreamingService] Stream interrupted', [
                 'conversation_id' => $conversationId,
-                'model' => $resolvedModel,
-                'error' => $e->getMessage(),
+                'model'           => $resolvedModel,
+                'error'           => $e->getMessage(),
             ]);
 
             $finishReason = 'error';
@@ -77,10 +79,10 @@ class StreamingService
         $this->clearCancellationFlag($conversationId);
 
         return [
-            'content' => $fullContent,
-            'tokens_used' => $tokensUsed,
+            'content'       => $fullContent,
+            'tokens_used'   => $tokensUsed,
             'finish_reason' => $finishReason,
-            'sequence' => $sequence,
+            'sequence'      => $sequence,
         ];
     }
 

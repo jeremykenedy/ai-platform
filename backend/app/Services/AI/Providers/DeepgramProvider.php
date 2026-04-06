@@ -21,8 +21,9 @@ class DeepgramProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -31,8 +32,8 @@ class DeepgramProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -74,14 +75,15 @@ class DeepgramProvider extends AbstractAiProvider
     /**
      * Transcribe audio and return the transcript text with metadata.
      *
-     * @param  array<string, mixed>  $options  Deepgram query parameters (punctuate, diarize, language, etc.)
+     * @param array<string, mixed> $options Deepgram query parameters (punctuate, diarize, language, etc.)
+     *
      * @return array{transcript: string, confidence: float, words: array<int, array<string, mixed>>, metadata: array<string, mixed>}
      */
     public function transcribe(string $audioData, string $model = 'nova-3', array $options = []): array
     {
         $queryParams = array_merge([
-            'model' => $model,
-            'punctuate' => 'true',
+            'model'        => $model,
+            'punctuate'    => 'true',
             'smart_format' => 'true',
         ], $options);
 
@@ -89,7 +91,7 @@ class DeepgramProvider extends AbstractAiProvider
 
         $response = Http::withHeaders([
             'Authorization' => "Token {$this->apiKey}",
-            'Content-Type' => 'audio/*',
+            'Content-Type'  => 'audio/*',
         ])
             ->timeout(120)
             ->connectTimeout(10)
@@ -106,8 +108,8 @@ class DeepgramProvider extends AbstractAiProvider
         return [
             'transcript' => $alternative['transcript'] ?? '',
             'confidence' => (float) ($alternative['confidence'] ?? 0.0),
-            'words' => $alternative['words'] ?? [],
-            'metadata' => $data['metadata'] ?? [],
+            'words'      => $alternative['words'] ?? [],
+            'metadata'   => $data['metadata'] ?? [],
         ];
     }
 
@@ -118,7 +120,7 @@ class DeepgramProvider extends AbstractAiProvider
     {
         return [
             'Authorization' => "Token {$this->apiKey}",
-            'Content-Type' => 'application/json',
+            'Content-Type'  => 'application/json',
         ];
     }
 }

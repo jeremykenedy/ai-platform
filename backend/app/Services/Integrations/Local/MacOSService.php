@@ -21,22 +21,22 @@ class MacOSService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'get_clipboard',
+                'name'        => 'get_clipboard',
                 'description' => 'Read the current text content of the macOS clipboard.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'set_clipboard',
+                'name'        => 'set_clipboard',
                 'description' => 'Write text to the macOS clipboard.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'text' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The text to place on the clipboard.',
                         ],
                     ],
@@ -44,13 +44,13 @@ class MacOSService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'open_url',
+                'name'        => 'open_url',
                 'description' => 'Open a URL in the default browser on macOS.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'url' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The URL to open.',
                         ],
                     ],
@@ -58,26 +58,26 @@ class MacOSService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_frontmost_app',
+                'name'        => 'get_frontmost_app',
                 'description' => 'Get the name of the currently active application on macOS.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'run_shortcut',
+                'name'        => 'run_shortcut',
                 'description' => 'Run a macOS Shortcut by name with optional input.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'shortcutName' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The exact name of the Shortcut as it appears in the Shortcuts app.',
                         ],
                         'input' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Optional text input to pass to the Shortcut.',
                         ],
                     ],
@@ -85,13 +85,13 @@ class MacOSService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_reminders',
+                'name'        => 'list_reminders',
                 'description' => 'List reminders from a specific Reminders list on macOS.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'list' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Name of the Reminders list (e.g. "Reminders", "Work").',
                         ],
                     ],
@@ -99,21 +99,21 @@ class MacOSService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'add_reminder',
+                'name'        => 'add_reminder',
                 'description' => 'Add a reminder to a Reminders list on macOS.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'title' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The title/text of the reminder.',
                         ],
                         'list' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Name of the Reminders list to add to.',
                         ],
                         'dueDate' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Optional due date/time (e.g. "tomorrow at 9am", "2024-06-01 10:00").',
                         ],
                     ],
@@ -128,14 +128,14 @@ class MacOSService extends AbstractIntegrationService
         $this->assertMacOS();
 
         return match ($toolName) {
-            'get_clipboard' => $this->getClipboard(),
-            'set_clipboard' => $this->setClipboard($params),
-            'open_url' => $this->openUrl($params),
+            'get_clipboard'     => $this->getClipboard(),
+            'set_clipboard'     => $this->setClipboard($params),
+            'open_url'          => $this->openUrl($params),
             'get_frontmost_app' => $this->getFrontmostApp(),
-            'run_shortcut' => $this->runShortcut($params),
-            'list_reminders' => $this->listReminders($params),
-            'add_reminder' => $this->addReminder($params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'run_shortcut'      => $this->runShortcut($params),
+            'list_reminders'    => $this->listReminders($params),
+            'add_reminder'      => $this->addReminder($params),
+            default             => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -171,7 +171,8 @@ class MacOSService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function setClipboard(array $params): array
@@ -186,7 +187,8 @@ class MacOSService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function openUrl(array $params): array
@@ -194,7 +196,7 @@ class MacOSService extends AbstractIntegrationService
         $url = $params['url'] ?? throw new RuntimeException('url is required.');
 
         // Validate URL before passing to shell.
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new RuntimeException('Invalid URL provided.');
         }
 
@@ -218,7 +220,8 @@ class MacOSService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function runShortcut(array $params): array
@@ -236,7 +239,7 @@ class MacOSService extends AbstractIntegrationService
 
         $process = Process::input($input ?? '')->run(implode(' ', array_map('escapeshellarg', $command)));
 
-        if (! $process->successful()) {
+        if (!$process->successful()) {
             throw new RuntimeException(
                 "Shortcut '{$shortcutName}' failed: ".trim($process->errorOutput())
             );
@@ -246,7 +249,8 @@ class MacOSService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listReminders(array $params): array
@@ -275,7 +279,8 @@ class MacOSService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function addReminder(array $params): array
@@ -316,7 +321,7 @@ class MacOSService extends AbstractIntegrationService
 
     private function assertSuccess(ProcessResult $result, string $tool): void
     {
-        if (! $result->successful()) {
+        if (!$result->successful()) {
             throw new RuntimeException(
                 "macOS tool '{$tool}' failed: ".trim($result->errorOutput())
             );

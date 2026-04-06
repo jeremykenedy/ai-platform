@@ -20,9 +20,9 @@ abstract class TestCase extends BaseTestCase
         return [
             '--drop-views' => false,
             '--drop-types' => false,
-            '--path' => [database_path('migrations')],
-            '--realpath' => true,
-            '--seed' => false,
+            '--path'       => [database_path('migrations')],
+            '--realpath'   => true,
+            '--seed'       => false,
         ];
     }
 

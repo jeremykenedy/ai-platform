@@ -33,17 +33,17 @@ class ApifyService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'run_actor',
+                'name'        => 'run_actor',
                 'description' => 'Run an Apify actor synchronously and return its output.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'actorId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Apify actor ID or name (e.g. "apify/web-scraper").',
                         ],
                         'input' => [
-                            'type' => 'object',
+                            'type'        => 'object',
                             'description' => 'Actor input as a JSON object.',
                         ],
                     ],
@@ -51,13 +51,13 @@ class ApifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_run_output',
+                'name'        => 'get_run_output',
                 'description' => 'Retrieve the dataset output of a completed Apify actor run.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'runId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The Apify run ID.',
                         ],
                     ],
@@ -65,13 +65,13 @@ class ApifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'scrape_url',
+                'name'        => 'scrape_url',
                 'description' => 'Scrape the content of a URL using Apify.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'url' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The URL to scrape.',
                         ],
                     ],
@@ -79,17 +79,17 @@ class ApifyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'search_and_scrape',
+                'name'        => 'search_and_scrape',
                 'description' => 'Perform a Google search via Apify and scrape the results.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The search query.',
                         ],
                         'maxResults' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Maximum number of search results to return (default 10).',
                         ],
                     ],
@@ -102,16 +102,17 @@ class ApifyService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'run_actor' => $this->runActor($user, $params),
-            'get_run_output' => $this->getRunOutput($user, $params),
-            'scrape_url' => $this->scrapeUrl($user, $params),
+            'run_actor'         => $this->runActor($user, $params),
+            'get_run_output'    => $this->getRunOutput($user, $params),
+            'scrape_url'        => $this->scrapeUrl($user, $params),
             'search_and_scrape' => $this->searchAndScrape($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default             => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function runActor(User $user, array $params): array
@@ -119,7 +120,7 @@ class ApifyService extends AbstractIntegrationService
         $actorId = $params['actorId'] ?? throw new RuntimeException('actorId is required.');
         $input = $params['input'] ?? [];
 
-        if (! is_array($input)) {
+        if (!is_array($input)) {
             throw new RuntimeException('input must be a JSON object.');
         }
 
@@ -132,7 +133,8 @@ class ApifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getRunOutput(User $user, array $params): array
@@ -148,7 +150,8 @@ class ApifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function scrapeUrl(User $user, array $params): array
@@ -157,9 +160,9 @@ class ApifyService extends AbstractIntegrationService
 
         $response = $this->client($user)
             ->post(self::BASE_URL.'/acts/'.urlencode(self::SCRAPER_ACTOR).'/run-sync-get-dataset-items', [
-                'startUrls' => [['url' => $url]],
+                'startUrls'        => [['url' => $url]],
                 'maxCrawlingDepth' => 0,
-                'maxResults' => 1,
+                'maxResults'       => 1,
             ]);
 
         $response->throw();
@@ -170,7 +173,8 @@ class ApifyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchAndScrape(User $user, array $params): array
@@ -180,10 +184,10 @@ class ApifyService extends AbstractIntegrationService
 
         $response = $this->client($user)
             ->post(self::BASE_URL.'/acts/'.urlencode(self::SEARCH_ACTOR).'/run-sync-get-dataset-items', [
-                'queries' => $query,
+                'queries'          => $query,
                 'maxPagesPerQuery' => 1,
-                'resultsPerPage' => $maxResults,
-                'mobileResults' => false,
+                'resultsPerPage'   => $maxResults,
+                'mobileResults'    => false,
             ]);
 
         $response->throw();

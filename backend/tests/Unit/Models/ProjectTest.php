@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 it('has correct fillable attributes', function (): void {
-    $project = new Project;
+    $project = new Project();
     expect($project->getFillable())->toContain(
         'user_id',
         'name',

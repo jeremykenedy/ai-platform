@@ -28,19 +28,19 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.microsoft.client_id'),
-            'redirect_uri' => config('services.microsoft.redirect_uri'),
+            'client_id'     => config('services.microsoft.client_id'),
+            'redirect_uri'  => config('services.microsoft.redirect_uri'),
             'response_type' => 'code',
-            'scope' => implode(' ', self::SCOPES),
+            'scope'         => implode(' ', self::SCOPES),
             'response_mode' => 'query',
-            'state' => $user->getKey(),
+            'state'         => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -50,12 +50,12 @@ class MicrosoftCalendarService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.microsoft.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.microsoft.client_id'),
                 'client_secret' => config('services.microsoft.client_secret'),
-                'redirect_uri' => config('services.microsoft.redirect_uri'),
-                'grant_type' => 'authorization_code',
-                'scope' => implode(' ', self::SCOPES),
+                'redirect_uri'  => config('services.microsoft.redirect_uri'),
+                'grant_type'    => 'authorization_code',
+                'scope'         => implode(' ', self::SCOPES),
             ]);
 
         $response->throw();
@@ -66,14 +66,14 @@ class MicrosoftCalendarService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'] ?? null,
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => self::SCOPES,
@@ -88,91 +88,91 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_events',
+                'name'        => 'list_events',
                 'description' => 'List Microsoft Calendar events within a date range.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'startDateTime' => ['type' => 'string', 'description' => 'Start of range (ISO8601).'],
-                        'endDateTime' => ['type' => 'string', 'description' => 'End of range (ISO8601).'],
+                        'endDateTime'   => ['type' => 'string', 'description' => 'End of range (ISO8601).'],
                     ],
                 ],
             ],
             [
-                'name' => 'create_event',
+                'name'        => 'create_event',
                 'description' => 'Create a new Microsoft Calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['subject', 'start', 'end'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['subject', 'start', 'end'],
                     'properties' => [
                         'subject' => ['type' => 'string', 'description' => 'Event subject/title.'],
-                        'start' => ['type' => 'string', 'description' => 'Start datetime (ISO8601).'],
-                        'end' => ['type' => 'string', 'description' => 'End datetime (ISO8601).'],
-                        'body' => ['type' => 'string', 'description' => 'Event body/description.'],
+                        'start'   => ['type' => 'string', 'description' => 'Start datetime (ISO8601).'],
+                        'end'     => ['type' => 'string', 'description' => 'End datetime (ISO8601).'],
+                        'body'    => ['type' => 'string', 'description' => 'Event body/description.'],
                     ],
                 ],
             ],
             [
-                'name' => 'update_event',
+                'name'        => 'update_event',
                 'description' => 'Update an existing Microsoft Calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId'],
                     'properties' => [
                         'eventId' => ['type' => 'string', 'description' => 'Microsoft Calendar event ID.'],
                         'subject' => ['type' => 'string', 'description' => 'New event subject.'],
-                        'start' => ['type' => 'string', 'description' => 'New start datetime (ISO8601).'],
-                        'end' => ['type' => 'string', 'description' => 'New end datetime (ISO8601).'],
+                        'start'   => ['type' => 'string', 'description' => 'New start datetime (ISO8601).'],
+                        'end'     => ['type' => 'string', 'description' => 'New end datetime (ISO8601).'],
                     ],
                 ],
             ],
             [
-                'name' => 'delete_event',
+                'name'        => 'delete_event',
                 'description' => 'Delete a Microsoft Calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId'],
                     'properties' => [
                         'eventId' => ['type' => 'string', 'description' => 'Microsoft Calendar event ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'find_free_time',
+                'name'        => 'find_free_time',
                 'description' => 'Find free/busy time slots for attendees.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['startDateTime', 'endDateTime'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['startDateTime', 'endDateTime'],
                     'properties' => [
                         'startDateTime' => ['type' => 'string', 'description' => 'Start of range (ISO8601).'],
-                        'endDateTime' => ['type' => 'string', 'description' => 'End of range (ISO8601).'],
-                        'attendees' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                        'endDateTime'   => ['type' => 'string', 'description' => 'End of range (ISO8601).'],
+                        'attendees'     => [
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'Email addresses of attendees to check.',
                         ],
                     ],
                 ],
             ],
             [
-                'name' => 'list_calendars',
+                'name'        => 'list_calendars',
                 'description' => 'List all Microsoft calendars for the user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'respond_to_event',
+                'name'        => 'respond_to_event',
                 'description' => 'RSVP to a Microsoft Calendar event invitation.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId', 'response'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId', 'response'],
                     'properties' => [
-                        'eventId' => ['type' => 'string', 'description' => 'Microsoft Calendar event ID.'],
+                        'eventId'  => ['type' => 'string', 'description' => 'Microsoft Calendar event ID.'],
                         'response' => [
-                            'type' => 'string',
-                            'enum' => ['accept', 'tentativelyAccept', 'decline'],
+                            'type'        => 'string',
+                            'enum'        => ['accept', 'tentativelyAccept', 'decline'],
                             'description' => 'RSVP response.',
                         ],
                     ],
@@ -182,19 +182,19 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_events' => $this->listEvents($params, $user),
-            'create_event' => $this->createEvent($params, $user),
-            'update_event' => $this->updateEvent($params, $user),
-            'delete_event' => $this->deleteEvent($params, $user),
-            'find_free_time' => $this->findFreeTime($params, $user),
-            'list_calendars' => $this->listCalendars($user),
+            'list_events'      => $this->listEvents($params, $user),
+            'create_event'     => $this->createEvent($params, $user),
+            'update_event'     => $this->updateEvent($params, $user),
+            'delete_event'     => $this->deleteEvent($params, $user),
+            'find_free_time'   => $this->findFreeTime($params, $user),
+            'list_calendars'   => $this->listCalendars($user),
             'respond_to_event' => $this->respondToEvent($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            default            => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -210,16 +210,17 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listEvents(array $params, User $user): array
     {
         $query = array_filter([
             'startDateTime' => $params['startDateTime'] ?? now()->toIso8601String(),
-            'endDateTime' => $params['endDateTime'] ?? now()->addDays(7)->toIso8601String(),
-            '$top' => 25,
-            '$orderby' => 'start/dateTime',
+            'endDateTime'   => $params['endDateTime'] ?? now()->addDays(7)->toIso8601String(),
+            '$top'          => 25,
+            '$orderby'      => 'start/dateTime',
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -233,14 +234,15 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createEvent(array $params, User $user): array
     {
         $body = array_filter([
             'subject' => $params['subject'],
-            'start' => [
+            'start'   => [
                 'dateTime' => $params['start'],
                 'timeZone' => 'UTC',
             ],
@@ -250,7 +252,7 @@ class MicrosoftCalendarService extends AbstractIntegrationService
             ],
             'body' => isset($params['body']) ? [
                 'contentType' => 'text',
-                'content' => $params['body'],
+                'content'     => $params['body'],
             ] : null,
         ]);
 
@@ -265,7 +267,8 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updateEvent(array $params, User $user): array
@@ -274,8 +277,8 @@ class MicrosoftCalendarService extends AbstractIntegrationService
 
         $body = array_filter([
             'subject' => $params['subject'] ?? null,
-            'start' => isset($params['start']) ? ['dateTime' => $params['start'], 'timeZone' => 'UTC'] : null,
-            'end' => isset($params['end']) ? ['dateTime' => $params['end'], 'timeZone' => 'UTC'] : null,
+            'start'   => isset($params['start']) ? ['dateTime' => $params['start'], 'timeZone' => 'UTC'] : null,
+            'end'     => isset($params['end']) ? ['dateTime' => $params['end'], 'timeZone' => 'UTC'] : null,
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -289,7 +292,8 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function deleteEvent(array $params, User $user): array
@@ -307,7 +311,8 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function findFreeTime(array $params, User $user): array
@@ -361,7 +366,8 @@ class MicrosoftCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function respondToEvent(array $params, User $user): array

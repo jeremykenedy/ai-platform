@@ -27,20 +27,20 @@ class GoogleCalendarService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.google.client_id'),
-            'redirect_uri' => config('services.google.redirect_uri'),
+            'client_id'     => config('services.google.client_id'),
+            'redirect_uri'  => config('services.google.redirect_uri'),
             'response_type' => 'code',
-            'scope' => implode(' ', self::SCOPES),
-            'access_type' => 'offline',
-            'prompt' => 'consent',
-            'state' => $user->getKey(),
+            'scope'         => implode(' ', self::SCOPES),
+            'access_type'   => 'offline',
+            'prompt'        => 'consent',
+            'state'         => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -50,11 +50,11 @@ class GoogleCalendarService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.google.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
-                'redirect_uri' => config('services.google.redirect_uri'),
-                'grant_type' => 'authorization_code',
+                'redirect_uri'  => config('services.google.redirect_uri'),
+                'grant_type'    => 'authorization_code',
             ]);
 
         $response->throw();
@@ -65,14 +65,14 @@ class GoogleCalendarService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'] ?? null,
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => self::SCOPES,
@@ -87,67 +87,67 @@ class GoogleCalendarService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_events',
+                'name'        => 'list_events',
                 'description' => 'List calendar events within a time range.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Free-text search query.'],
+                        'query'   => ['type' => 'string', 'description' => 'Free-text search query.'],
                         'timeMin' => ['type' => 'string', 'description' => 'Start of time range (RFC3339).'],
                         'timeMax' => ['type' => 'string', 'description' => 'End of time range (RFC3339).'],
                     ],
                 ],
             ],
             [
-                'name' => 'create_event',
+                'name'        => 'create_event',
                 'description' => 'Create a new calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['summary', 'start', 'end'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['summary', 'start', 'end'],
                     'properties' => [
-                        'summary' => ['type' => 'string', 'description' => 'Event title.'],
-                        'start' => ['type' => 'string', 'description' => 'Start datetime (RFC3339).'],
-                        'end' => ['type' => 'string', 'description' => 'End datetime (RFC3339).'],
+                        'summary'     => ['type' => 'string', 'description' => 'Event title.'],
+                        'start'       => ['type' => 'string', 'description' => 'Start datetime (RFC3339).'],
+                        'end'         => ['type' => 'string', 'description' => 'End datetime (RFC3339).'],
                         'description' => ['type' => 'string', 'description' => 'Event description.'],
-                        'attendees' => [
-                            'type' => 'array',
-                            'items' => ['type' => 'string'],
+                        'attendees'   => [
+                            'type'        => 'array',
+                            'items'       => ['type' => 'string'],
                             'description' => 'List of attendee email addresses.',
                         ],
                     ],
                 ],
             ],
             [
-                'name' => 'update_event',
+                'name'        => 'update_event',
                 'description' => 'Update an existing calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId'],
                     'properties' => [
                         'eventId' => ['type' => 'string', 'description' => 'Google Calendar event ID.'],
                         'summary' => ['type' => 'string', 'description' => 'New event title.'],
-                        'start' => ['type' => 'string', 'description' => 'New start datetime (RFC3339).'],
-                        'end' => ['type' => 'string', 'description' => 'New end datetime (RFC3339).'],
+                        'start'   => ['type' => 'string', 'description' => 'New start datetime (RFC3339).'],
+                        'end'     => ['type' => 'string', 'description' => 'New end datetime (RFC3339).'],
                     ],
                 ],
             ],
             [
-                'name' => 'delete_event',
+                'name'        => 'delete_event',
                 'description' => 'Delete a calendar event.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId'],
                     'properties' => [
                         'eventId' => ['type' => 'string', 'description' => 'Google Calendar event ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'find_free_time',
+                'name'        => 'find_free_time',
                 'description' => 'Find free time slots within a time range.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['timeMin', 'timeMax'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['timeMin', 'timeMax'],
                     'properties' => [
                         'timeMin' => ['type' => 'string', 'description' => 'Start of range (RFC3339).'],
                         'timeMax' => ['type' => 'string', 'description' => 'End of range (RFC3339).'],
@@ -155,24 +155,24 @@ class GoogleCalendarService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_calendars',
+                'name'        => 'list_calendars',
                 'description' => 'List all calendars in the user\'s account.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'respond_to_event',
+                'name'        => 'respond_to_event',
                 'description' => 'RSVP to a calendar event invitation.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['eventId', 'response'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['eventId', 'response'],
                     'properties' => [
-                        'eventId' => ['type' => 'string', 'description' => 'Google Calendar event ID.'],
+                        'eventId'  => ['type' => 'string', 'description' => 'Google Calendar event ID.'],
                         'response' => [
-                            'type' => 'string',
-                            'enum' => ['accepted', 'declined', 'tentative'],
+                            'type'        => 'string',
+                            'enum'        => ['accepted', 'declined', 'tentative'],
                             'description' => 'RSVP response.',
                         ],
                     ],
@@ -182,19 +182,19 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_events' => $this->listEvents($params, $user),
-            'create_event' => $this->createEvent($params, $user),
-            'update_event' => $this->updateEvent($params, $user),
-            'delete_event' => $this->deleteEvent($params, $user),
-            'find_free_time' => $this->findFreeTime($params, $user),
-            'list_calendars' => $this->listCalendars($user),
+            'list_events'      => $this->listEvents($params, $user),
+            'create_event'     => $this->createEvent($params, $user),
+            'update_event'     => $this->updateEvent($params, $user),
+            'delete_event'     => $this->deleteEvent($params, $user),
+            'find_free_time'   => $this->findFreeTime($params, $user),
+            'list_calendars'   => $this->listCalendars($user),
             'respond_to_event' => $this->respondToEvent($params, $user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            default            => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -210,17 +210,18 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listEvents(array $params, User $user): array
     {
         $query = array_filter([
-            'q' => $params['query'] ?? null,
-            'timeMin' => $params['timeMin'] ?? null,
-            'timeMax' => $params['timeMax'] ?? null,
+            'q'            => $params['query'] ?? null,
+            'timeMin'      => $params['timeMin'] ?? null,
+            'timeMax'      => $params['timeMax'] ?? null,
             'singleEvents' => 'true',
-            'orderBy' => 'startTime',
+            'orderBy'      => 'startTime',
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -234,7 +235,8 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createEvent(array $params, User $user): array
@@ -245,11 +247,11 @@ class GoogleCalendarService extends AbstractIntegrationService
         );
 
         $body = array_filter([
-            'summary' => $params['summary'],
+            'summary'     => $params['summary'],
             'description' => $params['description'] ?? null,
-            'start' => ['dateTime' => $params['start'], 'timeZone' => 'UTC'],
-            'end' => ['dateTime' => $params['end'], 'timeZone' => 'UTC'],
-            'attendees' => $attendees !== [] ? $attendees : null,
+            'start'       => ['dateTime' => $params['start'], 'timeZone' => 'UTC'],
+            'end'         => ['dateTime' => $params['end'], 'timeZone' => 'UTC'],
+            'attendees'   => $attendees !== [] ? $attendees : null,
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -263,7 +265,8 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updateEvent(array $params, User $user): array
@@ -272,8 +275,8 @@ class GoogleCalendarService extends AbstractIntegrationService
 
         $body = array_filter([
             'summary' => $params['summary'] ?? null,
-            'start' => isset($params['start']) ? ['dateTime' => $params['start'], 'timeZone' => 'UTC'] : null,
-            'end' => isset($params['end']) ? ['dateTime' => $params['end'], 'timeZone' => 'UTC'] : null,
+            'start'   => isset($params['start']) ? ['dateTime' => $params['start'], 'timeZone' => 'UTC'] : null,
+            'end'     => isset($params['end']) ? ['dateTime' => $params['end'], 'timeZone' => 'UTC'] : null,
         ]);
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -287,7 +290,8 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function deleteEvent(array $params, User $user): array
@@ -305,7 +309,8 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function findFreeTime(array $params, User $user): array
@@ -313,7 +318,7 @@ class GoogleCalendarService extends AbstractIntegrationService
         $body = [
             'timeMin' => $params['timeMin'],
             'timeMax' => $params['timeMax'],
-            'items' => [['id' => 'primary']],
+            'items'   => [['id' => 'primary']],
         ];
 
         $response = Http::withToken($this->getOauthToken($user))
@@ -342,7 +347,8 @@ class GoogleCalendarService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function respondToEvent(array $params, User $user): array

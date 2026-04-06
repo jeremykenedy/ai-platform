@@ -12,27 +12,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string $dataset_id
- * @property string $base_model_id
- * @property string $output_model_name
+ * @property string            $id
+ * @property string            $user_id
+ * @property string            $dataset_id
+ * @property string            $base_model_id
+ * @property string            $output_model_name
  * @property array<mixed>|null $config
- * @property string $status
- * @property int $progress
- * @property string|null $log_output
- * @property Carbon|null $started_at
- * @property Carbon|null $completed_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Carbon|null $deleted_at
+ * @property string            $status
+ * @property int               $progress
+ * @property string|null       $log_output
+ * @property Carbon|null       $started_at
+ * @property Carbon|null       $completed_at
+ * @property Carbon|null       $created_at
+ * @property Carbon|null       $updated_at
+ * @property Carbon|null       $deleted_at
  * @property-read TrainingDataset|null $dataset
  * @property-read AiModel|null $baseModel
  * @property-read User|null $user
  */
 class TrainingJob extends Model
 {
-    use HasUlids, SoftDeletes;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>
@@ -56,9 +57,9 @@ class TrainingJob extends Model
     protected function casts(): array
     {
         return [
-            'config' => 'array',
-            'progress' => 'integer',
-            'started_at' => 'datetime',
+            'config'       => 'array',
+            'progress'     => 'integer',
+            'started_at'   => 'datetime',
             'completed_at' => 'datetime',
         ];
     }
@@ -79,7 +80,8 @@ class TrainingJob extends Model
     }
 
     /**
-     * @param  Builder<TrainingJob>  $query
+     * @param Builder<TrainingJob> $query
+     *
      * @return Builder<TrainingJob>
      */
     public function scopeRunning(Builder $query): Builder
@@ -88,7 +90,8 @@ class TrainingJob extends Model
     }
 
     /**
-     * @param  Builder<TrainingJob>  $query
+     * @param Builder<TrainingJob> $query
+     *
      * @return Builder<TrainingJob>
      */
     public function scopePending(Builder $query): Builder
@@ -97,7 +100,8 @@ class TrainingJob extends Model
     }
 
     /**
-     * @param  Builder<TrainingJob>  $query
+     * @param Builder<TrainingJob> $query
+     *
      * @return Builder<TrainingJob>
      */
     public function scopeForUser(Builder $query, string $userId): Builder

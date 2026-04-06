@@ -36,7 +36,7 @@ it('can update settings with valid data', function (): void {
 
     $this->actingAs($user)
         ->putJson('/api/v1/settings', [
-            'theme' => 'dark',
+            'theme'     => 'dark',
             'font_size' => 16,
         ])->assertSuccessful();
 });

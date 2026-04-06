@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Storage;
 
 class ProcessFileExtractionJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public int $tries = 2;
 
@@ -39,8 +42,8 @@ class ProcessFileExtractionJob implements ShouldQueue
         if ($file === null || $file === '') {
             Log::warning('[ProcessFileExtractionJob] File not found on disk', [
                 'attachment_id' => $this->attachmentId,
-                'disk' => $disk,
-                'path' => $attachment->path,
+                'disk'          => $disk,
+                'path'          => $attachment->path,
             ]);
 
             $attachment->update(['extraction_status' => 'failed']);
@@ -53,14 +56,14 @@ class ProcessFileExtractionJob implements ShouldQueue
         $tokenEstimate = (int) $extractionResult['token_estimate'];
 
         $attachment->update([
-            'extracted_text' => $extractedText,
+            'extracted_text'    => $extractedText,
             'extraction_status' => 'complete',
-            'token_estimate' => $tokenEstimate,
+            'token_estimate'    => $tokenEstimate,
         ]);
 
         Log::info('[ProcessFileExtractionJob] Extraction complete', [
-            'attachment_id' => $this->attachmentId,
-            'mime_type' => $attachment->mime_type,
+            'attachment_id'  => $this->attachmentId,
+            'mime_type'      => $attachment->mime_type,
             'token_estimate' => $tokenEstimate,
         ]);
     }
@@ -69,7 +72,7 @@ class ProcessFileExtractionJob implements ShouldQueue
     {
         Log::error('[ProcessFileExtractionJob] Job failed', [
             'attachment_id' => $this->attachmentId,
-            'error' => $exception->getMessage(),
+            'error'         => $exception->getMessage(),
         ]);
 
         $attachment = MessageAttachment::find($this->attachmentId);

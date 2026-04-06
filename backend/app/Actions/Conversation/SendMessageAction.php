@@ -20,12 +20,13 @@ class SendMessageAction
         private readonly ContextWindowService $contextWindowService,
         private readonly MemoryRetrievalService $memoryRetrievalService,
         private readonly EmbeddingService $embeddingService,
-    ) {}
+    ) {
+    }
 
     /**
      * Persist the user message, handle attachments, and dispatch streaming inference.
      *
-     * @param  array<int, array{file: UploadedFile, mime_type?: string}>  $attachments
+     * @param array<int, array{file: UploadedFile, mime_type?: string}> $attachments
      */
     public function handle(
         Conversation $conversation,
@@ -38,9 +39,9 @@ class SendMessageAction
         /** @var Message $message */
         $message = Message::create([
             'conversation_id' => $conversation->id,
-            'role' => 'user',
-            'content' => $content,
-            'sequence' => $sequence,
+            'role'            => 'user',
+            'content'         => $content,
+            'sequence'        => $sequence,
         ]);
 
         foreach ($attachments as $attachment) {
@@ -48,12 +49,12 @@ class SendMessageAction
             $path = Storage::disk('local')->putFile('attachments/'.$conversation->id, $file);
 
             MessageAttachment::create([
-                'message_id' => $message->id,
-                'disk' => 'local',
-                'path' => $path,
-                'filename' => $file->getClientOriginalName(),
-                'mime_type' => $file->getMimeType() ?? ($attachment['mime_type'] ?? 'application/octet-stream'),
-                'size' => $file->getSize(),
+                'message_id'        => $message->id,
+                'disk'              => 'local',
+                'path'              => $path,
+                'filename'          => $file->getClientOriginalName(),
+                'mime_type'         => $file->getMimeType() ?? ($attachment['mime_type'] ?? 'application/octet-stream'),
+                'size'              => $file->getSize(),
                 'extraction_status' => 'pending',
             ]);
         }

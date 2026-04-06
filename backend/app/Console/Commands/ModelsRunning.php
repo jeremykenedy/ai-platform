@@ -21,7 +21,7 @@ class ModelsRunning extends Command
 
     public function handle(): int
     {
-        if (! $this->ollamaProvider->isAvailable()) {
+        if (!$this->ollamaProvider->isAvailable()) {
             $this->error('Ollama is not available. Ensure the Ollama service is running and reachable.');
 
             return self::FAILURE;

@@ -39,7 +39,7 @@ it('can create a persona', function (): void {
 
     $this->actingAs($user)
         ->postJson('/api/v1/personas', [
-            'name' => 'Test Persona',
+            'name'          => 'Test Persona',
             'system_prompt' => 'You are a helpful assistant.',
         ])->assertStatus(201)
         ->assertJsonPath('data.name', 'Test Persona');

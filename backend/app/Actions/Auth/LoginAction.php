@@ -13,13 +13,13 @@ class LoginAction
     /**
      * Attempt to authenticate the user and return the session data.
      *
-     * @return array{user: User, token: null}
-     *
      * @throws ValidationException
+     *
+     * @return array{user: User, token: null}
      */
     public function handle(string $email, string $password): array
     {
-        if (! Auth::attempt(['email' => $email, 'password' => $password])) {
+        if (!Auth::attempt(['email' => $email, 'password' => $password])) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
@@ -31,7 +31,7 @@ class LoginAction
         $user->update(['last_active_at' => now()]);
 
         return [
-            'user' => $user,
+            'user'  => $user,
             'token' => null,
         ];
     }

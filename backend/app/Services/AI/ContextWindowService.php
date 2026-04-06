@@ -26,7 +26,8 @@ class ContextWindowService
      * Always includes: system prompt, time awareness, latest summary (if any).
      * Fills remaining window with most recent messages.
      *
-     * @param  array<int, array{role: string, content: string}>  $return
+     * @param array<int, array{role: string, content: string}> $return
+     *
      * @return array<int, array{role: string, content: string}>
      */
     public function buildContext(Conversation $conversation, string $userMessage, ?string $systemPrompt = null): array
@@ -59,7 +60,7 @@ class ContextWindowService
 
         foreach ($selectedHistory as $message) {
             $messages[] = [
-                'role' => $message->role,
+                'role'    => $message->role,
                 'content' => $message->content,
             ];
         }
@@ -190,7 +191,7 @@ class ContextWindowService
             ->whereIn('role', ['user', 'assistant'])
             ->orderBy('sequence', 'asc');
 
-        if ($summary !== null && ! empty($summary->covers_message_ids)) {
+        if ($summary !== null && !empty($summary->covers_message_ids)) {
             $query->whereNotIn('id', $summary->covers_message_ids);
         }
 
@@ -200,7 +201,8 @@ class ContextWindowService
     /**
      * Select as many messages as fit within the token budget, keeping order.
      *
-     * @param  Collection<int, Message>  $messages
+     * @param Collection<int, Message> $messages
+     *
      * @return Collection<int, Message>
      */
     private function selectMessagesWithinBudget(Collection $messages, int $tokenBudget): Collection

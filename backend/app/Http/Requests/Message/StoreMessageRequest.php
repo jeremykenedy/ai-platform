@@ -13,7 +13,7 @@ class StoreMessageRequest extends FormRequest
     {
         $conversation = $this->route('conversation');
 
-        if (! ($conversation instanceof Conversation)) {
+        if (!($conversation instanceof Conversation)) {
             return false;
         }
 
@@ -23,11 +23,11 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['required', 'string'],
-            'model' => ['nullable', 'string', 'max:255'],
-            'attachments' => ['nullable', 'array'],
+            'content'       => ['required', 'string'],
+            'model'         => ['nullable', 'string', 'max:255'],
+            'attachments'   => ['nullable', 'array'],
             'attachments.*' => ['file', 'max:52428800'],
-            'stream' => ['nullable', 'boolean'],
+            'stream'        => ['nullable', 'boolean'],
         ];
     }
 }

@@ -9,8 +9,9 @@ interface AiProviderInterface
     /**
      * Send a chat completion request.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array;
@@ -18,8 +19,8 @@ interface AiProviderInterface
     /**
      * Stream a chat completion, yielding token strings.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator;
 

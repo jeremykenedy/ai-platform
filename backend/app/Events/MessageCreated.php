@@ -13,14 +13,17 @@ use Illuminate\Queue\SerializesModels;
 
 class MessageCreated implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $conversationId,
         public string $messageId,
         public string $role,
         public string $content,
-    ) {}
+    ) {
+    }
 
     /**
      * @return Channel|array<int, Channel>
@@ -37,8 +40,8 @@ class MessageCreated implements ShouldBroadcastNow
     {
         return [
             'message_id' => $this->messageId,
-            'role' => $this->role,
-            'content' => $this->content,
+            'role'       => $this->role,
+            'content'    => $this->content,
         ];
     }
 }

@@ -23,17 +23,17 @@ class MiroService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'list_boards',
+                'name'        => 'list_boards',
                 'description' => 'List all Miro boards accessible to the authenticated user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'limit' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Maximum number of boards to return (default 10).',
                         ],
                         'cursor' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Pagination cursor from a previous response.',
                         ],
                     ],
@@ -41,13 +41,13 @@ class MiroService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'get_board',
+                'name'        => 'get_board',
                 'description' => 'Retrieve details of a specific Miro board by its ID.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'boardId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The unique identifier of the Miro board.',
                         ],
                     ],
@@ -55,17 +55,17 @@ class MiroService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_board',
+                'name'        => 'create_board',
                 'description' => 'Create a new Miro board with the given name and optional description.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'name' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Name of the new board.',
                         ],
                         'description' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Optional description of the board.',
                         ],
                     ],
@@ -73,23 +73,23 @@ class MiroService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_sticky_note',
+                'name'        => 'create_sticky_note',
                 'description' => 'Create a sticky note item on a Miro board.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'boardId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The board on which to create the sticky note.',
                         ],
                         'content' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Text content of the sticky note.',
                         ],
                         'position' => [
-                            'type' => 'object',
+                            'type'        => 'object',
                             'description' => 'Position on the board with x and y coordinates.',
-                            'properties' => [
+                            'properties'  => [
                                 'x' => ['type' => 'number'],
                                 'y' => ['type' => 'number'],
                             ],
@@ -99,17 +99,17 @@ class MiroService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'list_items',
+                'name'        => 'list_items',
                 'description' => 'List items on a Miro board, optionally filtered by item type.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'boardId' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The board from which to list items.',
                         ],
                         'type' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'Optional item type filter (e.g. sticky_note, shape, text).',
                         ],
                     ],
@@ -122,12 +122,12 @@ class MiroService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'list_boards' => $this->listBoards($user, $params),
-            'get_board' => $this->getBoard($user, $params),
-            'create_board' => $this->createBoard($user, $params),
+            'list_boards'        => $this->listBoards($user, $params),
+            'get_board'          => $this->getBoard($user, $params),
+            'create_board'       => $this->createBoard($user, $params),
             'create_sticky_note' => $this->createStickyNote($user, $params),
-            'list_items' => $this->listItems($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'list_items'         => $this->listItems($user, $params),
+            default              => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -139,9 +139,9 @@ class MiroService extends AbstractIntegrationService
 
         return 'https://miro.com/oauth/authorize?'.http_build_query([
             'response_type' => 'code',
-            'client_id' => $clientId,
-            'redirect_uri' => $redirectUri,
-            'state' => $state,
+            'client_id'     => $clientId,
+            'redirect_uri'  => $redirectUri,
+            'state'         => $state,
         ]);
     }
 
@@ -150,11 +150,11 @@ class MiroService extends AbstractIntegrationService
         $code = $params['code'] ?? throw new RuntimeException('Missing OAuth code.');
 
         $response = Http::timeout(15)->post('https://api.miro.com/v1/oauth/token', [
-            'grant_type' => 'authorization_code',
-            'client_id' => config('services.miro.client_id'),
+            'grant_type'    => 'authorization_code',
+            'client_id'     => config('services.miro.client_id'),
             'client_secret' => config('services.miro.client_secret'),
-            'redirect_uri' => config('services.miro.redirect_uri'),
-            'code' => $code,
+            'redirect_uri'  => config('services.miro.redirect_uri'),
+            'code'          => $code,
         ]);
 
         $response->throw();
@@ -166,11 +166,11 @@ class MiroService extends AbstractIntegrationService
             $definition = $this->getDefinition();
 
             $user->integrations()->create([
-                'integration_id' => $definition->getKey(),
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'],
+                'integration_id'      => $definition->getKey(),
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'],
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => isset($data['scope'])
@@ -179,10 +179,10 @@ class MiroService extends AbstractIntegrationService
             ]);
         } else {
             $integration->update([
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'],
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'],
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => isset($data['scope'])
@@ -193,7 +193,8 @@ class MiroService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listBoards(User $user, array $params): array
@@ -217,7 +218,8 @@ class MiroService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getBoard(User $user, array $params): array
@@ -233,7 +235,8 @@ class MiroService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createBoard(User $user, array $params): array
@@ -255,7 +258,8 @@ class MiroService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createStickyNote(User $user, array $params): array
@@ -269,8 +273,8 @@ class MiroService extends AbstractIntegrationService
 
         if (isset($params['position']) && is_array($params['position'])) {
             $body['position'] = [
-                'x' => (float) ($params['position']['x'] ?? 0),
-                'y' => (float) ($params['position']['y'] ?? 0),
+                'x'      => (float) ($params['position']['x'] ?? 0),
+                'y'      => (float) ($params['position']['y'] ?? 0),
                 'origin' => 'center',
             ];
         }
@@ -284,7 +288,8 @@ class MiroService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listItems(User $user, array $params): array

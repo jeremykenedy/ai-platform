@@ -16,7 +16,8 @@ class MemoryRetrievalService
 {
     public function __construct(
         private readonly EmbeddingService $embeddingService,
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieve the most relevant memories for a given user message.
@@ -64,7 +65,7 @@ class MemoryRetrievalService
 
         Memory::whereIn('id', $ids)->update([
             'last_accessed_at' => now(),
-            'access_count' => DB::raw('access_count + 1'),
+            'access_count'     => DB::raw('access_count + 1'),
         ]);
 
         $orderedIds = $ids;
@@ -78,7 +79,7 @@ class MemoryRetrievalService
     /**
      * Format a collection of memories as a system prompt prefix.
      *
-     * @param  Collection<int, Memory>  $memories
+     * @param Collection<int, Memory> $memories
      */
     public function formatAsSystemPrompt(Collection $memories, string $timezone = 'America/Los_Angeles'): string
     {

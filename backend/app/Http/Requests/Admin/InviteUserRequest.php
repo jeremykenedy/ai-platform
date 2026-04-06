@@ -17,8 +17,8 @@ class InviteUserRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email', 'unique:users,email'],
-            'name' => ['required', 'string', 'max:255'],
-            'role' => ['nullable', 'string', 'in:user,admin'],
+            'name'  => ['required', 'string', 'max:255'],
+            'role'  => ['nullable', 'string', 'in:user,admin'],
         ];
     }
 }

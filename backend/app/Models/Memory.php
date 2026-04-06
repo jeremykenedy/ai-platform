@@ -13,16 +13,16 @@ use Illuminate\Support\Carbon;
 use Pgvector\Laravel\HasNeighbors;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string $content
+ * @property string      $id
+ * @property string      $user_id
+ * @property string      $content
  * @property string|null $source_conversation_id
  * @property string|null $source_message_id
- * @property string $category
- * @property int $importance
+ * @property string      $category
+ * @property int         $importance
  * @property Carbon|null $last_accessed_at
- * @property int $access_count
- * @property bool $is_active
+ * @property int         $access_count
+ * @property bool        $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -30,7 +30,9 @@ use Pgvector\Laravel\HasNeighbors;
  */
 class Memory extends Model
 {
-    use HasNeighbors, HasUlids, SoftDeletes;
+    use HasNeighbors;
+    use HasUlids;
+    use SoftDeletes;
 
     /**
      * @var list<string>
@@ -61,10 +63,10 @@ class Memory extends Model
     protected function casts(): array
     {
         return [
-            'importance' => 'integer',
-            'access_count' => 'integer',
+            'importance'       => 'integer',
+            'access_count'     => 'integer',
             'last_accessed_at' => 'datetime',
-            'is_active' => 'boolean',
+            'is_active'        => 'boolean',
         ];
     }
 
@@ -84,7 +86,8 @@ class Memory extends Model
     }
 
     /**
-     * @param  Builder<Memory>  $query
+     * @param Builder<Memory> $query
+     *
      * @return Builder<Memory>
      */
     public function scopeActive(Builder $query): Builder
@@ -93,7 +96,8 @@ class Memory extends Model
     }
 
     /**
-     * @param  Builder<Memory>  $query
+     * @param Builder<Memory> $query
+     *
      * @return Builder<Memory>
      */
     public function scopeByCategory(Builder $query, string $category): Builder
@@ -102,7 +106,8 @@ class Memory extends Model
     }
 
     /**
-     * @param  Builder<Memory>  $query
+     * @param Builder<Memory> $query
+     *
      * @return Builder<Memory>
      */
     public function scopeByImportance(Builder $query, int $importance): Builder

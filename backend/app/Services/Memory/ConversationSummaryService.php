@@ -22,7 +22,8 @@ class ConversationSummaryService
 
     public function __construct(
         private readonly ModelRouterService $modelRouter,
-    ) {}
+    ) {
+    }
 
     /**
      * Summarize messages in the conversation since the last summary.
@@ -42,13 +43,13 @@ class ConversationSummaryService
 
         try {
             $response = $route['provider']->chat($llmMessages, $route['model'], [
-                'format' => 'json',
+                'format'     => 'json',
                 'max_tokens' => 1024,
             ]);
 
             $decoded = json_decode(trim($response['content']), true);
 
-            if (! is_array($decoded) || ! isset($decoded['summary']) || ! is_string($decoded['summary'])) {
+            if (!is_array($decoded) || !isset($decoded['summary']) || !is_string($decoded['summary'])) {
                 Log::warning('[ConversationSummaryService] Invalid summary response for conversation '.$conversation->id);
 
                 return null;
@@ -64,10 +65,10 @@ class ConversationSummaryService
 
             /** @var ConversationSummary $summary */
             $summary = ConversationSummary::create([
-                'conversation_id' => (string) $conversation->id,
-                'content' => $summaryText,
+                'conversation_id'    => (string) $conversation->id,
+                'content'            => $summaryText,
                 'covers_message_ids' => $messageIds,
-                'message_count' => $messages->count(),
+                'message_count'      => $messages->count(),
             ]);
 
             return $summary;
@@ -138,7 +139,7 @@ class ConversationSummaryService
         if ($latest !== null) {
             $coveredIds = $latest->covers_message_ids ?? [];
 
-            if (! empty($coveredIds)) {
+            if (!empty($coveredIds)) {
                 $query->whereNotIn('id', $coveredIds);
             }
         }
@@ -149,7 +150,8 @@ class ConversationSummaryService
     /**
      * Build the messages array to send to the LLM for summarization.
      *
-     * @param  Collection<int, Message>  $messages
+     * @param Collection<int, Message> $messages
+     *
      * @return array<int, array{role: string, content: string}>
      */
     private function buildSummarizationPrompt(Collection $messages): array
@@ -163,7 +165,7 @@ class ConversationSummaryService
 
         return [
             [
-                'role' => 'user',
+                'role'    => 'user',
                 'content' => "Summarize the key points of this conversation concisely. Include decisions made, questions asked, topics covered, and any action items. Respond with only JSON: {\"summary\": \"...\"}\n\n{$conversationText}",
             ],
         ];

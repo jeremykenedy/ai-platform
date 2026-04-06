@@ -25,7 +25,7 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -33,11 +33,11 @@ return [
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'channel'              => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
-        'client_id' => env('SLACK_CLIENT_ID'),
+        'client_id'     => env('SLACK_CLIENT_ID'),
         'client_secret' => env('SLACK_CLIENT_SECRET'),
-        'redirect_uri' => env('SLACK_REDIRECT_URI'),
+        'redirect_uri'  => env('SLACK_REDIRECT_URI'),
     ],
 
     'ollama' => [
@@ -49,15 +49,15 @@ return [
     ],
 
     'openai' => [
-        'api_key' => env('OPENAI_API_KEY'),
+        'api_key'      => env('OPENAI_API_KEY'),
         'organization' => env('OPENAI_ORGANIZATION'),
     ],
 
     'google' => [
         'gemini_api_key' => env('GOOGLE_GEMINI_API_KEY'),
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect_uri' => env('GOOGLE_REDIRECT_URI'),
+        'client_id'      => env('GOOGLE_CLIENT_ID'),
+        'client_secret'  => env('GOOGLE_CLIENT_SECRET'),
+        'redirect_uri'   => env('GOOGLE_REDIRECT_URI'),
     ],
 
     'mistral' => [
@@ -73,9 +73,9 @@ return [
     ],
 
     'openrouter' => [
-        'api_key' => env('OPENROUTER_API_KEY'),
+        'api_key'  => env('OPENROUTER_API_KEY'),
         'app_name' => env('OPENROUTER_APP_NAME', 'My AI'),
-        'app_url' => env('OPENROUTER_APP_URL'),
+        'app_url'  => env('OPENROUTER_APP_URL'),
     ],
 
     'replicate' => [
@@ -103,27 +103,27 @@ return [
     ],
 
     'github' => [
-        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_id'     => env('GITHUB_CLIENT_ID'),
         'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        'redirect_uri' => env('GITHUB_REDIRECT_URI'),
+        'redirect_uri'  => env('GITHUB_REDIRECT_URI'),
     ],
 
     'microsoft' => [
-        'client_id' => env('MICROSOFT_CLIENT_ID'),
+        'client_id'     => env('MICROSOFT_CLIENT_ID'),
         'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
-        'redirect_uri' => env('MICROSOFT_REDIRECT_URI'),
+        'redirect_uri'  => env('MICROSOFT_REDIRECT_URI'),
     ],
 
     'calendly' => [
-        'client_id' => env('CALENDLY_CLIENT_ID'),
+        'client_id'     => env('CALENDLY_CLIENT_ID'),
         'client_secret' => env('CALENDLY_CLIENT_SECRET'),
-        'redirect_uri' => env('CALENDLY_REDIRECT_URI'),
+        'redirect_uri'  => env('CALENDLY_REDIRECT_URI'),
     ],
 
     'spotify' => [
-        'client_id' => env('SPOTIFY_CLIENT_ID'),
+        'client_id'     => env('SPOTIFY_CLIENT_ID'),
         'client_secret' => env('SPOTIFY_CLIENT_SECRET'),
-        'redirect_uri' => env('SPOTIFY_REDIRECT_URI'),
+        'redirect_uri'  => env('SPOTIFY_REDIRECT_URI'),
     ],
 
     'postman' => [
@@ -139,7 +139,7 @@ return [
     ],
 
     'paypal' => [
-        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'client_id'     => env('PAYPAL_CLIENT_ID'),
         'client_secret' => env('PAYPAL_CLIENT_SECRET'),
     ],
 
@@ -148,7 +148,7 @@ return [
     ],
 
     'miro' => [
-        'client_id' => env('MIRO_CLIENT_ID'),
+        'client_id'     => env('MIRO_CLIENT_ID'),
         'client_secret' => env('MIRO_CLIENT_SECRET'),
     ],
 

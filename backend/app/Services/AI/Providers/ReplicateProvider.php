@@ -24,8 +24,9 @@ class ReplicateProvider extends AbstractAiProvider
     /**
      * Replicate is image-only; chat is not supported.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -34,8 +35,8 @@ class ReplicateProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -74,7 +75,8 @@ class ReplicateProvider extends AbstractAiProvider
     /**
      * Submit a prediction to Replicate and poll until it completes.
      *
-     * @param  array<string, mixed>  $input
+     * @param array<string, mixed> $input
+     *
      * @return array<string, mixed>
      */
     public function generateImage(string $model, array $input): array
@@ -84,7 +86,7 @@ class ReplicateProvider extends AbstractAiProvider
             ->connectTimeout(10)
             ->post("{$this->baseUrl}/v1/predictions", [
                 'version' => $this->resolveModelVersion($model),
-                'input' => $input,
+                'input'   => $input,
             ]);
 
         $createResponse->throw();
@@ -106,7 +108,7 @@ class ReplicateProvider extends AbstractAiProvider
     {
         return [
             'Authorization' => "Token {$this->apiToken}",
-            'Content-Type' => 'application/json',
+            'Content-Type'  => 'application/json',
         ];
     }
 
@@ -138,6 +140,7 @@ class ReplicateProvider extends AbstractAiProvider
 
             if ($status === 'failed' || $status === 'canceled') {
                 $error = $data['error'] ?? 'Prediction failed with status: '.$status;
+
                 throw new \RuntimeException($error);
             }
 

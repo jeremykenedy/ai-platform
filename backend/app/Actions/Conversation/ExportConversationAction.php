@@ -31,28 +31,29 @@ class ExportConversationAction
     }
 
     /**
-     * @param  Collection<int, Message>  $messages
+     * @param Collection<int, Message> $messages
+     *
      * @return array{content: array<mixed>, filename: string, mime_type: string}
      */
     private function exportJson(Conversation $conversation, Collection $messages): array
     {
         $content = [
-            'id' => $conversation->id,
-            'title' => $conversation->title,
+            'id'         => $conversation->id,
+            'title'      => $conversation->title,
             'model_name' => $conversation->model_name,
             'created_at' => $conversation->created_at?->toIso8601String(),
             'updated_at' => $conversation->updated_at?->toIso8601String(),
-            'messages' => $messages->map(fn (Message $m): array => [
-                'id' => $m->id,
-                'role' => $m->role,
-                'content' => $m->content,
-                'sequence' => $m->sequence,
+            'messages'   => $messages->map(fn (Message $m): array => [
+                'id'          => $m->id,
+                'role'        => $m->role,
+                'content'     => $m->content,
+                'sequence'    => $m->sequence,
                 'tokens_used' => $m->tokens_used,
-                'created_at' => $m->created_at?->toIso8601String(),
+                'created_at'  => $m->created_at?->toIso8601String(),
                 'attachments' => $m->attachments->map(fn (MessageAttachment $a): array => [
-                    'filename' => $a->filename,
+                    'filename'  => $a->filename,
                     'mime_type' => $a->mime_type,
-                    'size' => $a->size,
+                    'size'      => $a->size,
                 ])->all(),
             ])->all(),
         ];
@@ -60,14 +61,15 @@ class ExportConversationAction
         $slug = $this->titleSlug($conversation->title ?? (string) $conversation->id);
 
         return [
-            'content' => $content,
-            'filename' => "conversation-{$slug}.json",
+            'content'   => $content,
+            'filename'  => "conversation-{$slug}.json",
             'mime_type' => 'application/json',
         ];
     }
 
     /**
-     * @param  Collection<int, Message>  $messages
+     * @param Collection<int, Message> $messages
+     *
      * @return array{content: string, filename: string, mime_type: string}
      */
     private function exportMarkdown(Conversation $conversation, Collection $messages): array
@@ -106,8 +108,8 @@ class ExportConversationAction
         $slug = $this->titleSlug($conversation->title ?? (string) $conversation->id);
 
         return [
-            'content' => implode("\n", $lines),
-            'filename' => "conversation-{$slug}.md",
+            'content'   => implode("\n", $lines),
+            'filename'  => "conversation-{$slug}.md",
             'mime_type' => 'text/markdown',
         ];
     }

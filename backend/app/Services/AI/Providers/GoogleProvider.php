@@ -33,8 +33,9 @@ class GoogleProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -60,15 +61,15 @@ class GoogleProvider extends AbstractAiProvider
         $finishReason = strtolower($data['candidates'][0]['finishReason'] ?? 'stop');
 
         return [
-            'content' => $content,
-            'tokens_used' => $inputTokens + $outputTokens,
+            'content'       => $content,
+            'tokens_used'   => $inputTokens + $outputTokens,
             'finish_reason' => $finishReason,
         ];
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -88,17 +89,17 @@ class GoogleProvider extends AbstractAiProvider
 
         $body = $response->toPsrResponse()->getBody();
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $line = $this->readLine($body);
 
-            if ($line === '' || ! str_starts_with($line, 'data: ')) {
+            if ($line === '' || !str_starts_with($line, 'data: ')) {
                 continue;
             }
 
             $jsonStr = substr($line, 6);
             $chunk = json_decode($jsonStr, true);
 
-            if (! is_array($chunk)) {
+            if (!is_array($chunk)) {
                 continue;
             }
 
@@ -126,7 +127,7 @@ class GoogleProvider extends AbstractAiProvider
         $url = "{$this->baseUrl}/v1beta/models/{$embedModel}:embedContent?key={$this->apiKey}";
 
         $payload = [
-            'model' => "models/{$embedModel}",
+            'model'   => "models/{$embedModel}",
             'content' => [
                 'parts' => [['text' => $text]],
             ],
@@ -158,9 +159,9 @@ class GoogleProvider extends AbstractAiProvider
             $models = $response->json()['models'] ?? [];
 
             return array_map(fn (array $m): array => [
-                'id' => $m['name'] ?? '',
-                'display_name' => $m['displayName'] ?? '',
-                'description' => $m['description'] ?? '',
+                'id'                           => $m['name'] ?? '',
+                'display_name'                 => $m['displayName'] ?? '',
+                'description'                  => $m['description'] ?? '',
                 'supported_generation_methods' => $m['supportedGenerationMethods'] ?? [],
             ], $models);
         } catch (\Throwable $e) {
@@ -183,13 +184,14 @@ class GoogleProvider extends AbstractAiProvider
     /**
      * Map generic messages to Gemini's contents format.
      *
-     * @param  array<int, array{role: string, content: string}>  $messages
+     * @param array<int, array{role: string, content: string}> $messages
+     *
      * @return array<int, array{role: string, parts: array<int, array{text: string}>}>
      */
     private function formatContents(array $messages): array
     {
         return array_map(fn (array $m): array => [
-            'role' => $m['role'] === 'assistant' ? 'model' : 'user',
+            'role'  => $m['role'] === 'assistant' ? 'model' : 'user',
             'parts' => [['text' => $m['content']]],
         ], $messages);
     }
@@ -198,7 +200,7 @@ class GoogleProvider extends AbstractAiProvider
     {
         $line = '';
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $char = $body->read(1);
 
             if ($char === "\n") {

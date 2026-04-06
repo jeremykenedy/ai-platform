@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $message_id
- * @property string $original_content
- * @property Carbon $edited_at
+ * @property string      $id
+ * @property string      $message_id
+ * @property string      $original_content
+ * @property Carbon      $edited_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */

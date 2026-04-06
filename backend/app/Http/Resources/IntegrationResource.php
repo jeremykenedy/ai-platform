@@ -14,14 +14,14 @@ class IntegrationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'           => $this->id,
+            'name'         => $this->name,
             'display_name' => $this->display_name,
-            'description' => $this->description,
-            'category' => $this->category,
-            'auth_type' => $this->auth_type,
-            'icon_url' => $this->icon_url,
-            'is_active' => $this->is_active,
+            'description'  => $this->description,
+            'category'     => $this->category,
+            'auth_type'    => $this->auth_type,
+            'icon_url'     => $this->icon_url,
+            'is_active'    => $this->is_active,
             'is_connected' => $this->when(
                 $this->resource->relationLoaded('userIntegration'),
                 fn () => $this->userIntegration !== null

@@ -14,32 +14,32 @@ class FileExtractionService
      * @var array<string, string>
      */
     private const CODE_MIME_LANGUAGES = [
-        'text/x-php' => 'php',
-        'application/x-php' => 'php',
-        'text/javascript' => 'javascript',
-        'application/javascript' => 'javascript',
-        'application/x-javascript' => 'javascript',
-        'text/x-python' => 'python',
+        'text/x-php'                => 'php',
+        'application/x-php'         => 'php',
+        'text/javascript'           => 'javascript',
+        'application/javascript'    => 'javascript',
+        'application/x-javascript'  => 'javascript',
+        'text/x-python'             => 'python',
         'application/x-python-code' => 'python',
-        'text/x-ruby' => 'ruby',
-        'text/x-java-source' => 'java',
-        'text/x-csrc' => 'c',
-        'text/x-c++src' => 'cpp',
-        'text/x-csharp' => 'csharp',
-        'text/x-go' => 'go',
-        'text/x-rust' => 'rust',
-        'text/x-swift' => 'swift',
-        'text/x-kotlin' => 'kotlin',
-        'text/x-typescript' => 'typescript',
-        'text/x-vue' => 'vue',
-        'text/x-sh' => 'bash',
-        'application/x-sh' => 'bash',
-        'text/x-shellscript' => 'bash',
-        'text/x-yaml' => 'yaml',
-        'application/x-yaml' => 'yaml',
-        'text/x-toml' => 'toml',
-        'text/x-sql' => 'sql',
-        'application/sql' => 'sql',
+        'text/x-ruby'               => 'ruby',
+        'text/x-java-source'        => 'java',
+        'text/x-csrc'               => 'c',
+        'text/x-c++src'             => 'cpp',
+        'text/x-csharp'             => 'csharp',
+        'text/x-go'                 => 'go',
+        'text/x-rust'               => 'rust',
+        'text/x-swift'              => 'swift',
+        'text/x-kotlin'             => 'kotlin',
+        'text/x-typescript'         => 'typescript',
+        'text/x-vue'                => 'vue',
+        'text/x-sh'                 => 'bash',
+        'application/x-sh'          => 'bash',
+        'text/x-shellscript'        => 'bash',
+        'text/x-yaml'               => 'yaml',
+        'application/x-yaml'        => 'yaml',
+        'text/x-toml'               => 'toml',
+        'text/x-sql'                => 'sql',
+        'application/sql'           => 'sql',
     ];
 
     /**
@@ -126,20 +126,20 @@ class FileExtractionService
             $text = $this->normalizeWhitespace($text);
 
             return [
-                'text' => $text ?: '[PDF content could not be extracted — binary or encrypted]',
+                'text'           => $text ?: '[PDF content could not be extracted — binary or encrypted]',
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => $pageCount,
+                'pages'          => $pageCount,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractPdf failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[PDF extraction failed: '.$e->getMessage().']',
+                'text'           => '[PDF extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -152,7 +152,7 @@ class FileExtractionService
     public function extractDocx(string $filePath): array
     {
         try {
-            $zip = new \ZipArchive;
+            $zip = new \ZipArchive();
             $result = $zip->open($filePath);
 
             if ($result !== true) {
@@ -173,20 +173,20 @@ class FileExtractionService
             $text = $this->normalizeWhitespace($text);
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractDocx failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[DOCX extraction failed: '.$e->getMessage().']',
+                'text'           => '[DOCX extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -199,7 +199,7 @@ class FileExtractionService
     public function extractSpreadsheet(string $filePath): array
     {
         try {
-            $zip = new \ZipArchive;
+            $zip = new \ZipArchive();
             $result = $zip->open($filePath);
 
             if ($result !== true) {
@@ -271,20 +271,20 @@ class FileExtractionService
             $text = $this->normalizeWhitespace($text);
 
             return [
-                'text' => $text ?: '[Spreadsheet appears to be empty]',
+                'text'           => $text ?: '[Spreadsheet appears to be empty]',
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => $sheetIndex > 1 ? $sheetIndex - 1 : null,
+                'pages'          => $sheetIndex > 1 ? $sheetIndex - 1 : null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractSpreadsheet failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[Spreadsheet extraction failed: '.$e->getMessage().']',
+                'text'           => '[Spreadsheet extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -313,9 +313,9 @@ class FileExtractionService
 
             if ($rows === []) {
                 return [
-                    'text' => '[CSV file is empty]',
+                    'text'           => '[CSV file is empty]',
                     'token_estimate' => 0,
-                    'pages' => null,
+                    'pages'          => null,
                 ];
             }
 
@@ -335,20 +335,20 @@ class FileExtractionService
             $text = implode("\n", $lines);
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractCsv failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[CSV extraction failed: '.$e->getMessage().']',
+                'text'           => '[CSV extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -370,20 +370,20 @@ class FileExtractionService
             $text = $this->normalizeWhitespace($text);
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractText failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[Text extraction failed: '.$e->getMessage().']',
+                'text'           => '[Text extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -406,20 +406,20 @@ class FileExtractionService
             $text = "File: {$filename}\n\n```{$language}\n{$content}\n```";
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractCode failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[Code extraction failed: '.$e->getMessage().']',
+                'text'           => '[Code extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -448,20 +448,20 @@ class FileExtractionService
             $text = "```json\n{$pretty}\n```";
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractJson failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[JSON extraction failed: '.$e->getMessage().']',
+                'text'           => '[JSON extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -480,11 +480,11 @@ class FileExtractionService
                 throw new \RuntimeException("Failed to read file: {$filePath}");
             }
 
-            $dom = new \DOMDocument;
+            $dom = new \DOMDocument();
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
 
-            if (! @$dom->loadXML($raw)) {
+            if (!@$dom->loadXML($raw)) {
                 // Fall back to stripping tags if parsing fails.
                 $text = strip_tags($raw);
                 $text = $this->normalizeWhitespace($text);
@@ -494,20 +494,20 @@ class FileExtractionService
             }
 
             return [
-                'text' => $text,
+                'text'           => $text,
                 'token_estimate' => $this->estimateTokens($text),
-                'pages' => null,
+                'pages'          => null,
             ];
         } catch (\Throwable $e) {
             Log::error('[FileExtractionService] extractXml failed', [
-                'file' => $filePath,
+                'file'  => $filePath,
                 'error' => $e->getMessage(),
             ]);
 
             return [
-                'text' => '[XML extraction failed: '.$e->getMessage().']',
+                'text'           => '[XML extraction failed: '.$e->getMessage().']',
                 'token_estimate' => 0,
-                'pages' => null,
+                'pages'          => null,
             ];
         }
     }
@@ -526,9 +526,9 @@ class FileExtractionService
         $text = "[Image file: {$filename}, type: {$mimeType}, size: {$sizeKb} KB — send as base64 to vision model]";
 
         return [
-            'text' => $text,
+            'text'           => $text,
             'token_estimate' => $this->estimateTokens($text),
-            'pages' => null,
+            'pages'          => null,
         ];
     }
 

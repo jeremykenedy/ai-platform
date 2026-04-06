@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * @property string $id
- * @property string $user_id
- * @property string $memory_id
- * @property string $conflicts_with
- * @property bool $resolved
+ * @property string      $id
+ * @property string      $user_id
+ * @property string      $memory_id
+ * @property string      $conflicts_with
+ * @property bool        $resolved
  * @property string|null $resolution
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -61,7 +61,8 @@ class MemoryConflict extends Model
     }
 
     /**
-     * @param  Builder<MemoryConflict>  $query
+     * @param Builder<MemoryConflict> $query
+     *
      * @return Builder<MemoryConflict>
      */
     public function scopeUnresolved(Builder $query): Builder

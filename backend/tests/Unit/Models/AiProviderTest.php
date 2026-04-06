@@ -5,7 +5,7 @@ use App\Models\AiProvider;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 
 it('has correct fillable attributes', function (): void {
-    $provider = new AiProvider;
+    $provider = new AiProvider();
     expect($provider->getFillable())->toContain(
         'name',
         'display_name',
@@ -19,7 +19,7 @@ it('has correct fillable attributes', function (): void {
 });
 
 it('has correct casts', function (): void {
-    $provider = new AiProvider;
+    $provider = new AiProvider();
     $casts = $provider->getCasts();
     expect($casts)
         ->toHaveKey('capabilities', 'array')

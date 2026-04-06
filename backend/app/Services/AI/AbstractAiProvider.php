@@ -49,9 +49,9 @@ abstract class AbstractAiProvider implements AiProviderInterface
             $latencyMs = (int) round((hrtime(true) - $start) / 1_000_000);
 
             return [
-                'success' => true,
+                'success'    => true,
                 'latency_ms' => $latencyMs,
-                'error' => null,
+                'error'      => null,
             ];
         } catch (\Throwable $e) {
             $latencyMs = (int) round((hrtime(true) - $start) / 1_000_000);
@@ -59,9 +59,9 @@ abstract class AbstractAiProvider implements AiProviderInterface
             Log::warning(sprintf('[%s] testConnection failed: %s', static::class, $e->getMessage()));
 
             return [
-                'success' => false,
+                'success'    => false,
                 'latency_ms' => $latencyMs,
-                'error' => $e->getMessage(),
+                'error'      => $e->getMessage(),
             ];
         }
     }
@@ -75,7 +75,8 @@ abstract class AbstractAiProvider implements AiProviderInterface
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
+     *
      * @return array<string, mixed>
      */
     protected function makeRequest(string $method, string $url, array $data = []): array

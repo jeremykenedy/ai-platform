@@ -18,16 +18,16 @@ class AiProviderFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->slug(2),
-            'display_name' => fake()->words(2, true),
-            'type' => fake()->randomElement(['local', 'remote']),
-            'base_url' => null,
-            'is_active' => true,
-            'is_configured' => true,
-            'health_status' => 'ok',
+            'name'                 => fake()->unique()->slug(2),
+            'display_name'         => fake()->words(2, true),
+            'type'                 => fake()->randomElement(['local', 'remote']),
+            'base_url'             => null,
+            'is_active'            => true,
+            'is_configured'        => true,
+            'health_status'        => 'ok',
             'last_health_check_at' => now(),
-            'capabilities' => null,
-            'config' => null,
+            'capabilities'         => null,
+            'config'               => null,
         ];
     }
 }

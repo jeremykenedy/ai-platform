@@ -20,22 +20,22 @@ class JiraService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search_issues',
+                'name'        => 'search_issues',
                 'description' => 'Search Jira issues using JQL (Jira Query Language).',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'jql' => ['type' => 'string', 'description' => 'JQL query string (e.g. "project = MY-PROJECT AND status = Open").'],
+                        'jql'        => ['type' => 'string', 'description' => 'JQL query string (e.g. "project = MY-PROJECT AND status = Open").'],
                         'maxResults' => ['type' => 'integer', 'description' => 'Maximum number of results to return.', 'default' => 50],
                     ],
                     'required' => ['jql'],
                 ],
             ],
             [
-                'name' => 'get_issue',
+                'name'        => 'get_issue',
                 'description' => 'Get details for a specific Jira issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'issueKey' => ['type' => 'string', 'description' => 'Jira issue key (e.g. "MY-PROJECT-123").'],
                     ],
@@ -43,28 +43,28 @@ class JiraService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'create_issue',
+                'name'        => 'create_issue',
                 'description' => 'Create a new Jira issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
-                        'projectKey' => ['type' => 'string', 'description' => 'The project key (e.g. "MY-PROJECT").'],
-                        'summary' => ['type' => 'string', 'description' => 'Issue summary/title.'],
+                        'projectKey'  => ['type' => 'string', 'description' => 'The project key (e.g. "MY-PROJECT").'],
+                        'summary'     => ['type' => 'string', 'description' => 'Issue summary/title.'],
                         'description' => ['type' => 'string', 'description' => 'Issue description.'],
-                        'issueType' => ['type' => 'string', 'description' => 'Issue type name (e.g. "Story", "Bug", "Task").', 'default' => 'Task'],
+                        'issueType'   => ['type' => 'string', 'description' => 'Issue type name (e.g. "Story", "Bug", "Task").', 'default' => 'Task'],
                     ],
                     'required' => ['projectKey', 'summary'],
                 ],
             ],
             [
-                'name' => 'update_issue',
+                'name'        => 'update_issue',
                 'description' => 'Update fields on an existing Jira issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'issueKey' => ['type' => 'string', 'description' => 'Jira issue key.'],
-                        'fields' => [
-                            'type' => 'object',
+                        'fields'   => [
+                            'type'        => 'object',
                             'description' => 'Fields to update as key-value pairs (e.g. {"summary": "New title", "priority": {"name": "High"}}).',
                         ],
                     ],
@@ -72,31 +72,31 @@ class JiraService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'add_comment',
+                'name'        => 'add_comment',
                 'description' => 'Add a comment to a Jira issue.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'issueKey' => ['type' => 'string', 'description' => 'Jira issue key.'],
-                        'body' => ['type' => 'string', 'description' => 'Comment text.'],
+                        'body'     => ['type' => 'string', 'description' => 'Comment text.'],
                     ],
                     'required' => ['issueKey', 'body'],
                 ],
             ],
             [
-                'name' => 'list_projects',
+                'name'        => 'list_projects',
                 'description' => 'List all Jira projects accessible to the user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
-                    'required' => [],
+                    'required'   => [],
                 ],
             ],
             [
-                'name' => 'get_board',
+                'name'        => 'get_board',
                 'description' => 'Get details for a specific Jira Agile board.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'boardId' => ['type' => 'integer', 'description' => 'The board ID.'],
                     ],
@@ -110,13 +110,13 @@ class JiraService extends AbstractIntegrationService
     {
         return match ($toolName) {
             'search_issues' => $this->searchIssues($params, $user),
-            'get_issue' => $this->getIssue($params, $user),
-            'create_issue' => $this->createIssue($params, $user),
-            'update_issue' => $this->updateIssue($params, $user),
-            'add_comment' => $this->addComment($params, $user),
+            'get_issue'     => $this->getIssue($params, $user),
+            'create_issue'  => $this->createIssue($params, $user),
+            'update_issue'  => $this->updateIssue($params, $user),
+            'add_comment'   => $this->addComment($params, $user),
             'list_projects' => $this->listProjects($params, $user),
-            'get_board' => $this->getBoard($params, $user),
-            default => ['error' => "Unknown tool: {$toolName}"],
+            'get_board'     => $this->getBoard($params, $user),
+            default         => ['error' => "Unknown tool: {$toolName}"],
         };
     }
 
@@ -134,20 +134,21 @@ class JiraService extends AbstractIntegrationService
             ->connectTimeout(10)
             ->withHeaders([
                 'Authorization' => "Basic {$encoded}",
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
+                'Accept'        => 'application/json',
+                'Content-Type'  => 'application/json',
             ]);
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchIssues(array $params, User $user): array
     {
         try {
             $response = $this->makeClient($user)->post('/issue/search', [
-                'jql' => $params['jql'],
+                'jql'        => $params['jql'],
                 'maxResults' => $params['maxResults'] ?? 50,
             ]);
 
@@ -162,7 +163,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getIssue(array $params, User $user): array
@@ -181,7 +183,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createIssue(array $params, User $user): array
@@ -189,19 +192,19 @@ class JiraService extends AbstractIntegrationService
         try {
             $body = [
                 'fields' => [
-                    'project' => ['key' => $params['projectKey']],
-                    'summary' => $params['summary'],
+                    'project'   => ['key' => $params['projectKey']],
+                    'summary'   => $params['summary'],
                     'issuetype' => ['name' => $params['issueType'] ?? 'Task'],
                 ],
             ];
 
             if (isset($params['description'])) {
                 $body['fields']['description'] = [
-                    'type' => 'doc',
+                    'type'    => 'doc',
                     'version' => 1,
                     'content' => [
                         [
-                            'type' => 'paragraph',
+                            'type'    => 'paragraph',
                             'content' => [
                                 ['type' => 'text', 'text' => $params['description']],
                             ],
@@ -223,7 +226,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function updateIssue(array $params, User $user): array
@@ -245,7 +249,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function addComment(array $params, User $user): array
@@ -253,11 +258,11 @@ class JiraService extends AbstractIntegrationService
         try {
             $body = [
                 'body' => [
-                    'type' => 'doc',
+                    'type'    => 'doc',
                     'version' => 1,
                     'content' => [
                         [
-                            'type' => 'paragraph',
+                            'type'    => 'paragraph',
                             'content' => [
                                 ['type' => 'text', 'text' => $params['body']],
                             ],
@@ -279,7 +284,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function listProjects(array $params, User $user): array
@@ -298,7 +304,8 @@ class JiraService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function getBoard(array $params, User $user): array
@@ -317,7 +324,7 @@ class JiraService extends AbstractIntegrationService
                 ->connectTimeout(10)
                 ->withHeaders([
                     'Authorization' => "Basic {$encoded}",
-                    'Accept' => 'application/json',
+                    'Accept'        => 'application/json',
                 ])
                 ->get("/board/{$params['boardId']}");
 

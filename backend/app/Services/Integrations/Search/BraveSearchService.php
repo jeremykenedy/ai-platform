@@ -23,22 +23,22 @@ class BraveSearchService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'web_search',
+                'name'        => 'web_search',
                 'description' => 'Search the web using Brave Search.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The search query.',
                         ],
                         'count' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of results to return (default 10, max 20).',
                         ],
                         'freshness' => [
-                            'type' => 'string',
-                            'enum' => ['pd', 'pw', 'pm', 'py'],
+                            'type'        => 'string',
+                            'enum'        => ['pd', 'pw', 'pm', 'py'],
                             'description' => 'Time freshness filter: pd=past day, pw=past week, pm=past month, py=past year.',
                         ],
                     ],
@@ -46,17 +46,17 @@ class BraveSearchService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'news_search',
+                'name'        => 'news_search',
                 'description' => 'Search news articles using Brave Search.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The news search query.',
                         ],
                         'count' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of results to return (default 10, max 20).',
                         ],
                     ],
@@ -64,17 +64,17 @@ class BraveSearchService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'image_search',
+                'name'        => 'image_search',
                 'description' => 'Search images using Brave Search.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The image search query.',
                         ],
                         'count' => [
-                            'type' => 'integer',
+                            'type'        => 'integer',
                             'description' => 'Number of results to return (default 10, max 20).',
                         ],
                     ],
@@ -87,15 +87,16 @@ class BraveSearchService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'web_search' => $this->webSearch($user, $params),
-            'news_search' => $this->newsSearch($user, $params),
+            'web_search'   => $this->webSearch($user, $params),
+            'news_search'  => $this->newsSearch($user, $params),
             'image_search' => $this->imageSearch($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            default        => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function webSearch(User $user, array $params): array
@@ -104,7 +105,7 @@ class BraveSearchService extends AbstractIntegrationService
         $count = min((int) ($params['count'] ?? 10), 20);
 
         $queryParams = [
-            'q' => $query,
+            'q'     => $query,
             'count' => $count,
         ];
 
@@ -119,7 +120,8 @@ class BraveSearchService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function newsSearch(User $user, array $params): array
@@ -128,7 +130,7 @@ class BraveSearchService extends AbstractIntegrationService
         $count = min((int) ($params['count'] ?? 10), 20);
 
         $response = $this->client($user)->get(self::BASE_URL.'/news/search', [
-            'q' => $query,
+            'q'     => $query,
             'count' => $count,
         ]);
 
@@ -138,7 +140,8 @@ class BraveSearchService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function imageSearch(User $user, array $params): array
@@ -147,7 +150,7 @@ class BraveSearchService extends AbstractIntegrationService
         $count = min((int) ($params['count'] ?? 10), 20);
 
         $response = $this->client($user)->get(self::BASE_URL.'/images/search', [
-            'q' => $query,
+            'q'     => $query,
             'count' => $count,
         ]);
 
@@ -171,7 +174,7 @@ class BraveSearchService extends AbstractIntegrationService
     {
         return Http::withHeaders([
             'X-Subscription-Token' => $this->getApiKey($user),
-            'Accept' => 'application/json',
+            'Accept'               => 'application/json',
         ])
             ->timeout(30)
             ->connectTimeout(10)

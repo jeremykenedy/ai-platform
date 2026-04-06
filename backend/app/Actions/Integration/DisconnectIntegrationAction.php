@@ -11,7 +11,8 @@ class DisconnectIntegrationAction
 {
     public function __construct(
         private readonly IntegrationManager $integrationManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Disconnect and clear credentials for the named integration.

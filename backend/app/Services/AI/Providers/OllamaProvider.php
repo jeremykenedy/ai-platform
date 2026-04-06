@@ -21,16 +21,17 @@ class OllamaProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
-            'stream' => false,
+            'stream'   => false,
         ], $options);
 
         $response = Http::withHeaders($this->buildHeaders())
@@ -43,22 +44,22 @@ class OllamaProvider extends AbstractAiProvider
         $data = $response->json();
 
         return [
-            'content' => $data['message']['content'] ?? '',
-            'tokens_used' => $data['eval_count'] ?? 0,
+            'content'       => $data['message']['content'] ?? '',
+            'tokens_used'   => $data['eval_count'] ?? 0,
             'finish_reason' => $data['done_reason'] ?? 'stop',
         ];
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
-            'stream' => true,
+            'stream'   => true,
         ], $options);
 
         $response = Http::withHeaders($this->buildHeaders())
@@ -71,7 +72,7 @@ class OllamaProvider extends AbstractAiProvider
 
         $body = $response->toPsrResponse()->getBody();
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $line = $this->readLine($body);
 
             if ($line === '') {
@@ -80,7 +81,7 @@ class OllamaProvider extends AbstractAiProvider
 
             $chunk = json_decode($line, true);
 
-            if (! is_array($chunk)) {
+            if (!is_array($chunk)) {
                 continue;
             }
 
@@ -135,10 +136,10 @@ class OllamaProvider extends AbstractAiProvider
         $models = $data['models'] ?? [];
 
         return array_map(fn (array $m): array => [
-            'name' => $m['name'] ?? '',
-            'size' => $m['size'] ?? 0,
+            'name'        => $m['name'] ?? '',
+            'size'        => $m['size'] ?? 0,
             'modified_at' => $m['modified_at'] ?? null,
-            'digest' => $m['digest'] ?? null,
+            'digest'      => $m['digest'] ?? null,
         ], $models);
     }
 
@@ -170,7 +171,7 @@ class OllamaProvider extends AbstractAiProvider
 
         $body = $response->toPsrResponse()->getBody();
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $line = $this->readLine($body);
 
             if ($line === '') {
@@ -238,7 +239,7 @@ class OllamaProvider extends AbstractAiProvider
                 ->timeout(30)
                 ->connectTimeout(10)
                 ->post("{$this->baseUrl}/api/copy", [
-                    'source' => $source,
+                    'source'      => $source,
                     'destination' => $destination,
                 ]);
 
@@ -259,7 +260,7 @@ class OllamaProvider extends AbstractAiProvider
     {
         $line = '';
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $char = $body->read(1);
 
             if ($char === "\n") {

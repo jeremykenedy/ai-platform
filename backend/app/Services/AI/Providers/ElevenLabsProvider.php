@@ -22,8 +22,9 @@ class ElevenLabsProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
@@ -32,8 +33,8 @@ class ElevenLabsProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
@@ -62,10 +63,10 @@ class ElevenLabsProvider extends AbstractAiProvider
             $response->throw();
 
             return array_map(fn (array $m): array => [
-                'id' => $m['model_id'],
-                'name' => $m['name'] ?? $m['model_id'],
+                'id'          => $m['model_id'],
+                'name'        => $m['name'] ?? $m['model_id'],
                 'description' => $m['description'] ?? null,
-                'languages' => $m['languages'] ?? [],
+                'languages'   => $m['languages'] ?? [],
             ], $response->json() ?? []);
         } catch (\Throwable $e) {
             Log::warning('[ElevenLabsProvider] listModels failed: '.$e->getMessage());
@@ -85,17 +86,17 @@ class ElevenLabsProvider extends AbstractAiProvider
     public function textToSpeech(string $text, string $voiceId, string $modelId = 'eleven_turbo_v2_5'): string
     {
         $response = Http::withHeaders([
-            'xi-api-key' => $this->apiKey,
+            'xi-api-key'   => $this->apiKey,
             'Content-Type' => 'application/json',
-            'Accept' => 'audio/mpeg',
+            'Accept'       => 'audio/mpeg',
         ])
             ->timeout(120)
             ->connectTimeout(10)
             ->post("{$this->baseUrl}/v1/text-to-speech/{$voiceId}", [
-                'text' => $text,
-                'model_id' => $modelId,
+                'text'           => $text,
+                'model_id'       => $modelId,
                 'voice_settings' => [
-                    'stability' => 0.5,
+                    'stability'        => 0.5,
                     'similarity_boost' => 0.75,
                 ],
             ]);
@@ -120,10 +121,10 @@ class ElevenLabsProvider extends AbstractAiProvider
         $response->throw();
 
         return array_map(fn (array $v): array => [
-            'voice_id' => $v['voice_id'],
-            'name' => $v['name'],
-            'category' => $v['category'] ?? null,
-            'labels' => $v['labels'] ?? [],
+            'voice_id'    => $v['voice_id'],
+            'name'        => $v['name'],
+            'category'    => $v['category'] ?? null,
+            'labels'      => $v['labels'] ?? [],
             'preview_url' => $v['preview_url'] ?? null,
         ], $response->json()['voices'] ?? []);
     }
@@ -134,7 +135,7 @@ class ElevenLabsProvider extends AbstractAiProvider
     protected function buildHeaders(): array
     {
         return [
-            'xi-api-key' => $this->apiKey,
+            'xi-api-key'   => $this->apiKey,
             'Content-Type' => 'application/json',
         ];
     }

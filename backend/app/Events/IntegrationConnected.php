@@ -9,10 +9,12 @@ use Illuminate\Queue\SerializesModels;
 
 class IntegrationConnected
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable;
+    use SerializesModels;
 
     public function __construct(
         public string $userId,
         public string $integrationName,
-    ) {}
+    ) {
+    }
 }

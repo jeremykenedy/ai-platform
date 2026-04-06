@@ -26,7 +26,8 @@ class IntegrationController extends Controller
         private readonly DisconnectIntegrationAction $disconnectIntegrationAction,
         private readonly ExecuteIntegrationToolAction $executeIntegrationToolAction,
         private readonly IntegrationManager $integrationManager,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): JsonResponse
     {

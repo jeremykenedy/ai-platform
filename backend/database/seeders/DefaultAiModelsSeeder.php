@@ -24,70 +24,70 @@ class DefaultAiModelsSeeder extends Seeder
         $definitions = [
             'ollama' => [
                 'display_name' => 'Ollama',
-                'type' => 'local',
-                'base_url' => config('services.ollama.base_url', 'http://ollama:11434'),
-                'is_active' => true,
+                'type'         => 'local',
+                'base_url'     => config('services.ollama.base_url', 'http://ollama:11434'),
+                'is_active'    => true,
             ],
             'anthropic' => [
                 'display_name' => 'Anthropic',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'openai' => [
                 'display_name' => 'OpenAI',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'google' => [
                 'display_name' => 'Google Gemini',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'mistral' => [
                 'display_name' => 'Mistral AI',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'groq' => [
                 'display_name' => 'Groq',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'together' => [
                 'display_name' => 'Together AI',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'openrouter' => [
                 'display_name' => 'OpenRouter',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'replicate' => [
                 'display_name' => 'Replicate',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'stability' => [
                 'display_name' => 'Stability AI',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'elevenlabs' => [
                 'display_name' => 'ElevenLabs',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'deepgram' => [
                 'display_name' => 'Deepgram',
-                'type' => 'remote',
-                'is_active' => false,
+                'type'         => 'remote',
+                'is_active'    => false,
             ],
             'comfyui' => [
                 'display_name' => 'ComfyUI',
-                'type' => 'local',
-                'base_url' => 'http://comfyui:8188',
-                'is_active' => false,
+                'type'         => 'local',
+                'base_url'     => 'http://comfyui:8188',
+                'is_active'    => false,
             ],
         ];
 
@@ -104,7 +104,7 @@ class DefaultAiModelsSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, AiProvider>  $providers
+     * @param array<string, AiProvider> $providers
      */
     private function createModels(array $providers): void
     {
@@ -113,36 +113,36 @@ class DefaultAiModelsSeeder extends Seeder
         AiModel::updateOrCreate(
             ['provider_id' => $ollamaId, 'name' => 'llama3.2:latest'],
             [
-                'display_name' => 'Llama 3.2 (3B)',
-                'capabilities' => ['chat', 'streaming'],
+                'display_name'    => 'Llama 3.2 (3B)',
+                'capabilities'    => ['chat', 'streaming'],
                 'parameter_count' => '3B',
-                'is_local' => true,
-                'is_active' => true,
-                'is_default' => true,
+                'is_local'        => true,
+                'is_active'       => true,
+                'is_default'      => true,
             ],
         );
 
         AiModel::updateOrCreate(
             ['provider_id' => $ollamaId, 'name' => 'qwen2.5:7b'],
             [
-                'display_name' => 'Qwen 2.5 (7B)',
-                'capabilities' => ['chat', 'streaming', 'code'],
+                'display_name'    => 'Qwen 2.5 (7B)',
+                'capabilities'    => ['chat', 'streaming', 'code'],
                 'parameter_count' => '7B',
-                'is_local' => true,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'        => true,
+                'is_active'       => true,
+                'is_default'      => false,
             ],
         );
 
         AiModel::updateOrCreate(
             ['provider_id' => $ollamaId, 'name' => 'mistral:7b'],
             [
-                'display_name' => 'Mistral (7B)',
-                'capabilities' => ['chat', 'streaming'],
+                'display_name'    => 'Mistral (7B)',
+                'capabilities'    => ['chat', 'streaming'],
                 'parameter_count' => '7B',
-                'is_local' => true,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'        => true,
+                'is_active'       => true,
+                'is_default'      => false,
             ],
         );
 
@@ -151,9 +151,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Nomic Embed Text',
                 'capabilities' => ['embeddings'],
-                'is_local' => true,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => true,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -165,9 +165,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Claude Opus 4.5',
                 'capabilities' => $claudeCapabilities,
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -176,9 +176,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Claude Sonnet 4.5',
                 'capabilities' => $claudeCapabilities,
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -187,9 +187,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Claude Haiku 4.5',
                 'capabilities' => $claudeCapabilities,
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -200,9 +200,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'GPT-4o',
                 'capabilities' => ['vision', 'reasoning', 'code', 'chat', 'streaming', 'function_calling', 'structured_output'],
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -211,9 +211,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'GPT-4o Mini',
                 'capabilities' => ['chat', 'streaming', 'code'],
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -224,9 +224,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Gemini 2.0 Flash',
                 'capabilities' => ['chat', 'streaming', 'vision', 'code'],
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -235,9 +235,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Gemini 2.0 Pro',
                 'capabilities' => ['chat', 'streaming', 'vision', 'code', 'reasoning'],
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
 
@@ -248,9 +248,9 @@ class DefaultAiModelsSeeder extends Seeder
             [
                 'display_name' => 'Llama 3.3 70B Versatile',
                 'capabilities' => ['chat', 'streaming', 'code'],
-                'is_local' => false,
-                'is_active' => true,
-                'is_default' => false,
+                'is_local'     => false,
+                'is_active'    => true,
+                'is_default'   => false,
             ],
         );
     }

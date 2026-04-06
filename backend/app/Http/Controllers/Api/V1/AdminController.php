@@ -21,7 +21,8 @@ class AdminController extends Controller
 {
     public function __construct(
         private readonly InviteUserAction $inviteUserAction,
-    ) {}
+    ) {
+    }
 
     public function users(Request $request): JsonResponse
     {
@@ -64,11 +65,11 @@ class AdminController extends Controller
 
         return response()->json([
             'data' => [
-                'total_users' => User::count(),
+                'total_users'         => User::count(),
                 'total_conversations' => Conversation::count(),
-                'total_messages' => Message::count(),
+                'total_messages'      => Message::count(),
                 'active_models_count' => AiModel::active()->count(),
-                'running_jobs_count' => TrainingJob::whereIn('status', ['pending', 'running'])->count(),
+                'running_jobs_count'  => TrainingJob::whereIn('status', ['pending', 'running'])->count(),
             ],
         ]);
     }

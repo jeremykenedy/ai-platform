@@ -28,20 +28,20 @@ class GmailService extends AbstractIntegrationService
     public function getAuthUrl(User $user): ?string
     {
         $params = http_build_query([
-            'client_id' => config('services.google.client_id'),
-            'redirect_uri' => config('services.google.redirect_uri'),
+            'client_id'     => config('services.google.client_id'),
+            'redirect_uri'  => config('services.google.redirect_uri'),
             'response_type' => 'code',
-            'scope' => implode(' ', self::SCOPES),
-            'access_type' => 'offline',
-            'prompt' => 'consent',
-            'state' => $user->getKey(),
+            'scope'         => implode(' ', self::SCOPES),
+            'access_type'   => 'offline',
+            'prompt'        => 'consent',
+            'state'         => $user->getKey(),
         ]);
 
         return self::AUTH_URL.'?'.$params;
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handleCallback(User $user, array $params): void
     {
@@ -51,11 +51,11 @@ class GmailService extends AbstractIntegrationService
             ->timeout(30)
             ->connectTimeout(10)
             ->post(self::TOKEN_URL, [
-                'code' => $code,
-                'client_id' => config('services.google.client_id'),
+                'code'          => $code,
+                'client_id'     => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
-                'redirect_uri' => config('services.google.redirect_uri'),
-                'grant_type' => 'authorization_code',
+                'redirect_uri'  => config('services.google.redirect_uri'),
+                'grant_type'    => 'authorization_code',
             ]);
 
         $response->throw();
@@ -66,14 +66,14 @@ class GmailService extends AbstractIntegrationService
 
         UserIntegration::updateOrCreate(
             [
-                'user_id' => $user->getKey(),
+                'user_id'        => $user->getKey(),
                 'integration_id' => $definition->getKey(),
             ],
             [
-                'is_enabled' => true,
-                'oauth_token' => $data['access_token'] ?? null,
+                'is_enabled'          => true,
+                'oauth_token'         => $data['access_token'] ?? null,
                 'oauth_refresh_token' => $data['refresh_token'] ?? null,
-                'oauth_expires_at' => isset($data['expires_in'])
+                'oauth_expires_at'    => isset($data['expires_in'])
                     ? now()->addSeconds((int) $data['expires_in'])
                     : null,
                 'scopes_granted' => self::SCOPES,
@@ -88,65 +88,65 @@ class GmailService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'search_messages',
+                'name'        => 'search_messages',
                 'description' => 'Search Gmail messages using Gmail query syntax.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['query'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['query'],
                     'properties' => [
-                        'query' => ['type' => 'string', 'description' => 'Gmail search query (e.g. "from:foo@bar.com is:unread").'],
+                        'query'      => ['type' => 'string', 'description' => 'Gmail search query (e.g. "from:foo@bar.com is:unread").'],
                         'maxResults' => ['type' => 'integer', 'description' => 'Maximum number of results to return (default 10).'],
                     ],
                 ],
             ],
             [
-                'name' => 'read_message',
+                'name'        => 'read_message',
                 'description' => 'Read the full content of a Gmail message.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['messageId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['messageId'],
                     'properties' => [
                         'messageId' => ['type' => 'string', 'description' => 'Gmail message ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'read_thread',
+                'name'        => 'read_thread',
                 'description' => 'Read an entire Gmail conversation thread.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['threadId'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['threadId'],
                     'properties' => [
                         'threadId' => ['type' => 'string', 'description' => 'Gmail thread ID.'],
                     ],
                 ],
             ],
             [
-                'name' => 'create_draft',
+                'name'        => 'create_draft',
                 'description' => 'Create a Gmail draft message.',
-                'parameters' => [
-                    'type' => 'object',
-                    'required' => ['to', 'subject', 'body'],
+                'parameters'  => [
+                    'type'       => 'object',
+                    'required'   => ['to', 'subject', 'body'],
                     'properties' => [
-                        'to' => ['type' => 'string', 'description' => 'Recipient email address.'],
+                        'to'      => ['type' => 'string', 'description' => 'Recipient email address.'],
                         'subject' => ['type' => 'string', 'description' => 'Email subject line.'],
-                        'body' => ['type' => 'string', 'description' => 'Email body text.'],
+                        'body'    => ['type' => 'string', 'description' => 'Email body text.'],
                     ],
                 ],
             ],
             [
-                'name' => 'list_labels',
+                'name'        => 'list_labels',
                 'description' => 'List all Gmail labels for the user.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
             [
-                'name' => 'get_profile',
+                'name'        => 'get_profile',
                 'description' => 'Get the user\'s Gmail profile (email address, message count, etc.).',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [],
                 ],
             ],
@@ -154,18 +154,18 @@ class GmailService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
             'search_messages' => $this->searchMessages($params, $user),
-            'read_message' => $this->readMessage($params, $user),
-            'read_thread' => $this->readThread($params, $user),
-            'create_draft' => $this->createDraft($params, $user),
-            'list_labels' => $this->listLabels($user),
-            'get_profile' => $this->getProfile($user),
-            default => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
+            'read_message'    => $this->readMessage($params, $user),
+            'read_thread'     => $this->readThread($params, $user),
+            'create_draft'    => $this->createDraft($params, $user),
+            'list_labels'     => $this->listLabels($user),
+            'get_profile'     => $this->getProfile($user),
+            default           => throw new \InvalidArgumentException("Unknown tool: {$toolName}"),
         };
     }
 
@@ -181,13 +181,14 @@ class GmailService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function searchMessages(array $params, User $user): array
     {
         $query = [
-            'q' => (string) $params['query'],
+            'q'          => (string) $params['query'],
             'maxResults' => (int) ($params['maxResults'] ?? 10),
         ];
 
@@ -202,7 +203,8 @@ class GmailService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function readMessage(array $params, User $user): array
@@ -220,7 +222,8 @@ class GmailService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function readThread(array $params, User $user): array
@@ -238,7 +241,8 @@ class GmailService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function createDraft(array $params, User $user): array

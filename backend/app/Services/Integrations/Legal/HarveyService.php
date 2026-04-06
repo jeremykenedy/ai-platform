@@ -23,17 +23,17 @@ class HarveyService extends AbstractIntegrationService
     {
         return [
             [
-                'name' => 'legal_research',
+                'name'        => 'legal_research',
                 'description' => 'Perform AI-assisted legal research on a topic within a jurisdiction.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'query' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The legal research question or topic.',
                         ],
                         'jurisdiction' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The jurisdiction to research within (e.g. "US Federal", "California", "UK").',
                         ],
                     ],
@@ -41,18 +41,18 @@ class HarveyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'document_analysis',
+                'name'        => 'document_analysis',
                 'description' => 'Analyze a legal document using AI for key issues, risks, or summaries.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'documentText' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The full text of the legal document to analyze.',
                         ],
                         'analysisType' => [
-                            'type' => 'string',
-                            'enum' => ['summary', 'risks', 'key_terms', 'obligations'],
+                            'type'        => 'string',
+                            'enum'        => ['summary', 'risks', 'key_terms', 'obligations'],
                             'description' => 'Type of analysis to perform (default "summary").',
                         ],
                     ],
@@ -60,13 +60,13 @@ class HarveyService extends AbstractIntegrationService
                 ],
             ],
             [
-                'name' => 'contract_review',
+                'name'        => 'contract_review',
                 'description' => 'Review a contract for issues, missing clauses, and negotiation points.',
-                'parameters' => [
-                    'type' => 'object',
+                'parameters'  => [
+                    'type'       => 'object',
                     'properties' => [
                         'contractText' => [
-                            'type' => 'string',
+                            'type'        => 'string',
                             'description' => 'The full text of the contract to review.',
                         ],
                     ],
@@ -79,15 +79,16 @@ class HarveyService extends AbstractIntegrationService
     public function executeTool(string $toolName, array $params, User $user): mixed
     {
         return match ($toolName) {
-            'legal_research' => $this->legalResearch($user, $params),
+            'legal_research'    => $this->legalResearch($user, $params),
             'document_analysis' => $this->documentAnalysis($user, $params),
-            'contract_review' => $this->contractReview($user, $params),
-            default => throw new RuntimeException("Unknown tool: {$toolName}"),
+            'contract_review'   => $this->contractReview($user, $params),
+            default             => throw new RuntimeException("Unknown tool: {$toolName}"),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function legalResearch(User $user, array $params): array
@@ -107,7 +108,8 @@ class HarveyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function documentAnalysis(User $user, array $params): array
@@ -116,7 +118,7 @@ class HarveyService extends AbstractIntegrationService
         $analysisType = $params['analysisType'] ?? 'summary';
 
         $response = $this->client($user)->post(self::BASE_URL.'/documents/analyze', [
-            'document' => $documentText,
+            'document'      => $documentText,
             'analysis_type' => $analysisType,
         ]);
 
@@ -126,7 +128,8 @@ class HarveyService extends AbstractIntegrationService
     }
 
     /**
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
+     *
      * @return array<string, mixed>
      */
     private function contractReview(User $user, array $params): array

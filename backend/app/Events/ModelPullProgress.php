@@ -13,14 +13,17 @@ use Illuminate\Queue\SerializesModels;
 
 class ModelPullProgress implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $modelName,
         public int $percentage,
         public string $status,
         public ?string $error = null,
-    ) {}
+    ) {
+    }
 
     /**
      * @return Channel|array<int, Channel>
@@ -36,10 +39,10 @@ class ModelPullProgress implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'model' => $this->modelName,
+            'model'      => $this->modelName,
             'percentage' => $this->percentage,
-            'status' => $this->status,
-            'error' => $this->error,
+            'status'     => $this->status,
+            'error'      => $this->error,
         ];
     }
 }

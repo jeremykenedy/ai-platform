@@ -17,14 +17,14 @@ use Spatie\Activitylog\Models\Concerns\CausesActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @property string $id
- * @property string $name
- * @property string $email
+ * @property string      $id
+ * @property string      $name
+ * @property string      $email
  * @property Carbon|null $email_verified_at
- * @property string $password
+ * @property string      $password
  * @property string|null $avatar
- * @property string $locale
- * @property string $timezone
+ * @property string      $locale
+ * @property string      $timezone
  * @property string|null $invite_token
  * @property string|null $invited_by
  * @property string|null $subscription_tier
@@ -36,7 +36,11 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use CausesActivity, HasFactory, HasRoles, HasUlids, Notifiable;
+    use CausesActivity;
+    use HasFactory;
+    use HasRoles;
+    use HasUlids;
+    use Notifiable;
 
     /**
      * @var list<string>
@@ -71,8 +75,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'last_active_at' => 'datetime',
+            'password'          => 'hashed',
+            'last_active_at'    => 'datetime',
         ];
     }
 
@@ -117,7 +121,8 @@ class User extends Authenticatable
     }
 
     /**
-     * @param  Builder<User>  $query
+     * @param Builder<User> $query
+     *
      * @return Builder<User>
      */
     public function scopeActive($query): Builder

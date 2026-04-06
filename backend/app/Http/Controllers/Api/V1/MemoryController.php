@@ -20,7 +20,8 @@ class MemoryController extends Controller
 {
     public function __construct(
         private readonly ResolveMemoryConflictAction $resolveMemoryConflictAction,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): MemoryCollection
     {
@@ -30,7 +31,7 @@ class MemoryController extends Controller
         $sortBy = $request->string('sort_by', 'created_at')->toString();
         $allowedSorts = ['importance', 'created_at'];
 
-        if (! in_array($sortBy, $allowedSorts, true)) {
+        if (!in_array($sortBy, $allowedSorts, true)) {
             $sortBy = 'created_at';
         }
 

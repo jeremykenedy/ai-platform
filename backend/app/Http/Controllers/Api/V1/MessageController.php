@@ -20,7 +20,8 @@ class MessageController extends Controller
     public function __construct(
         private readonly SendMessageAction $sendMessageAction,
         private readonly RegenerateMessageAction $regenerateMessageAction,
-    ) {}
+    ) {
+    }
 
     public function index(Conversation $conversation): MessageCollection
     {

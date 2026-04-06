@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 it('has correct fillable attributes', function (): void {
-    $conversation = new Conversation;
+    $conversation = new Conversation();
     expect($conversation->getFillable())->toContain(
         'user_id',
         'project_id',
@@ -19,7 +19,7 @@ it('has correct fillable attributes', function (): void {
 });
 
 it('has correct casts', function (): void {
-    $conversation = new Conversation;
+    $conversation = new Conversation();
     $casts = $conversation->getCasts();
     expect($casts)
         ->toHaveKey('enabled_integrations', 'array')

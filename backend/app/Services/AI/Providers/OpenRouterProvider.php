@@ -43,14 +43,15 @@ class OpenRouterProvider extends AbstractAiProvider
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
+     *
      * @return array{content: string, tokens_used: int, finish_reason: string}
      */
     public function chat(array $messages, string $model, array $options = []): array
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
         ], $options);
 
@@ -64,22 +65,22 @@ class OpenRouterProvider extends AbstractAiProvider
         $data = $response->json();
 
         return [
-            'content' => $data['choices'][0]['message']['content'] ?? '',
-            'tokens_used' => $data['usage']['total_tokens'] ?? 0,
+            'content'       => $data['choices'][0]['message']['content'] ?? '',
+            'tokens_used'   => $data['usage']['total_tokens'] ?? 0,
             'finish_reason' => $data['choices'][0]['finish_reason'] ?? 'stop',
         ];
     }
 
     /**
-     * @param  array<int, array{role: string, content: string}>  $messages
-     * @param  array<string, mixed>  $options
+     * @param array<int, array{role: string, content: string}> $messages
+     * @param array<string, mixed>                             $options
      */
     public function stream(array $messages, string $model, array $options = []): \Generator
     {
         $payload = array_merge([
-            'model' => $model,
+            'model'    => $model,
             'messages' => $messages,
-            'stream' => true,
+            'stream'   => true,
         ], $options);
 
         $response = Http::withHeaders($this->buildHeaders())
@@ -92,10 +93,10 @@ class OpenRouterProvider extends AbstractAiProvider
 
         $body = $response->toPsrResponse()->getBody();
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $line = $this->readLine($body);
 
-            if ($line === '' || ! str_starts_with($line, 'data: ')) {
+            if ($line === '' || !str_starts_with($line, 'data: ')) {
                 continue;
             }
 
@@ -108,7 +109,7 @@ class OpenRouterProvider extends AbstractAiProvider
 
             $chunk = json_decode($jsonStr, true);
 
-            if (! is_array($chunk)) {
+            if (!is_array($chunk)) {
                 continue;
             }
 
@@ -160,10 +161,10 @@ class OpenRouterProvider extends AbstractAiProvider
             $response->throw();
 
             return array_map(fn (array $m): array => [
-                'id' => $m['id'],
-                'name' => $m['name'] ?? $m['id'],
+                'id'             => $m['id'],
+                'name'           => $m['name'] ?? $m['id'],
                 'context_length' => $m['context_length'] ?? null,
-                'pricing' => $m['pricing'] ?? null,
+                'pricing'        => $m['pricing'] ?? null,
             ], $response->json()['data'] ?? []);
         } catch (\Throwable $e) {
             Log::warning('[OpenRouterProvider] listModels failed: '.$e->getMessage());
@@ -184,8 +185,8 @@ class OpenRouterProvider extends AbstractAiProvider
     {
         $headers = [
             'Authorization' => "Bearer {$this->apiKey}",
-            'Content-Type' => 'application/json',
-            'X-Title' => $this->appName,
+            'Content-Type'  => 'application/json',
+            'X-Title'       => $this->appName,
         ];
 
         if ($this->appUrl !== '') {
@@ -204,7 +205,7 @@ class OpenRouterProvider extends AbstractAiProvider
     {
         $line = '';
 
-        while (! $body->eof()) {
+        while (!$body->eof()) {
             $char = $body->read(1);
 
             if ($char === "\n") {

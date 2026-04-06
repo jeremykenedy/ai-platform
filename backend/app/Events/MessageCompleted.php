@@ -13,14 +13,17 @@ use Illuminate\Queue\SerializesModels;
 
 class MessageCompleted implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $conversationId,
         public string $messageId,
         public int $tokensUsed,
         public string $finishReason,
-    ) {}
+    ) {
+    }
 
     /**
      * @return Channel|array<int, Channel>
@@ -36,8 +39,8 @@ class MessageCompleted implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'message_id' => $this->messageId,
-            'tokens_used' => $this->tokensUsed,
+            'message_id'    => $this->messageId,
+            'tokens_used'   => $this->tokensUsed,
             'finish_reason' => $this->finishReason,
         ];
     }

@@ -21,10 +21,10 @@ class InviteUserAction
 
         /** @var User $user */
         $user = User::create([
-            'email' => $email,
-            'name' => $name,
+            'email'        => $email,
+            'name'         => $name,
             'invite_token' => $inviteToken,
-            'password' => Hash::make(Str::random(32)),
+            'password'     => Hash::make(Str::random(32)),
         ]);
 
         $user->assignRole($role);

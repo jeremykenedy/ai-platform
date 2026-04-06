@@ -22,7 +22,8 @@ class ConversationController extends Controller
     public function __construct(
         private readonly CreateConversationAction $createConversationAction,
         private readonly ExportConversationAction $exportConversationAction,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): ConversationCollection
     {
@@ -95,7 +96,7 @@ class ConversationController extends Controller
             : $result['content'];
 
         return response((string) $content, 200, [
-            'Content-Type' => $result['mime_type'],
+            'Content-Type'        => $result['mime_type'],
             'Content-Disposition' => 'attachment; filename="'.$result['filename'].'"',
         ]);
     }

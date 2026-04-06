@@ -14,12 +14,13 @@ class ExecuteIntegrationToolAction
 {
     public function __construct(
         private readonly IntegrationManager $integrationManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Execute an integration tool call, log it, and return the result.
      *
-     * @param  array<string, mixed>  $params
+     * @param array<string, mixed> $params
      */
     public function handle(
         User $user,
@@ -43,24 +44,24 @@ class ExecuteIntegrationToolAction
             $errorMessage = $e->getMessage();
             Log::warning('[ExecuteIntegrationToolAction] Tool execution failed', [
                 'integration' => $integrationName,
-                'tool' => $toolName,
-                'error' => $e->getMessage(),
+                'tool'        => $toolName,
+                'error'       => $e->getMessage(),
             ]);
         }
 
         $durationMs = (int) round(microtime(true) * 1000) - $startMs;
 
         IntegrationToolCall::create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'conversation_id' => $conversationId,
-            'message_id' => $messageId,
-            'integration_id' => $definition?->id,
-            'tool_name' => $toolName,
-            'input' => $params,
-            'output' => is_array($result) ? $result : ['result' => $result],
-            'status' => $status,
-            'duration_ms' => $durationMs,
-            'error_message' => $errorMessage,
+            'message_id'      => $messageId,
+            'integration_id'  => $definition?->id,
+            'tool_name'       => $toolName,
+            'input'           => $params,
+            'output'          => is_array($result) ? $result : ['result' => $result],
+            'status'          => $status,
+            'duration_ms'     => $durationMs,
+            'error_message'   => $errorMessage,
         ]);
 
         if ($status === 'error') {

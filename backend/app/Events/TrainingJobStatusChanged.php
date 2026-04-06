@@ -13,14 +13,17 @@ use Illuminate\Queue\SerializesModels;
 
 class TrainingJobStatusChanged implements ShouldBroadcast
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
     public function __construct(
         public string $userId,
         public string $jobId,
         public string $status,
         public int $progress,
-    ) {}
+    ) {
+    }
 
     /**
      * @return array<int, Channel>
@@ -39,8 +42,8 @@ class TrainingJobStatusChanged implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'job_id' => $this->jobId,
-            'status' => $this->status,
+            'job_id'   => $this->jobId,
+            'status'   => $this->status,
             'progress' => $this->progress,
         ];
     }
