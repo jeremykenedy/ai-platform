@@ -1,6 +1,5 @@
 # Auto-detect Docker binary (QNAP vs standard)
-QNAP_DOCKER := /share/CE_CACHEDEV1_DATA/.qpkg/container-station/usr/bin/.libs/docker
-DOCKER := $(shell if [ -x "$(QNAP_DOCKER)" ]; then echo "$(QNAP_DOCKER)"; else echo "docker"; fi)
+DOCKER := $(shell if [ -x "$(QNAP_DOCKER_BINARY)" ]; then echo "$(QNAP_DOCKER_BINARY)"; else echo "docker"; fi)
 COMPOSE := $(DOCKER) compose
 
 # Load .env if it exists

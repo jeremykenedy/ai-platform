@@ -52,9 +52,9 @@ deploy_local() {
 
 deploy_qnap() {
     QNAP_HOST="${QNAP_HOST:?QNAP_HOST is not set in .env}"
-    QNAP_USER="${QNAP_USER:-jeremy}"
-    QNAP_PROJECT_PATH="${QNAP_PROJECT_PATH:-/share/CE_CACHEDEV1_DATA/homes/jeremy/sites/ai-platform}"
-    QNAP_DOCKER="${QNAP_DOCKER_BINARY:-/share/CE_CACHEDEV1_DATA/.qpkg/container-station/usr/bin/.libs/docker}"
+    QNAP_USER="${QNAP_USER:?QNAP_USER is not set in .env}"
+    QNAP_PROJECT_PATH="${QNAP_PROJECT_PATH:?QNAP_PROJECT_PATH is not set in .env}"
+    QNAP_DOCKER="${QNAP_DOCKER_BINARY:?QNAP_DOCKER_BINARY is not set in .env}"
 
     echo "Deploying to QNAP at $QNAP_HOST..."
 

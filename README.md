@@ -188,14 +188,14 @@ SUPER_ADMIN_PASSWORD=your-secure-password
 
 ```bash
 # SSH to QNAP
-ssh jeremy@<QNAP_HOST>
+ssh $QNAP_USER@$QNAP_HOST
 
 # Navigate to project
-cd /share/CE_CACHEDEV1_DATA/homes/jeremy/sites/ai-platform
+cd $QNAP_PROJECT_PATH
 
 # Create environment file
 cp .env.example .env
-# Edit .env with production values
+# Edit .env with production values (QNAP_HOST, QNAP_USER, QNAP_PROJECT_PATH, QNAP_DOCKER_BINARY)
 
 # Build and deploy
 make build
@@ -204,8 +204,7 @@ make migrate
 make seed
 ```
 
-The Docker binary on QNAP is auto-detected by the Makefile at:
-`/share/CE_CACHEDEV1_DATA/.qpkg/container-station/usr/bin/.libs/docker`
+The Docker binary path on QNAP is configured via the `QNAP_DOCKER_BINARY` variable in `.env` and auto-detected by the Makefile.
 
 Subsequent deployments:
 
