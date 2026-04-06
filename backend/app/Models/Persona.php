@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\PersonaFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -28,7 +30,8 @@ use Illuminate\Support\Carbon;
  */
 class Persona extends Model
 {
-    use HasUlids, SoftDeletes;
+    /** @use HasFactory<PersonaFactory> */
+    use HasFactory, HasUlids, SoftDeletes;
 
     /**
      * @var list<string>

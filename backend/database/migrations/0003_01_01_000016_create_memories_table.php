@@ -33,7 +33,9 @@ return new class extends Migration
             $table->index('source_message_id');
         });
 
-        DB::statement('ALTER TABLE memories ADD COLUMN embedding vector(1536)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE memories ADD COLUMN embedding vector(1536)');
+        }
     }
 
     public function down(): void
