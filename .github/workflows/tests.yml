@@ -62,6 +62,13 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Prepare Laravel directories
+        working-directory: backend
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/{cache,sessions,views}
+          mkdir -p storage/logs
+
       - name: Install Composer dependencies
         working-directory: backend
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -103,6 +110,12 @@ jobs:
           php-version: '8.4'
           coverage: none
 
+      - name: Prepare Laravel directories
+        working-directory: backend
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/{cache,sessions,views}
+
       - name: Install Composer dependencies
         working-directory: backend
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -124,6 +137,12 @@ jobs:
           php-version: '8.4'
           extensions: pdo_pgsql, redis, pcntl, intl, zip, bcmath
           coverage: none
+
+      - name: Prepare Laravel directories
+        working-directory: backend
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/{cache,sessions,views}
 
       - name: Install Composer dependencies
         working-directory: backend
