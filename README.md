@@ -12,6 +12,7 @@ Self-hosted AI chat platform with local LLM inference, 13 AI providers, and 30 i
 
 <p align="center">
 <a href="https://github.com/jeremykenedy/ai-platform/actions/workflows/tests.yml"><img src="https://github.com/jeremykenedy/ai-platform/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+  <a href="https://github.styleci.io/repos/1202525960?branch=main"><img src="https://github.styleci.io/repos/1202525960/shield?branch=main" alt="StyleCI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
 </p>
 
