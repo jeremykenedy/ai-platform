@@ -1,5 +1,9 @@
 <script setup>
+  import AppLayout from '@/components/layout/AppLayout.vue'
 </script>
+
 <template>
-  <div class="p-6"><h1 class="text-2xl font-bold">Chat Layout</h1></div>
+  <AppLayout>
+    <router-view />
+  </AppLayout>
 </template>

@@ -71,3 +71,5 @@ export const useUiStore = defineStore('ui', () => {
     setMobile,
   }
 })
+
+export { useUiStore as useUIStore }
