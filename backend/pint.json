@@ -6,6 +6,16 @@
         "strict_param": true,
         "declare_strict_types": true,
         "final_class": false,
-        "php_unit_test_class_requires_covers": false
+        "php_unit_test_class_requires_covers": false,
+        "braces_position": false,
+        "binary_operator_spaces": false,
+        "single_line_empty_body": false,
+        "not_operator_with_successor_space": false,
+        "new_with_parentheses": false,
+        "phpdoc_align": false,
+        "phpdoc_separation": false,
+        "phpdoc_order": false,
+        "concat_space": false,
+        "class_attributes_separation": false
     }
 }
