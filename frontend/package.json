@@ -27,7 +27,7 @@
   "dependencies": {
     "@tanstack/vue-virtual": "^3.13.23",
     "@vueuse/core": "^14.2.1",
-    "axios": "^1.14.0",
+    "axios": "^1.15.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -61,7 +61,7 @@
     "stylelint-config-recommended-vue": "^1.6.1",
     "stylelint-config-standard": "^40.0.0",
     "tailwindcss": "^4.2.2",
-    "vite": "^8.0.1",
+    "vite": "^8.0.5",
     "vite-plugin-compression2": "^2.5.3",
     "vite-plugin-pwa": "^1.2.0",
     "vue-eslint-parser": "^10.4.0",
