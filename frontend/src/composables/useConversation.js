@@ -34,13 +34,21 @@ export function useConversation() {
   function pollUntilAssistant(conversationId, timeoutMs) {
     const start = Date.now()
     const tick = async () => {
-      if (Date.now() - start > timeoutMs) return
+      if (Date.now() - start > timeoutMs) {
+        messages.cancelStream()
+        return
+      }
       try {
         const fetched = await messages.fetchForConversation(conversationId)
-        const hasFinishedAssistant = (fetched ?? []).some(
+        const finished = (fetched ?? []).find(
           (m) => m.role === 'assistant' && m.finish_reason && m.content
         )
-        if (!hasFinishedAssistant) setTimeout(tick, 3000)
+        if (finished) {
+          // Clears isStreaming, streamingMessageId, and watchdog.
+          messages.finalizeMessage(finished)
+          return
+        }
+        setTimeout(tick, 3000)
       } catch {
         setTimeout(tick, 3000)
       }

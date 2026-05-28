@@ -92,15 +92,36 @@ export const useMessagesStore = defineStore('messages', () => {
       messages[conversationId] = hasSaved
         ? withoutOptimistic
         : [...withoutOptimistic, saved]
+      // Keep isStreaming TRUE here — the assistant is now being generated
+      // server-side. It will flip to false in finalizeMessage when WS
+      // StreamCompleted fires, or via the timeout watchdog below.
+      armStreamingWatchdog()
       return saved
     } catch (err) {
       handleStreamError(err)
       messages[conversationId] = (messages[conversationId] ?? []).filter(
         (m) => m.id !== optimistic.id
       )
-      throw err
-    } finally {
       isStreaming.value = false
+      throw err
+    }
+  }
+
+  let streamingWatchdog = null
+  function armStreamingWatchdog() {
+    if (streamingWatchdog) clearTimeout(streamingWatchdog)
+    // After 2 minutes with no StreamCompleted, give up and clear the
+    // streaming flag so the UI doesn't spin forever.
+    streamingWatchdog = setTimeout(() => {
+      isStreaming.value = false
+      streamingMessageId.value = null
+      streamingWatchdog = null
+    }, 120000)
+  }
+  function clearStreamingWatchdog() {
+    if (streamingWatchdog) {
+      clearTimeout(streamingWatchdog)
+      streamingWatchdog = null
     }
   }
 
@@ -184,6 +205,7 @@ export const useMessagesStore = defineStore('messages', () => {
       streamingMessageId.value = null
       pendingTokens.value = ''
       isStreaming.value = false
+      clearStreamingWatchdog()
     }
 
     for (const convId of Object.keys(messages)) {
