@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Providers\EventServiceProvider;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -36,5 +37,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(function (Request $request) {
             return $request->is('api/*') || $request->expectsJson();
+        });
+
+        // AuthenticationException defaults to redirect(route('login'));
+        // we have no named 'login' route (SPA owns /login), so explicitly
+        // return JSON 401 for any API / JSON request before the default
+        // handler tries to resolve the missing route.
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage() ?: 'Unauthenticated.'], 401);
+            }
         });
     })->create();

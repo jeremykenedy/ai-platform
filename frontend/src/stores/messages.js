@@ -39,14 +39,23 @@ export const useMessagesStore = defineStore('messages', () => {
       const existingIds = new Set(existing.map((m) => m.id))
       const older = fetched.filter((m) => !existingIds.has(m.id))
       messages.value.set(conversationId, [...older, ...existing])
-    } else {
-      const fetchedIds = new Set(fetched.map((m) => m.id))
-      const pending = existing.filter((m) => m.pending && !fetchedIds.has(m.id))
-      const localOnly = existing.filter(
-        (m) => !m.pending && !fetchedIds.has(m.id) && String(m.id).startsWith('pending-') === false
-      )
-      messages.value.set(conversationId, [...fetched, ...localOnly, ...pending])
+      return fetched
     }
+
+    // Initial load: the server is the source of truth for persisted
+    // messages. Keep only optimistic messages whose content is not
+    // already represented in the fetched set (i.e., still in flight
+    // server-side). De-dupe by trimmed content+role rather than id,
+    // since the optimistic id ("pending-…") never matches a real ULID.
+    const fetchedContent = new Set(
+      fetched.map((m) => `${m.role}::${(m.content || '').trim()}`)
+    )
+    const stillPending = existing.filter(
+      (m) =>
+        m.pending &&
+        !fetchedContent.has(`${m.role}::${(m.content || '').trim()}`)
+    )
+    messages.value.set(conversationId, [...fetched, ...stillPending])
     return fetched
   }
 
@@ -74,16 +83,10 @@ export const useMessagesStore = defineStore('messages', () => {
       })
       const saved = response.data.data ?? response.data
       const now = messages.value.get(conversationId) ?? []
-      const hasOptimistic = now.some((m) => m.id === optimistic.id)
-      const hasSaved = now.some((m) => m.id === saved.id)
-      let next
-      if (hasOptimistic) {
-        next = now.map((m) => (m.id === optimistic.id ? saved : m))
-      } else if (!hasSaved) {
-        next = [...now, saved]
-      } else {
-        next = now
-      }
+      // Drop the optimistic unconditionally and append saved if missing.
+      const withoutOptimistic = now.filter((m) => m.id !== optimistic.id)
+      const hasSaved = withoutOptimistic.some((m) => m.id === saved.id)
+      const next = hasSaved ? withoutOptimistic : [...withoutOptimistic, saved]
       messages.value.set(conversationId, next)
       return saved
     } catch (err) {
