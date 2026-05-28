@@ -14,7 +14,7 @@ return new class() extends Migration {
         }
 
         DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
-        DB::statement('ALTER TABLE messages ADD COLUMN embedding vector(1536)');
+        DB::statement('ALTER TABLE messages ADD COLUMN embedding vector(768)');
     }
 
     public function down(): void

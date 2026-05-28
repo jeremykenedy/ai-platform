@@ -4,15 +4,15 @@
 ollama serve &
 OLLAMA_PID=$!
 
-# Wait for Ollama to be ready
+# Wait for Ollama to be ready (ollama CLI ships in the image; curl does not)
 echo "Waiting for Ollama..."
-until curl -sf http://localhost:11434/api/tags > /dev/null; do
+until ollama list >/dev/null 2>&1; do
   sleep 1
 done
 echo "Ollama ready."
 
 # Pull default models if not present
-for model in "llama3.2:latest" "qwen2.5:7b" "mistral:7b"; do
+for model in "llama3.2:latest" "nomic-embed-text:latest"; do
   if ! ollama list | grep -q "$model"; then
     echo "Pulling $model..."
     ollama pull "$model"

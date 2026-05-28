@@ -95,7 +95,7 @@ class ConversationSummaryService
         $contextWindowUsed = (int) $conversation->context_window_used;
 
         if ($contextWindowUsed > 0) {
-            $model = AiModel::where('model_id', $conversation->model_name)->first();
+            $model = AiModel::where('name', $conversation->model_name)->first();
             $contextLimit = $model?->context_window ?? 0;
 
             if ($contextLimit > 0 && ($contextWindowUsed / $contextLimit) > self::CONTEXT_WINDOW_USAGE_THRESHOLD) {

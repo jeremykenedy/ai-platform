@@ -33,7 +33,7 @@ return new class() extends Migration {
         });
 
         if (DB::getDriverName() === 'pgsql') {
-            DB::statement('ALTER TABLE memories ADD COLUMN embedding vector(1536)');
+            DB::statement('ALTER TABLE memories ADD COLUMN embedding vector(768)');
         }
     }
 

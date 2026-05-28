@@ -58,13 +58,21 @@ deploy_qnap() {
 
     echo "Deploying to QNAP at $QNAP_HOST..."
 
-    ssh "$QNAP_USER@$QNAP_HOST" bash -s "$QNAP_PROJECT_PATH" "$QNAP_DOCKER" << 'REMOTE_SCRIPT'
+    ssh "$QNAP_USER@$QNAP_HOST" bash -ls "$QNAP_PROJECT_PATH" "$QNAP_DOCKER" << 'REMOTE_SCRIPT'
         set -euo pipefail
         PROJECT_PATH="$1"
         DOCKER="$2"
         COMPOSE="$DOCKER compose"
 
         cd "$PROJECT_PATH"
+
+        # Safety: if a leftover docker-compose.override.yml exists in prod it
+        # would bind-mount ./backend over /app and wipe the image's vendor.
+        # Move it out of the way; dev users should use docker-compose.dev.yml.
+        if [ -f docker-compose.override.yml ]; then
+          echo "WARNING: docker-compose.override.yml present in production. Renaming to .yml.disabled."
+          mv docker-compose.override.yml docker-compose.override.yml.disabled
+        fi
 
         echo "Pulling latest code..."
         git pull origin main
@@ -75,17 +83,28 @@ deploy_qnap() {
         echo "Starting services..."
         $COMPOSE up -d --remove-orphans
 
+        # Clear bootstrap cache from any prior dev run (Pail, etc.) before
+        # artisan tries to bootstrap with cached providers it cannot find.
+        $DOCKER exec ai-platform-frankenphp-1 sh -c \
+          'rm -f /app/bootstrap/cache/packages.php /app/bootstrap/cache/services.php /app/bootstrap/cache/config.php /app/bootstrap/cache/routes-v7.php /app/bootstrap/cache/events.php' || true
+
         echo "Running migrations..."
         $COMPOSE exec -T frankenphp php artisan migrate --force
 
         echo "Caching configuration..."
         $COMPOSE exec -T frankenphp php artisan config:cache
         $COMPOSE exec -T frankenphp php artisan route:cache
-        $COMPOSE exec -T frankenphp php artisan view:cache
         $COMPOSE exec -T frankenphp php artisan event:cache
 
+        echo "Refreshing model registry against Ollama..."
+        $COMPOSE exec -T frankenphp php artisan models:sync || true
+
         echo "Restarting Horizon..."
-        $COMPOSE exec -T frankenphp php artisan horizon:terminate
+        $COMPOSE exec -T frankenphp php artisan horizon:terminate || true
+
+        # Frontend nginx caches DNS for upstream containers. Restart so it
+        # picks up any new frankenphp IP from this recreate cycle.
+        $DOCKER restart ai-platform-frontend-1 || true
 
         echo "QNAP deploy complete."
 REMOTE_SCRIPT

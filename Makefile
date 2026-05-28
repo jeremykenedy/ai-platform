@@ -8,17 +8,24 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-.PHONY: up down build fresh migrate seed shell tinker logs lint test deploy-local deploy-qnap ssh-qnap
+.PHONY: up up-dev down build build-dev fresh migrate seed shell tinker logs lint test deploy-local deploy-qnap ssh-qnap
 
-## Docker targets
+## Docker targets (production by default)
 up:
 	$(COMPOSE) up -d
+
+# Local dev: layers docker-compose.dev.yml on top (bind-mounts backend/frontend for hot reload)
+up-dev:
+	$(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 down:
 	$(COMPOSE) down
 
 build:
 	$(COMPOSE) build
+
+build-dev:
+	$(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml build
 
 ## Laravel targets (run inside frankenphp container)
 fresh:
