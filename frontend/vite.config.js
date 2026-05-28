@@ -1,65 +1,17 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
-import { VitePWA } from 'vite-plugin-pwa'
 import { compression } from 'vite-plugin-compression2'
 import { fileURLToPath, URL } from 'node:url'
+
+// PWA / service worker is intentionally disabled. The cached SW bundle
+// was causing users to see fixed bugs as still-present across deploys.
+// Re-enable once the app is stable.
 
 export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
-    VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https?:\/\/.*\/api\/v1\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 300 },
-              networkTimeoutSeconds: 10,
-            },
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: { maxEntries: 60, maxAgeSeconds: 2592000 },
-            },
-          },
-          {
-            urlPattern: /\.(?:woff|woff2|ttf|eot)$/,
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'fonts-cache' },
-          },
-        ],
-      },
-      manifest: {
-        name: 'My AI',
-        short_name: 'My AI',
-        description: 'Personal AI powered by local models',
-        theme_color: '#000000',
-        background_color: '#000000',
-        display: 'standalone',
-        start_url: '/c/new',
-        scope: '/',
-        icons: [
-          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          {
-            src: 'icons/icon-512-maskable.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'maskable',
-          },
-        ],
-      },
-    }),
     compression({
       algorithm: 'gzip',
       threshold: 1024,

@@ -8,9 +8,6 @@
   import { useMobile } from '@/composables/useMobile'
 
   import ImpersonationBanner from '@/components/ImpersonationBanner.vue'
-  import OfflineIndicator from '@/components/offline/OfflineIndicator.vue'
-  import PwaInstallPrompt from '@/components/offline/PwaInstallPrompt.vue'
-  import ServiceWorkerUpdate from '@/components/offline/ServiceWorkerUpdate.vue'
   import ToastContainer from '@/components/feedback/ToastContainer.vue'
   import CommandPalette from '@/components/feedback/CommandPalette.vue'
   import KeyboardShortcutHelp from '@/components/feedback/KeyboardShortcutHelp.vue'
@@ -71,7 +68,6 @@
     <!-- Main app -->
     <template v-else>
       <ImpersonationBanner />
-      <OfflineIndicator />
       <ErrorBoundary>
         <router-view />
       </ErrorBoundary>
@@ -79,8 +75,6 @@
 
     <!-- Global overlays (always rendered so transitions work) -->
     <ToastContainer />
-    <PwaInstallPrompt />
-    <ServiceWorkerUpdate />
     <CommandPalette v-model:show="showCommandPalette" />
     <KeyboardShortcutHelp v-model:show="showShortcutHelp" />
   </div>

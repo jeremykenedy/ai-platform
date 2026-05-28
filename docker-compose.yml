@@ -208,6 +208,10 @@ services:
       OLLAMA_NUM_THREAD: "${OLLAMA_NUM_THREAD:-4}"
       OLLAMA_INTEL_GPU: "${OLLAMA_INTEL_GPU:-1}"
       OLLAMA_HOST: 0.0.0.0
+      # Keep models resident so first user request isn't a 15s cold load.
+      OLLAMA_KEEP_ALIVE: "${OLLAMA_KEEP_ALIVE:-24h}"
+      # Allow concurrent requests against the same model.
+      OLLAMA_NUM_PARALLEL: "${OLLAMA_NUM_PARALLEL:-2}"
     devices:
       - "${INTEL_GPU_DEVICE_CARD:-/dev/dri/card0}:${INTEL_GPU_DEVICE_CARD:-/dev/dri/card0}"
       - "${INTEL_GPU_DEVICE_RENDER:-/dev/dri/renderD128}:${INTEL_GPU_DEVICE_RENDER:-/dev/dri/renderD128}"
