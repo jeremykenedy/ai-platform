@@ -16,7 +16,7 @@ export const usePersonasStore = defineStore('personas', () => {
   async function fetch() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/personas')
+      const response = await api.get('/personas')
       personas.value = response.data.data ?? response.data
     } finally {
       isLoading.value = false
@@ -24,14 +24,14 @@ export const usePersonasStore = defineStore('personas', () => {
   }
 
   async function create(data) {
-    const response = await api.post('/api/v1/personas', data)
+    const response = await api.post('/personas', data)
     const persona = response.data.data ?? response.data
     personas.value.push(persona)
     return persona
   }
 
   async function update(id, data) {
-    const response = await api.patch(`/api/v1/personas/${id}`, data)
+    const response = await api.patch(`/personas/${id}`, data)
     const updated = response.data.data ?? response.data
     const index = personas.value.findIndex((p) => p.id === id)
     if (index !== -1) personas.value[index] = updated
@@ -39,7 +39,7 @@ export const usePersonasStore = defineStore('personas', () => {
   }
 
   async function destroy(id) {
-    await api.delete(`/api/v1/personas/${id}`)
+    await api.delete(`/personas/${id}`)
     personas.value = personas.value.filter((p) => p.id !== id)
     if (activeId.value === id) activeId.value = null
   }

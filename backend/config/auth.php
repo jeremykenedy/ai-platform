@@ -116,4 +116,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Registration
+    |--------------------------------------------------------------------------
+    |
+    | When false, the registration endpoint is disabled. Users can only be
+    | created by an admin through the admin panel.
+    |
+    */
+
+    'registration_open' => env('REGISTRATION_OPEN', false),
+
 ];

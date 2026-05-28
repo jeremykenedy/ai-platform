@@ -96,7 +96,7 @@
     if (previewingVoice.value) return
     previewingVoice.value = true
     try {
-      const response = await fetch(`/api/v1/tts/preview?voice=${tts.voice}&speed=${tts.speed}`)
+      const response = await fetch(`/tts/preview?voice=${tts.voice}&speed=${tts.speed}`)
       if (!response.ok) throw new Error()
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)

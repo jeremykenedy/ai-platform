@@ -7,6 +7,7 @@
   import { useKeyboard } from '@/composables/useKeyboard'
   import { useMobile } from '@/composables/useMobile'
 
+  import ImpersonationBanner from '@/components/ImpersonationBanner.vue'
   import OfflineIndicator from '@/components/offline/OfflineIndicator.vue'
   import PwaInstallPrompt from '@/components/offline/PwaInstallPrompt.vue'
   import ServiceWorkerUpdate from '@/components/offline/ServiceWorkerUpdate.vue'
@@ -69,6 +70,7 @@
 
     <!-- Main app -->
     <template v-else>
+      <ImpersonationBanner />
       <OfflineIndicator />
       <ErrorBoundary>
         <router-view />

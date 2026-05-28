@@ -85,7 +85,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": ["pgvector/pgvector"]
         }
     },
     "config": {

@@ -11,7 +11,7 @@ export const useMemoryStore = defineStore('memory', () => {
   async function fetch(params = {}) {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/memory', { params })
+      const response = await api.get('/memory', { params })
       memories.value = response.data.data ?? response.data
       pagination.value = {
         nextCursor: response.data.meta?.next_cursor ?? null,
@@ -23,14 +23,14 @@ export const useMemoryStore = defineStore('memory', () => {
   }
 
   async function create(data) {
-    const response = await api.post('/api/v1/memory', data)
+    const response = await api.post('/memory', data)
     const memory = response.data.data ?? response.data
     memories.value.unshift(memory)
     return memory
   }
 
   async function update(id, data) {
-    const response = await api.patch(`/api/v1/memory/${id}`, data)
+    const response = await api.patch(`/memory/${id}`, data)
     const updated = response.data.data ?? response.data
     const index = memories.value.findIndex((m) => m.id === id)
     if (index !== -1) memories.value[index] = updated
@@ -38,23 +38,23 @@ export const useMemoryStore = defineStore('memory', () => {
   }
 
   async function destroy(id) {
-    await api.delete(`/api/v1/memory/${id}`)
+    await api.delete(`/memory/${id}`)
     memories.value = memories.value.filter((m) => m.id !== id)
   }
 
   async function bulkDestroy(ids) {
-    await api.post('/api/v1/memory/bulk-destroy', { ids })
+    await api.post('/memory/bulk-destroy', { ids })
     memories.value = memories.value.filter((m) => !ids.includes(m.id))
   }
 
   async function fetchConflicts() {
-    const response = await api.get('/api/v1/memory/conflicts')
+    const response = await api.get('/memory/conflicts')
     conflicts.value = response.data.data ?? response.data
     return conflicts.value
   }
 
   async function resolveConflict(conflictId, resolution) {
-    const response = await api.post(`/api/v1/memory/conflicts/${conflictId}/resolve`, {
+    const response = await api.post(`/memory/conflicts/${conflictId}/resolve`, {
       resolution,
     })
     conflicts.value = conflicts.value.filter((c) => c.id !== conflictId)

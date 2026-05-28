@@ -7,26 +7,31 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoading = ref(false)
 
   const isAuthenticated = computed(() => user.value !== null)
-  const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'super_admin')
-  const isSuperAdmin = computed(() => user.value?.role === 'super_admin')
+  const isAdmin = computed(
+    () => user.value?.role === 'admin' || user.value?.role === 'super-admin' || user.value?.role === 'super_admin'
+  )
+  const isSuperAdmin = computed(
+    () => user.value?.role === 'super-admin' || user.value?.role === 'super_admin'
+  )
+  const isImpersonating = computed(() => user.value?.impersonating === true)
   const permissions = computed(() => user.value?.permissions ?? [])
   const userTimezone = computed(
     () => user.value?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
   )
 
   async function login(email, password) {
-    const response = await api.post('/api/v1/auth/login', { email, password })
+    const response = await api.post('/auth/login', { email, password })
     await fetchUser()
     return response.data
   }
 
   async function logout() {
-    await api.post('/api/v1/auth/logout')
+    await api.post('/auth/logout')
     user.value = null
   }
 
   async function register(data) {
-    const response = await api.post('/api/v1/auth/register', data)
+    const response = await api.post('/auth/register', data)
     await fetchUser()
     return response.data
   }
@@ -34,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchUser() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/auth/user')
+      const response = await api.get('/auth/user')
       user.value = response.data.data ?? response.data
     } catch {
       user.value = null
@@ -44,9 +49,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function updateProfile(data) {
-    const response = await api.patch('/api/v1/auth/user', data)
+    const response = await api.patch('/auth/user', data)
     user.value = response.data.data ?? response.data
     return response.data
+  }
+
+  async function impersonate(userId) {
+    await api.post(`/admin/impersonate/${userId}`)
+    await fetchUser()
+  }
+
+  async function leaveImpersonation() {
+    await api.post('/admin/impersonate/leave')
+    await fetchUser()
   }
 
   return {
@@ -55,6 +70,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isAdmin,
     isSuperAdmin,
+    isImpersonating,
     permissions,
     userTimezone,
     login,
@@ -62,5 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     fetchUser,
     updateProfile,
+    impersonate,
+    leaveImpersonation,
   }
 })

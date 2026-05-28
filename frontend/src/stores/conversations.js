@@ -47,7 +47,7 @@ export const useConversationsStore = defineStore('conversations', () => {
     isLoading.value = true
     try {
       const params = cursor ? { cursor } : {}
-      const response = await api.get('/api/v1/conversations', { params })
+      const response = await api.get('/conversations', { params })
       conversations.value = response.data.data ?? response.data
       pagination.value = {
         nextCursor: response.data.meta?.next_cursor ?? null,
@@ -62,7 +62,7 @@ export const useConversationsStore = defineStore('conversations', () => {
     if (!pagination.value.hasMore || isLoading.value) return
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/conversations', {
+      const response = await api.get('/conversations', {
         params: { cursor: pagination.value.nextCursor },
       })
       const incoming = response.data.data ?? response.data
@@ -77,14 +77,14 @@ export const useConversationsStore = defineStore('conversations', () => {
   }
 
   async function create(data) {
-    const response = await api.post('/api/v1/conversations', data)
+    const response = await api.post('/conversations', data)
     const convo = response.data.data ?? response.data
     conversations.value.unshift(convo)
     return convo
   }
 
   async function update(id, data) {
-    const response = await api.patch(`/api/v1/conversations/${id}`, data)
+    const response = await api.patch(`/conversations/${id}`, data)
     const updated = response.data.data ?? response.data
     const index = conversations.value.findIndex((c) => c.id === id)
     if (index !== -1) conversations.value[index] = updated
@@ -92,7 +92,7 @@ export const useConversationsStore = defineStore('conversations', () => {
   }
 
   async function destroy(id) {
-    await api.delete(`/api/v1/conversations/${id}`)
+    await api.delete(`/conversations/${id}`)
     conversations.value = conversations.value.filter((c) => c.id !== id)
     if (activeId.value === id) activeId.value = null
   }

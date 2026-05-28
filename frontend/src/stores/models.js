@@ -22,7 +22,7 @@ export const useModelsStore = defineStore('models', () => {
   async function fetch() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/models')
+      const response = await api.get('/models')
       models.value = response.data.data ?? response.data
       if (!activeModelId.value && defaultModel.value) {
         activeModelId.value = defaultModel.value.id
@@ -37,12 +37,12 @@ export const useModelsStore = defineStore('models', () => {
   }
 
   async function pull(modelName) {
-    const response = await api.post('/api/v1/models/pull', { model: modelName })
+    const response = await api.post('/models/pull', { model: modelName })
     return response.data
   }
 
   async function deleteModel(id) {
-    await api.delete(`/api/v1/models/${id}`)
+    await api.delete(`/models/${id}`)
     models.value = models.value.filter((m) => m.id !== id)
     if (activeModelId.value === id) {
       activeModelId.value = defaultModel.value?.id ?? null

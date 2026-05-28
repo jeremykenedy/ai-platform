@@ -29,6 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $invited_by
  * @property string|null $subscription_tier
  * @property Carbon|null $last_active_at
+ * @property Carbon|null $disabled_at
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -57,6 +58,7 @@ class User extends Authenticatable
         'subscription_tier',
         'last_active_at',
         'email_verified_at',
+        'disabled_at',
     ];
 
     /**
@@ -77,6 +79,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'last_active_at'    => 'datetime',
+            'disabled_at'       => 'datetime',
         ];
     }
 

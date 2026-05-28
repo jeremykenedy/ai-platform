@@ -23,7 +23,9 @@ class UserResource extends JsonResource
             'subscription_tier' => $this->subscription_tier,
             'email_verified_at' => $this->email_verified_at,
             'last_active_at'    => $this->last_active_at,
+            'disabled_at'       => $this->disabled_at,
             'created_at'        => $this->created_at,
+            'role'              => $this->whenLoaded('roles', fn () => $this->roles->first()?->name),
             'settings'          => new SettingsResource($this->whenLoaded('settings')),
             'roles'             => $this->whenLoaded('roles', fn () => $this->roles->pluck('name')),
         ];

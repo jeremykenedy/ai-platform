@@ -28,6 +28,14 @@ class LoginAction
         /** @var User $user */
         $user = Auth::user();
 
+        if ($user->disabled_at !== null) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been disabled. Contact an administrator.'],
+            ]);
+        }
+
         $user->update(['last_active_at' => now()]);
 
         return [

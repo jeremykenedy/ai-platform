@@ -9,6 +9,8 @@ export function useAuth() {
   const isAuthenticated = computed(() => store.isAuthenticated)
   const user = computed(() => store.user)
   const isAdmin = computed(() => store.isAdmin)
+  const isSuperAdmin = computed(() => store.isSuperAdmin)
+  const isImpersonating = computed(() => store.isImpersonating)
 
   async function login(email, password) {
     await store.login(email, password)
@@ -21,5 +23,5 @@ export function useAuth() {
     router.push('/login')
   }
 
-  return { isAuthenticated, user, isAdmin, login, logout }
+  return { isAuthenticated, user, isAdmin, isSuperAdmin, isImpersonating, login, logout }
 }

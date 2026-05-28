@@ -16,7 +16,7 @@ export const useProjectsStore = defineStore('projects', () => {
   async function fetch() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/projects')
+      const response = await api.get('/projects')
       projects.value = response.data.data ?? response.data
     } finally {
       isLoading.value = false
@@ -24,14 +24,14 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function create(data) {
-    const response = await api.post('/api/v1/projects', data)
+    const response = await api.post('/projects', data)
     const project = response.data.data ?? response.data
     projects.value.unshift(project)
     return project
   }
 
   async function update(id, data) {
-    const response = await api.patch(`/api/v1/projects/${id}`, data)
+    const response = await api.patch(`/projects/${id}`, data)
     const updated = response.data.data ?? response.data
     const index = projects.value.findIndex((p) => p.id === id)
     if (index !== -1) projects.value[index] = updated
@@ -39,7 +39,7 @@ export const useProjectsStore = defineStore('projects', () => {
   }
 
   async function destroy(id) {
-    await api.delete(`/api/v1/projects/${id}`)
+    await api.delete(`/projects/${id}`)
     projects.value = projects.value.filter((p) => p.id !== id)
     if (activeId.value === id) activeId.value = null
   }

@@ -21,7 +21,7 @@ export const useIntegrationsStore = defineStore('integrations', () => {
   async function fetch() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/integrations')
+      const response = await api.get('/integrations')
       definitions.value = response.data.data ?? response.data
     } finally {
       isLoading.value = false
@@ -29,7 +29,7 @@ export const useIntegrationsStore = defineStore('integrations', () => {
   }
 
   async function connect(name, credentials) {
-    const response = await api.post(`/api/v1/integrations/${name}/connect`, credentials)
+    const response = await api.post(`/integrations/${name}/connect`, credentials)
     const updated = response.data.data ?? response.data
     const index = definitions.value.findIndex((d) => d.name === name)
     if (index !== -1) {
@@ -39,7 +39,7 @@ export const useIntegrationsStore = defineStore('integrations', () => {
   }
 
   async function disconnect(name) {
-    await api.post(`/api/v1/integrations/${name}/disconnect`)
+    await api.post(`/integrations/${name}/disconnect`)
     const index = definitions.value.findIndex((d) => d.name === name)
     if (index !== -1) {
       definitions.value[index] = { ...definitions.value[index], connected: false }
@@ -47,7 +47,7 @@ export const useIntegrationsStore = defineStore('integrations', () => {
   }
 
   async function executeTool(name, tool, params) {
-    const response = await api.post(`/api/v1/integrations/${name}/tools/${tool}`, params)
+    const response = await api.post(`/integrations/${name}/tools/${tool}`, params)
     return response.data
   }
 

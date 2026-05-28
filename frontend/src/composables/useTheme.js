@@ -23,7 +23,7 @@ export function useTheme() {
 
   async function syncToServer(value) {
     try {
-      await api.patch('/api/v1/settings', { theme: value ?? ui.theme.value })
+      await api.patch('/settings', { theme: value ?? ui.theme.value })
     } catch {
       // Non-critical; ignore sync failures silently
     }
@@ -32,7 +32,7 @@ export function useTheme() {
   async function initFromServer() {
     if (!auth.isAuthenticated) return
     try {
-      const response = await api.get('/api/v1/settings')
+      const response = await api.get('/settings')
       const serverTheme = response.data?.data?.theme ?? response.data?.theme
       if (serverTheme) {
         ui.setTheme(serverTheme)

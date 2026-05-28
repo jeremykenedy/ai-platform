@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.4-alpine AS base
+FROM dunglas/frankenphp:1.12.1-php8.4 AS base
 
 RUN install-php-extensions \
     pdo_pgsql \
@@ -9,7 +9,8 @@ RUN install-php-extensions \
     zip \
     bcmath \
     opcache \
-    gd
+    gd \
+    exif
 
 WORKDIR /app
 

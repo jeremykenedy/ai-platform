@@ -24,6 +24,7 @@ class UpdateUserRequest extends FormRequest
             'name'              => ['nullable', 'string', 'max:255'],
             'email'             => ['nullable', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'role'              => ['nullable', 'string', 'in:user,admin,super-admin'],
+            'password'          => ['nullable', 'string', 'min:8'],
             'subscription_tier' => ['nullable', 'string'],
         ];
     }

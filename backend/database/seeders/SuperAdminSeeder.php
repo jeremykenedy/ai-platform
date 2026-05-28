@@ -13,6 +13,12 @@ class SuperAdminSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->seedFromEnv();
+        $this->seedGmailUser();
+    }
+
+    private function seedFromEnv(): void
+    {
         $name = env('SUPER_ADMIN_NAME');
         $email = env('SUPER_ADMIN_EMAIL');
         $password = env('SUPER_ADMIN_PASSWORD');
@@ -37,5 +43,23 @@ class SuperAdminSeeder extends Seeder
         UserSetting::firstOrCreate(['user_id' => $user->id]);
 
         $this->command->info("Super admin seeded: {$user->name} <{$user->email}>");
+    }
+
+    private function seedGmailUser(): void
+    {
+        $user = User::firstOrCreate(
+            ['email' => 'jeremykenedy@gmail.com'],
+            [
+                'name'              => 'Jeremy Kenedy',
+                'password'          => Hash::make('password'),
+                'email_verified_at' => now(),
+            ],
+        );
+
+        $user->assignRole('super-admin');
+
+        UserSetting::firstOrCreate(['user_id' => $user->id]);
+
+        $this->command->info("Gmail admin seeded: {$user->name} <{$user->email}>");
     }
 }

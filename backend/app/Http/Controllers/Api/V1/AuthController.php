@@ -11,6 +11,7 @@ use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\SetPasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
@@ -58,14 +59,22 @@ class AuthController extends Controller
         return (new UserResource($user))->response()->setStatusCode(201);
     }
 
-    public function user(Request $request): UserResource
+    public function user(Request $request): JsonResponse
     {
         /** @var User $user */
         $user = $request->user();
 
         $user->loadMissing(['settings', 'roles']);
 
-        return new UserResource($user);
+        $data = (new UserResource($user))->toArray($request);
+
+        $impersonatorId = $request->session()->get('impersonator_id');
+        if ($impersonatorId !== null) {
+            $data['impersonating'] = true;
+            $data['impersonator_id'] = $impersonatorId;
+        }
+
+        return response()->json(['data' => $data]);
     }
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
@@ -104,5 +113,34 @@ class AuthController extends Controller
         $user->sendEmailVerificationNotification();
 
         return response()->json(['message' => 'Verification link sent.']);
+    }
+
+    public function setPassword(SetPasswordRequest $request): JsonResponse
+    {
+        $user = User::where('invite_token', $request->validated('token'))
+            ->whereNotNull('invite_token')
+            ->first();
+
+        if ($user === null) {
+            return response()->json(['message' => 'Invalid or expired token.'], 422);
+        }
+
+        $user->forceFill([
+            'password'          => Hash::make($request->validated('password')),
+            'invite_token'      => null,
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ]);
+        $user->save();
+
+        Auth::login($user);
+
+        return response()->json(['message' => 'Password set successfully.']);
+    }
+
+    public function registrationStatus(): JsonResponse
+    {
+        return response()->json([
+            'registration_open' => config('auth.registration_open', false),
+        ]);
     }
 }

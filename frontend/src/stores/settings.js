@@ -9,7 +9,7 @@ export const useSettingsStore = defineStore('settings', () => {
   async function fetch() {
     isLoading.value = true
     try {
-      const response = await api.get('/api/v1/settings')
+      const response = await api.get('/settings')
       settings.value = response.data.data ?? response.data
     } finally {
       isLoading.value = false
@@ -17,7 +17,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   async function update(data) {
-    const response = await api.patch('/api/v1/settings', data)
+    const response = await api.patch('/settings', data)
     settings.value = response.data.data ?? response.data
     return settings.value
   }
