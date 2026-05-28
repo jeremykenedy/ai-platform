@@ -97,11 +97,14 @@
               conversation_id: conversationId.value,
               role: 'assistant',
               content: messagesStore.pendingTokens,
-              finish_reason: event.finish_reason,
+              finish_reason: event.finish_reason ?? 'stop',
               tokens_used: event.tokens_used,
               created_at: new Date().toISOString(),
             })
           }
+          // Auto-titled conversations need a sidebar refresh after the
+          // first reply lands, otherwise the new title never shows up.
+          conversationsStore.fetch().catch(() => {})
         },
         onError() {
           messagesStore.handleStreamError(new Error('Stream failed'))

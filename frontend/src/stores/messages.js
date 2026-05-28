@@ -201,7 +201,11 @@ export const useMessagesStore = defineStore('messages', () => {
   }
 
   function finalizeMessage(message) {
-    if (streamingMessageId.value === message.id) {
+    // ALWAYS clear streaming state when a finished message arrives —
+    // not just when streamingMessageId matches. The MessageCreated WS
+    // event can be missed if the channel subscribed late, leaving
+    // streamingMessageId unset; we still want the indicator to clear.
+    if (message?.finish_reason || streamingMessageId.value === message?.id) {
       streamingMessageId.value = null
       pendingTokens.value = ''
       isStreaming.value = false

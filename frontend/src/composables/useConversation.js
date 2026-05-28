@@ -46,6 +46,8 @@ export function useConversation() {
         if (finished) {
           // Clears isStreaming, streamingMessageId, and watchdog.
           messages.finalizeMessage(finished)
+          // Refresh sidebar so the auto-generated title shows up.
+          conversations.fetch().catch(() => {})
           return
         }
         setTimeout(tick, 3000)
