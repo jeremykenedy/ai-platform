@@ -22,9 +22,7 @@
     aria-live="polite"
   >
     <div class="flex items-end gap-1">
-      <span
-        class="streaming-dot block h-2 w-2 rounded-full bg-primary dark:bg-primary"
-      />
+      <span class="streaming-dot block h-2 w-2 rounded-full bg-primary dark:bg-primary" />
       <span
         class="streaming-dot streaming-dot--delay-1 block h-2 w-2 rounded-full bg-primary dark:bg-primary"
       />

@@ -75,7 +75,6 @@
       }
 
       connect({
-
         onMessageCreated(event) {
           if (!event?.message_id) return
           messagesStore.beginAssistantStream(
@@ -129,7 +128,7 @@
   async function handleLoadOlder() {
     const id = conversationId.value
     if (!id) return
-    const current = messagesStore.messages.get(id) ?? []
+    const current = messagesStore.messages[id] ?? []
     const oldest = current[0]
     if (!oldest) return
     await messagesStore.fetchForConversation(id, oldest.id)

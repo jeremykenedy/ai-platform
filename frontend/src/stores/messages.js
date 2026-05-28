@@ -50,13 +50,9 @@ export const useMessagesStore = defineStore('messages', () => {
     // already represented in the fetched set (i.e., still in flight
     // server-side). De-dupe by trimmed content+role rather than id,
     // since the optimistic id ("pending-…") never matches a real ULID.
-    const fetchedContent = new Set(
-      fetched.map((m) => `${m.role}::${(m.content || '').trim()}`)
-    )
+    const fetchedContent = new Set(fetched.map((m) => `${m.role}::${(m.content || '').trim()}`))
     const stillPending = existing.filter(
-      (m) =>
-        m.pending &&
-        !fetchedContent.has(`${m.role}::${(m.content || '').trim()}`)
+      (m) => m.pending && !fetchedContent.has(`${m.role}::${(m.content || '').trim()}`)
     )
     messages[conversationId] = [...fetched, ...stillPending]
     return fetched
@@ -89,9 +85,7 @@ export const useMessagesStore = defineStore('messages', () => {
       // Drop the optimistic unconditionally and append saved if missing.
       const withoutOptimistic = now.filter((m) => m.id !== optimistic.id)
       const hasSaved = withoutOptimistic.some((m) => m.id === saved.id)
-      messages[conversationId] = hasSaved
-        ? withoutOptimistic
-        : [...withoutOptimistic, saved]
+      messages[conversationId] = hasSaved ? withoutOptimistic : [...withoutOptimistic, saved]
       // Keep isStreaming TRUE here — the assistant is now being generated
       // server-side. It will flip to false in finalizeMessage when WS
       // StreamCompleted fires, or via the timeout watchdog below.

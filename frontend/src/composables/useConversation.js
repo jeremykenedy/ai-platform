@@ -58,8 +58,6 @@ export function useConversation() {
     setTimeout(tick, 3000)
   }
 
-
-
   function cancel() {
     messages.cancelStream()
   }
