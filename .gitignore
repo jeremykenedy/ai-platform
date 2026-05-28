@@ -33,6 +33,11 @@ docker/postgres/data/
 docker/redis/data/
 docker/minio/data/
 
+# TLS certs — generated per-host (mkcert), never commit
+docker/certs/
+*.pem
+*.key
+
 # Editor
 .DS_Store
 .idea/
