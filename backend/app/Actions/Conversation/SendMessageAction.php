@@ -36,6 +36,16 @@ class SendMessageAction
     ): Message {
         $sequence = $conversation->messages()->max('sequence') + 1;
 
+        // Auto-title the conversation from the first user message so the
+        // sidebar shows something useful instead of "New conversation".
+        if ($sequence === 1 && ($conversation->title === null || $conversation->title === '')) {
+            $title = mb_substr(trim($content), 0, 60);
+            if (mb_strlen(trim($content)) > 60) {
+                $title .= '…';
+            }
+            $conversation->update(['title' => $title]);
+        }
+
         /** @var Message $message */
         $message = Message::create([
             'conversation_id' => $conversation->id,
