@@ -1,31 +1,28 @@
 services:
 
   frankenphp:
+    image: ai-platform-frankenphp:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
       target: production
     restart: unless-stopped
     environment:
-      SERVER_NAME: "${APP_URL:-https://ai.local}"
+      SERVER_NAME: ":80"
       OCTANE_SERVER: frankenphp
       APP_ENV: "${APP_ENV:-production}"
+    env_file: ./.env
     volumes:
-      - ./backend:/app
+      - ./backend/storage:/app/storage
       - caddy_data:/data
       - caddy_config:/config
-    ports:
-      - "${APP_HTTP_PORT:-80}:80"
-      - "${APP_HTTPS_PORT:-443}:443"
     depends_on:
       pgbouncer:
         condition: service_healthy
       redis:
         condition: service_healthy
-      reverb:
-        condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,12 +35,12 @@ services:
       - ai-platform
 
   horizon:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: production
+    image: ai-platform-frankenphp:latest
     command: php artisan horizon
     restart: unless-stopped
+    env_file: ./.env
+    volumes:
+      - ./backend/storage:/app/storage
     depends_on:
       - frankenphp
       - redis
@@ -56,12 +53,10 @@ services:
       - ai-platform
 
   reverb:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-      target: production
+    image: ai-platform-frankenphp:latest
     command: php artisan reverb:start --host=0.0.0.0 --port=${REVERB_PORT:-8080}
     restart: unless-stopped
+    env_file: ./.env
     ports:
       - "${REVERB_EXTERNAL_PORT:-8080}:${REVERB_PORT:-8080}"
     depends_on:
@@ -75,11 +70,22 @@ services:
       - ai-platform
 
   frontend:
+    image: ai-platform-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
       target: production
+      args:
+        VITE_REVERB_APP_KEY: "${REVERB_APP_KEY}"
+        VITE_REVERB_HOST: "${VITE_REVERB_HOST:-}"
+        VITE_REVERB_PORT: "${REVERB_EXTERNAL_PORT:-8080}"
+        VITE_REVERB_SCHEME: "${REVERB_SCHEME:-http}"
+        VITE_APP_NAME: "${APP_NAME:-AI Platform}"
     restart: unless-stopped
+    ports:
+      - "${APP_HTTP_PORT:-3080}:80"
+    depends_on:
+      - frankenphp
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 30s

@@ -13,6 +13,9 @@ export function useStreaming(conversationId) {
     channel = echo.private(`conversation.${conversationId.value || conversationId}`)
 
     channel
+      .listen('.MessageCreated', (e) => {
+        handlers.onMessageCreated?.(e)
+      })
       .listen('.TokenReceived', (e) => {
         if (e.sequence > lastSequence.value) {
           lastSequence.value = e.sequence

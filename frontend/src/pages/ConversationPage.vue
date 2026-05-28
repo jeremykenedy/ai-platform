@@ -75,11 +75,32 @@
       }
 
       connect({
+        onMessageCreated(event) {
+          if (!event?.message_id) return
+          messagesStore.beginAssistantStream(
+            conversationId.value,
+            event.message_id,
+            event.role ?? 'assistant',
+            event.content ?? ''
+          )
+        },
         onToken(token) {
           messagesStore.appendToken(token)
         },
         onComplete(event) {
-          if (event?.message) messagesStore.finalizeMessage(event.message)
+          if (event?.message) {
+            messagesStore.finalizeMessage(event.message)
+          } else if (event?.message_id) {
+            messagesStore.finalizeMessage({
+              id: event.message_id,
+              conversation_id: conversationId.value,
+              role: 'assistant',
+              content: messagesStore.pendingTokens,
+              finish_reason: event.finish_reason,
+              tokens_used: event.tokens_used,
+              created_at: new Date().toISOString(),
+            })
+          }
         },
         onError() {
           messagesStore.handleStreamError(new Error('Stream failed'))

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\AI;
 
+use App\Events\MessageStreamChunk;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -17,9 +18,8 @@ class StreamingService
     /**
      * Stream a chat completion for the given conversation.
      *
-     * Iterates the provider's Generator, accumulates content, and returns
-     * a summary array. Callers (jobs) are responsible for broadcasting each
-     * token via events.
+     * Iterates the provider's Generator, broadcasts each token over the
+     * conversation's private channel, and returns a summary array.
      *
      * @param array<int, array{role: string, content: string}> $messages
      * @param array<string, mixed>                             $options
@@ -59,8 +59,19 @@ class StreamingService
                 }
 
                 $token = (string) $chunk;
+
+                if ($token === '') {
+                    continue;
+                }
+
                 $fullContent .= $token;
                 $sequence = $this->trackSequence($conversationId);
+
+                broadcast(new MessageStreamChunk(
+                    conversationId: $conversationId,
+                    token: $token,
+                    sequence: $sequence,
+                ));
             }
         } catch (\Throwable $e) {
             Log::error('[StreamingService] Stream interrupted', [

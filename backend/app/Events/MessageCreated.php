@@ -44,4 +44,9 @@ class MessageCreated implements ShouldBroadcastNow
             'content'    => $this->content,
         ];
     }
+
+    public function broadcastAs(): string
+    {
+        return 'MessageCreated';
+    }
 }

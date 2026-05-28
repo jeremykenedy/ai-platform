@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Events\MessageCompleted;
+use App\Events\MessageCreated;
 use App\Events\MessageStreamChunk;
+use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\AI\ContextWindowService;
@@ -63,6 +65,23 @@ class StreamInferenceJob implements ShouldQueue
         $userMessage = Message::findOrFail($this->messageId);
 
         $model = $this->modelName ?? (string) $conversation->model_name;
+        $sequence = (int) $conversation->messages()->max('sequence') + 1;
+
+        /** @var Message $assistantMessage */
+        $assistantMessage = Message::create([
+            'conversation_id' => $this->conversationId,
+            'role'            => 'assistant',
+            'content'         => '',
+            'model_version'   => $model,
+            'sequence'        => $sequence,
+        ]);
+
+        broadcast(new MessageCreated(
+            conversationId: $this->conversationId,
+            messageId: (string) $assistantMessage->id,
+            role: 'assistant',
+            content: '',
+        ));
 
         $result = $streamingService->streamChat(
             $this->conversationId,
@@ -73,24 +92,23 @@ class StreamInferenceJob implements ShouldQueue
 
         $tokensUsed = $contextWindowService->estimateTokens($result['content']) + ($result['tokens_used'] ?? 0);
 
-        /** @var Message $assistantMessage */
-        $assistantMessage = Message::create([
-            'conversation_id' => $this->conversationId,
-            'role'            => 'assistant',
-            'content'         => $result['content'],
-            'tokens_used'     => $result['tokens_used'],
-            'finish_reason'   => $result['finish_reason'],
-            'model_version'   => $model,
-            'sequence'        => $result['sequence'],
+        $assistantMessage->update([
+            'content'       => $result['content'],
+            'tokens_used'   => $result['tokens_used'],
+            'finish_reason' => $result['finish_reason'],
         ]);
 
         $conversation->increment('context_window_used', $tokensUsed);
+
+        $assistantMessage->refresh();
+        $messagePayload = (new MessageResource($assistantMessage))->resolve();
 
         broadcast(new MessageCompleted(
             conversationId: $this->conversationId,
             messageId: (string) $assistantMessage->id,
             tokensUsed: (int) $assistantMessage->tokens_used,
             finishReason: (string) $assistantMessage->finish_reason,
+            message: $messagePayload,
         ));
 
         GenerateEmbeddingJob::dispatch(Message::class, (string) $assistantMessage->id);

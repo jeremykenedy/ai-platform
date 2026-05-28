@@ -17,11 +17,15 @@ class MessageCompleted implements ShouldBroadcastNow
     use InteractsWithSockets;
     use SerializesModels;
 
+    /**
+     * @param array<string, mixed>|null $message
+     */
     public function __construct(
         public string $conversationId,
         public string $messageId,
         public int $tokensUsed,
         public string $finishReason,
+        public ?array $message = null,
     ) {
     }
 
@@ -42,6 +46,7 @@ class MessageCompleted implements ShouldBroadcastNow
             'message_id'    => $this->messageId,
             'tokens_used'   => $this->tokensUsed,
             'finish_reason' => $this->finishReason,
+            'message'       => $this->message,
         ];
     }
 

@@ -22,10 +22,23 @@ export const useMessagesStore = defineStore('messages', () => {
 
   async function fetchForConversation(conversationId, cursor = null) {
     const params = cursor ? { cursor } : {}
-    const response = await api.get(`/api/v1/conversations/${conversationId}/messages`, { params })
-    const data = response.data.data ?? response.data
-    messages.value.set(conversationId, data)
-    return data
+    const response = await api.get(`/conversations/${conversationId}/messages`, { params })
+    const fetched = response.data.data ?? response.data
+    const existing = messages.value.get(conversationId) ?? []
+
+    if (cursor) {
+      const existingIds = new Set(existing.map((m) => m.id))
+      const older = fetched.filter((m) => !existingIds.has(m.id))
+      messages.value.set(conversationId, [...older, ...existing])
+    } else {
+      const fetchedIds = new Set(fetched.map((m) => m.id))
+      const pending = existing.filter((m) => m.pending && !fetchedIds.has(m.id))
+      const localOnly = existing.filter(
+        (m) => !m.pending && !fetchedIds.has(m.id) && String(m.id).startsWith('pending-') === false
+      )
+      messages.value.set(conversationId, [...fetched, ...localOnly, ...pending])
+    }
+    return fetched
   }
 
   async function send(conversationId, content, options = {}) {
@@ -46,15 +59,23 @@ export const useMessagesStore = defineStore('messages', () => {
     messages.value.set(conversationId, [...current, optimistic])
 
     try {
-      const response = await api.post(`/api/v1/conversations/${conversationId}/messages`, {
+      const response = await api.post(`/conversations/${conversationId}/messages`, {
         content,
         ...options,
       })
       const saved = response.data.data ?? response.data
-      const updated = (messages.value.get(conversationId) ?? []).map((m) =>
-        m.id === optimistic.id ? saved : m
-      )
-      messages.value.set(conversationId, updated)
+      const now = messages.value.get(conversationId) ?? []
+      const hasOptimistic = now.some((m) => m.id === optimistic.id)
+      const hasSaved = now.some((m) => m.id === saved.id)
+      let next
+      if (hasOptimistic) {
+        next = now.map((m) => (m.id === optimistic.id ? saved : m))
+      } else if (!hasSaved) {
+        next = [...now, saved]
+      } else {
+        next = now
+      }
+      messages.value.set(conversationId, next)
       return saved
     } catch (err) {
       handleStreamError(err)
@@ -72,7 +93,7 @@ export const useMessagesStore = defineStore('messages', () => {
     for (const [convId, msgs] of messages.value.entries()) {
       const index = msgs.findIndex((m) => m.id === id)
       if (index !== -1) {
-        await api.delete(`/api/v1/messages/${id}`)
+        await api.delete(`/conversations/${convId}/messages/${id}`)
         const updated = msgs.filter((m) => m.id !== id)
         messages.value.set(convId, updated)
         return
@@ -87,9 +108,11 @@ export const useMessagesStore = defineStore('messages', () => {
     streamingMessageId.value = messageId
 
     try {
-      const response = await api.post(`/api/v1/messages/${messageId}/regenerate`)
+      const response = await api.post(
+        `/conversations/${conversationId}/messages/${messageId}/regenerate`
+      )
       const updated = response.data.data ?? response.data
-      finalizeMessage(updated)
+      if (updated) finalizeMessage(updated)
       return updated
     } catch (err) {
       handleStreamError(err)
@@ -100,6 +123,26 @@ export const useMessagesStore = defineStore('messages', () => {
     }
   }
 
+  function beginAssistantStream(conversationId, messageId, role = 'assistant', content = '') {
+    streamingMessageId.value = messageId
+    pendingTokens.value = content
+    isStreaming.value = true
+    error.value = null
+
+    const existing = messages.value.get(conversationId) ?? []
+    if (existing.some((m) => m.id === messageId)) return
+
+    const placeholder = {
+      id: messageId,
+      conversation_id: conversationId,
+      role,
+      content,
+      created_at: new Date().toISOString(),
+      isStreaming: true,
+    }
+    messages.value.set(conversationId, [...existing, placeholder])
+  }
+
   function appendToken(token) {
     pendingTokens.value += token
 
@@ -108,7 +151,11 @@ export const useMessagesStore = defineStore('messages', () => {
         const index = msgs.findIndex((m) => m.id === streamingMessageId.value)
         if (index !== -1) {
           const updated = [...msgs]
-          updated[index] = { ...updated[index], content: pendingTokens.value }
+          updated[index] = {
+            ...updated[index],
+            content: pendingTokens.value,
+            isStreaming: true,
+          }
           messages.value.set(convId, updated)
           return
         }
@@ -117,11 +164,17 @@ export const useMessagesStore = defineStore('messages', () => {
   }
 
   function finalizeMessage(message) {
+    if (streamingMessageId.value === message.id) {
+      streamingMessageId.value = null
+      pendingTokens.value = ''
+      isStreaming.value = false
+    }
+
     for (const [convId, msgs] of messages.value.entries()) {
       const index = msgs.findIndex((m) => m.id === message.id)
       if (index !== -1) {
         const updated = [...msgs]
-        updated[index] = message
+        updated[index] = { ...message, isStreaming: false }
         messages.value.set(convId, updated)
         return
       }
@@ -129,7 +182,7 @@ export const useMessagesStore = defineStore('messages', () => {
 
     if (message.conversation_id) {
       const existing = messages.value.get(message.conversation_id) ?? []
-      messages.value.set(message.conversation_id, [...existing, message])
+      messages.value.set(message.conversation_id, [...existing, { ...message, isStreaming: false }])
     }
   }
 
@@ -157,6 +210,7 @@ export const useMessagesStore = defineStore('messages', () => {
     send,
     deleteMessage,
     regenerate,
+    beginAssistantStream,
     appendToken,
     finalizeMessage,
     handleStreamError,
