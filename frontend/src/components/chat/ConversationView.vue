@@ -153,17 +153,6 @@
           }"
         >
           <MessageBubble
-            v-if="!messages[item.index]?.isStreaming"
-            v-once
-            :message="messages[item.index]"
-            :is-last="item.index === messages.length - 1"
-            @edit="emit('edit-message', $event)"
-            @regenerate="emit('regenerate', $event)"
-            @delete="emit('delete-message', $event)"
-            @continue="emit('continue-message', $event)"
-          />
-          <MessageBubble
-            v-else
             :message="messages[item.index]"
             :is-last="item.index === messages.length - 1"
             @edit="emit('edit-message', $event)"
