@@ -77,11 +77,26 @@ deploy_qnap() {
         echo "Pulling latest code..."
         git pull origin main
 
-        echo "Building containers..."
-        $COMPOSE build
+        # On QNAP, install-php-extensions fails inside docker build
+        # ("tar: Cannot change mode: Bad address" — kernel/seccomp incompat).
+        # So we ONLY rebuild images that actually build successfully on
+        # this kernel. The frankenphp image is reused as-is and new PHP
+        # source is copied into the running containers below.
+        echo "Building frontend image..."
+        $COMPOSE build frontend
 
         echo "Starting services..."
         $COMPOSE up -d --remove-orphans
+
+        echo "Patching backend source into running PHP containers..."
+        for c in ai-platform-frankenphp-1 ai-platform-horizon-1 ai-platform-reverb-1; do
+          $DOCKER cp "$PROJECT_PATH/backend/app/."                   "$c:/app/app/"
+          $DOCKER cp "$PROJECT_PATH/backend/routes/."                "$c:/app/routes/"
+          $DOCKER cp "$PROJECT_PATH/backend/config/."                "$c:/app/config/"
+          $DOCKER cp "$PROJECT_PATH/backend/database/migrations/."   "$c:/app/database/migrations/"
+          $DOCKER cp "$PROJECT_PATH/backend/database/seeders/."      "$c:/app/database/seeders/"
+          $DOCKER cp "$PROJECT_PATH/backend/database/factories/."    "$c:/app/database/factories/"
+        done
 
         # Clear bootstrap cache from any prior dev run (Pail, etc.) before
         # artisan tries to bootstrap with cached providers it cannot find.
