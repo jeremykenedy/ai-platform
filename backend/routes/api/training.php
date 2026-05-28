@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\TrainingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'role:admin|super-admin'])->prefix('admin')->group(function (): void {
     Route::get('/training/datasets', [TrainingController::class, 'datasetsIndex']);
     Route::post('/training/datasets', [TrainingController::class, 'datasetsStore']);
     Route::delete('/training/datasets/{dataset}', [TrainingController::class, 'datasetsDestroy']);
