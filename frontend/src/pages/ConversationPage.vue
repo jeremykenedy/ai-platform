@@ -75,6 +75,7 @@
       }
 
       connect({
+
         onMessageCreated(event) {
           if (!event?.message_id) return
           messagesStore.beginAssistantStream(

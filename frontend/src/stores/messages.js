@@ -22,7 +22,16 @@ export const useMessagesStore = defineStore('messages', () => {
 
   async function fetchForConversation(conversationId, cursor = null) {
     const params = cursor ? { cursor } : {}
-    const response = await api.get(`/conversations/${conversationId}/messages`, { params })
+    let response
+    try {
+      response = await api.get(`/conversations/${conversationId}/messages`, { params })
+    } catch (err) {
+      if (err?.response?.status === 404) {
+        messages.value.set(conversationId, [])
+        return []
+      }
+      throw err
+    }
     const fetched = response.data.data ?? response.data
     const existing = messages.value.get(conversationId) ?? []
 
