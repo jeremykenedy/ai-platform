@@ -22,12 +22,13 @@ RUN npm run build
 
 FROM nginx:alpine AS production
 
-RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/conf.d/default.conf \
+    && apk add --no-cache wget
 
 COPY docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 80 443
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+    CMD wget -q --no-check-certificate -O /dev/null https://localhost/ || exit 1
