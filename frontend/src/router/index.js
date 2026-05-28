@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -132,12 +133,19 @@ const router = createRouter({
   ],
 })
 
+// Hoist a single pending fetchUser promise so concurrent guards (initial
+// nav + cancelAllRequests beforeEach) wait on the same request instead of
+// firing twice (or racing with isLoading and returning false-negative).
+let bootstrapAuthPromise = null
+
 router.beforeEach(async (to) => {
-  const { useAuthStore } = await import('@/stores/auth')
   const auth = useAuthStore()
 
-  if (!auth.isAuthenticated && !auth.isLoading) {
-    await auth.fetchUser().catch(() => {})
+  if (auth.user === null) {
+    if (bootstrapAuthPromise === null) {
+      bootstrapAuthPromise = auth.fetchUser().catch(() => {})
+    }
+    await bootstrapAuthPromise
   }
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
