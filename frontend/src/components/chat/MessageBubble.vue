@@ -148,6 +148,21 @@
           />
         </template>
 
+        <!-- Empty finalized assistant message (failed generation) -->
+        <template v-else-if="isAssistant && !message.content">
+          <div class="flex items-center gap-2 text-sm text-muted-foreground italic">
+            <AlertTriangle class="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
+            <span>No response generated. Try regenerating.</span>
+            <button
+              type="button"
+              class="ml-2 rounded-md border border-border bg-background px-2 py-0.5 text-xs font-medium text-foreground transition-colors hover:bg-muted dark:bg-background dark:hover:bg-muted"
+              @click="emit('regenerate', message.id)"
+            >
+              Regenerate
+            </button>
+          </div>
+        </template>
+
         <!-- Finalized content via markdown renderer slot -->
         <template v-else>
           <div class="prose prose-sm max-w-none dark:prose-invert" v-html="message.content" />

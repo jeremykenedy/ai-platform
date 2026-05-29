@@ -125,6 +125,24 @@
     })
   }
 
+  async function handleRegenerate(messageId) {
+    if (!messageId || !conversationId.value) return
+    try {
+      await messagesStore.regenerate(conversationId.value, messageId)
+    } catch {
+      // surfaced via store error toast
+    }
+  }
+
+  async function handleDeleteMessage(messageId) {
+    if (!messageId) return
+    try {
+      await messagesStore.deleteMessage(messageId)
+    } catch {
+      // surfaced via store error toast
+    }
+  }
+
   async function handleLoadOlder() {
     const id = conversationId.value
     if (!id) return
@@ -305,6 +323,8 @@
         v-if="conversationId"
         :conversation-id="conversationId"
         @load-older="handleLoadOlder"
+        @regenerate="handleRegenerate"
+        @delete-message="handleDeleteMessage"
       />
 
       <!-- Chat input -->
