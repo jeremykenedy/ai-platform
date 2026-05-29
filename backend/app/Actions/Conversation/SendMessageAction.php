@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Conversation;
 
 use App\Jobs\StreamInferenceJob;
+use App\Models\AiModel;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\MessageAttachment;
@@ -74,13 +75,38 @@ class SendMessageAction
         $systemPrompt = $this->memoryRetrievalService->formatAsSystemPrompt($memories);
         $context = $this->contextWindowService->buildContext($conversation, $content, $systemPrompt);
 
+        // The frontend may send either the AiModel.id (ULID) or the model
+        // name. Inference needs the name (e.g. "llama3.2:latest").
+        $resolvedModel = $this->resolveModelName($model ?? $conversation->model_name);
+
         StreamInferenceJob::dispatch(
             $conversation->id,
             $message->id,
             $context,
-            $model ?? $conversation->model_name,
+            $resolvedModel,
         );
 
         return $message;
+    }
+
+    /**
+     * Resolve either an AiModel ULID id or the model name itself to the
+     * canonical name expected by inference providers ("llama3.2:latest").
+     */
+    private function resolveModelName(?string $idOrName): ?string
+    {
+        if ($idOrName === null || $idOrName === '') {
+            return null;
+        }
+
+        // ULIDs are 26 char base32. If it could be a ULID, look it up.
+        if (preg_match('/^[0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{26}$/', $idOrName) === 1) {
+            $model = AiModel::find($idOrName);
+            if ($model !== null) {
+                return $model->name;
+            }
+        }
+
+        return $idOrName;
     }
 }
