@@ -33,6 +33,11 @@ export function useConversation() {
 
   function pollUntilAssistant(conversationId, timeoutMs) {
     const start = Date.now()
+    // Aggressive poll: 1.5s. Runs in parallel with WS. Whichever delivers
+    // the finished assistant message first wins. If WS is broken for any
+    // reason (cert, proxy, extension, network), the user still sees the
+    // response within ~1.5s of it being saved server-side.
+    const interval = 1500
     const tick = async () => {
       if (Date.now() - start > timeoutMs) {
         messages.cancelStream()
@@ -50,12 +55,25 @@ export function useConversation() {
           conversations.fetch().catch(() => {})
           return
         }
-        setTimeout(tick, 3000)
+        // Also surface partial progress: if there's an assistant message
+        // with content but no finish_reason yet, show it as streaming.
+        const partial = (fetched ?? []).find(
+          (m) => m.role === 'assistant' && m.content && !m.finish_reason
+        )
+        if (partial) {
+          messages.beginAssistantStream(
+            conversationId,
+            partial.id,
+            'assistant',
+            partial.content
+          )
+        }
+        setTimeout(tick, interval)
       } catch {
-        setTimeout(tick, 3000)
+        setTimeout(tick, interval)
       }
     }
-    setTimeout(tick, 3000)
+    setTimeout(tick, interval)
   }
 
   function cancel() {
