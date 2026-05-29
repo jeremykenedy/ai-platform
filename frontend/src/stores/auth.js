@@ -39,8 +39,12 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchUser() {
     isLoading.value = true
     try {
-      const response = await api.get('/auth/user')
-      user.value = response.data.data ?? response.data
+      // 401 is the expected pre-login response; tell axios not to throw
+      // so Chrome devtools doesn't log it as a failed resource.
+      const response = await api.get('/auth/user', {
+        validateStatus: (s) => s < 500,
+      })
+      user.value = response.status === 200 ? (response.data.data ?? response.data) : null
     } catch {
       user.value = null
     } finally {
