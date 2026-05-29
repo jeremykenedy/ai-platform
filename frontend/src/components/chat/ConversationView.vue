@@ -175,7 +175,7 @@
         </div>
       </div>
 
-      <StreamingIndicator v-if="showStandaloneIndicator" />
+      <StreamingIndicator v-if="isStreaming" />
     </div>
 
     <!-- Scroll to bottom button -->
