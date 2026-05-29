@@ -27,6 +27,18 @@
   const messages = computed(() => messagesStore.activeMessages)
   const isStreaming = computed(() => messagesStore.isStreaming)
 
+  // Only show the standalone "Generating response…" indicator when we're
+  // streaming AND no assistant bubble is already showing tokens. Once
+  // tokens start arriving in the bubble itself, the bubble has its own
+  // animated cursor and a duplicate indicator below it just looks like
+  // nothing is happening.
+  const showStandaloneIndicator = computed(() => {
+    if (!isStreaming.value) return false
+    const last = messages.value[messages.value.length - 1]
+    if (!last || last.role !== 'assistant') return true
+    return !last.content || last.content.length === 0
+  })
+
   const { scrollRef, virtualizer } = useVirtualScroll(messages)
 
   const isAtBottom = ref(true)
@@ -163,7 +175,7 @@
         </div>
       </div>
 
-      <StreamingIndicator v-if="isStreaming" />
+      <StreamingIndicator v-if="showStandaloneIndicator" />
     </div>
 
     <!-- Scroll to bottom button -->
