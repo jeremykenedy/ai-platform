@@ -75,16 +75,6 @@ class StreamingService
                     token: $token,
                     sequence: $sequence,
                 ));
-
-                // Flush partial content to the DB every ~1.5s so the
-                // poll-based fallback path can show progress even if WS
-                // delivery is broken for this client.
-                $now = microtime(true);
-                if ($assistantMessageId !== null && ($now - $lastFlush) > 1.5) {
-                    Message::where('id', $assistantMessageId)
-                        ->update(['content' => $fullContent]);
-                    $lastFlush = $now;
-                }
             }
         } catch (\Throwable $e) {
             Log::error('[StreamingService] Stream interrupted', [
