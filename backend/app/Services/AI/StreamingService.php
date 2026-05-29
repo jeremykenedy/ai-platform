@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\AI;
 
 use App\Events\MessageStreamChunk;
+use App\Models\Message;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -38,6 +39,8 @@ class StreamingService
         $tokensUsed = 0;
         $finishReason = 'stop';
         $sequence = 0;
+        $assistantMessageId = $options['assistant_message_id'] ?? null;
+        $lastFlush = microtime(true);
 
         try {
             $generator = $provider->stream($messages, $resolvedModel, $options);
@@ -72,6 +75,16 @@ class StreamingService
                     token: $token,
                     sequence: $sequence,
                 ));
+
+                // Flush partial content to the DB every ~1.5s so the
+                // poll-based fallback path can show progress even if WS
+                // delivery is broken for this client.
+                $now = microtime(true);
+                if ($assistantMessageId !== null && ($now - $lastFlush) > 1.5) {
+                    Message::where('id', $assistantMessageId)
+                        ->update(['content' => $fullContent]);
+                    $lastFlush = $now;
+                }
             }
         } catch (\Throwable $e) {
             Log::error('[StreamingService] Stream interrupted', [

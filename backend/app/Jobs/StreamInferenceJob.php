@@ -87,7 +87,7 @@ class StreamInferenceJob implements ShouldQueue
             $this->conversationId,
             $this->context,
             $model,
-            $this->options,
+            array_merge($this->options, ['assistant_message_id' => $assistantMessage->id]),
         );
 
         $tokensUsed = $contextWindowService->estimateTokens($result['content']) + ($result['tokens_used'] ?? 0);
