@@ -43,6 +43,11 @@ const router = createRouter({
       redirect: '/c/new',
     },
     {
+      path: '/diagnose',
+      name: 'diagnose',
+      component: () => import('@/pages/DiagnosePage.vue'),
+    },
+    {
       path: '/c',
       component: () => import('@/layouts/ChatLayout.vue'),
       meta: { requiresAuth: true },
