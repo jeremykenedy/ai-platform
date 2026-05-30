@@ -35,7 +35,7 @@ class OllamaProvider extends AbstractAiProvider
         ], $options);
 
         $response = Http::withHeaders($this->buildHeaders())
-            ->timeout(120)
+            ->timeout(900)
             ->connectTimeout(10)
             ->post("{$this->baseUrl}/api/chat", $payload);
 
@@ -63,7 +63,7 @@ class OllamaProvider extends AbstractAiProvider
         ], $options);
 
         $response = Http::withHeaders($this->buildHeaders())
-            ->timeout(120)
+            ->timeout(900)
             ->connectTimeout(10)
             ->withOptions(['stream' => true])
             ->post("{$this->baseUrl}/api/chat", $payload);

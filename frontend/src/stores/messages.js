@@ -110,7 +110,7 @@ export const useMessagesStore = defineStore('messages', () => {
       isStreaming.value = false
       streamingMessageId.value = null
       streamingWatchdog = null
-    }, 120000)
+    }, 900000)
   }
   function clearStreamingWatchdog() {
     if (streamingWatchdog) {

@@ -24,10 +24,9 @@ export function useConversation() {
       router.push(`/c/${conversationId}`)
     }
     await messages.send(conversationId, content, options)
-    // Fallback poll: matches the backend StreamInferenceJob timeout (300s).
-    // Ollama on CPU can take 3+ minutes for long responses; if we give up
-    // sooner the user sees the indicator vanish with no response.
-    pollUntilAssistant(conversationId, 300000)
+    // Fallback poll: matches the backend StreamInferenceJob timeout (900s).
+    // Long outputs on CPU-only Ollama can take 5-10 minutes.
+    pollUntilAssistant(conversationId, 900000)
   }
 
   function pollUntilAssistant(conversationId, timeoutMs) {
@@ -35,10 +34,8 @@ export function useConversation() {
     const interval = 1500
     const tick = async () => {
       if (Date.now() - start > timeoutMs) {
-        // The backend job hit its own timeout. Surface a real error
-        // instead of silently clearing the indicator.
         messages.handleStreamError(new Error(
-          'Response took longer than 5 minutes. The model may be overloaded. Try a shorter prompt or a faster model.'
+          'Response exceeded 15 minutes. Try a shorter prompt or smaller model.'
         ))
         return
       }

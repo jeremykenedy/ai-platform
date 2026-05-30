@@ -33,12 +33,12 @@ class StreamInferenceJob implements ShouldQueue
     /** @var array<string, mixed> */
     public array $options;
 
-    public int $tries = 3;
+    public int $tries = 1;
 
-    public int $timeout = 300;
+    public int $timeout = 900;
 
     /** @var int[] */
-    public array $backoff = [1, 5, 10];
+    public array $backoff = [];
 
     /**
      * @param array<int, array{role: string, content: string}> $context
