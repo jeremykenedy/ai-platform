@@ -24,23 +24,22 @@ export function useConversation() {
       router.push(`/c/${conversationId}`)
     }
     await messages.send(conversationId, content, options)
-    // Fallback poll: even if the WebSocket missed the inference broadcast
-    // (race between job dispatch and channel subscription on a brand-new
-    // conversation), refetch every 3s until the assistant message arrives
-    // or 60s elapses. Cheap, and guarantees the user sees a response.
-    pollUntilAssistant(conversationId, 60000)
+    // Fallback poll: matches the backend StreamInferenceJob timeout (300s).
+    // Ollama on CPU can take 3+ minutes for long responses; if we give up
+    // sooner the user sees the indicator vanish with no response.
+    pollUntilAssistant(conversationId, 300000)
   }
 
   function pollUntilAssistant(conversationId, timeoutMs) {
     const start = Date.now()
-    // Aggressive poll: 1.5s. Runs in parallel with WS. Whichever delivers
-    // the finished assistant message first wins. If WS is broken for any
-    // reason (cert, proxy, extension, network), the user still sees the
-    // response within ~1.5s of it being saved server-side.
     const interval = 1500
     const tick = async () => {
       if (Date.now() - start > timeoutMs) {
-        messages.cancelStream()
+        // The backend job hit its own timeout. Surface a real error
+        // instead of silently clearing the indicator.
+        messages.handleStreamError(new Error(
+          'Response took longer than 5 minutes. The model may be overloaded. Try a shorter prompt or a faster model.'
+        ))
         return
       }
       try {
