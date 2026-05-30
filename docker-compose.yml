@@ -44,6 +44,12 @@ services:
     depends_on:
       - frankenphp
       - redis
+    healthcheck:
+      test: ["CMD-SHELL", "php /app/artisan horizon:status 2>&1 | grep -q running"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -61,6 +67,12 @@ services:
       - "${REVERB_EXTERNAL_PORT:-8080}:${REVERB_PORT:-8080}"
     depends_on:
       - redis
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('127.0.0.1', ${REVERB_PORT:-8080}) ? 0 : 1);\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     deploy:
       resources:
         limits:
@@ -92,10 +104,11 @@ services:
     depends_on:
       - frankenphp
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD-SHELL", "wget -q --no-check-certificate --spider https://localhost/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 10s
     deploy:
       resources:
         limits:
