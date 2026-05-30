@@ -62,12 +62,8 @@
     try {
       conversationsStore.setActive(id)
 
-      // Ensure conversation is in store
       if (!conversationsStore.conversations.find((c) => c.id === id)) {
-        if (!conversationsStore.conversations.length) {
-          await conversationsStore.fetch()
-        }
-        // Re-check after fetch
+        await conversationsStore.fetch().catch(() => {})
         if (!conversationsStore.conversations.find((c) => c.id === id)) {
           notFound.value = true
           return
