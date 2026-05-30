@@ -45,6 +45,22 @@ deploy_local() {
     echo "Building frontend..."
     cd "$SCRIPT_DIR/frontend"
     npm ci
+
+    # Source VITE_REVERB_* / VITE_APP_NAME from the project .env so the
+    # built bundle's Echo client uses the same Reverb key that the
+    # backend container exposes. A missing key produces a bundle that
+    # gets rejected by Reverb with "Application does not exist" and
+    # every WebSocket subscription closes immediately — chat streaming
+    # silently breaks while everything else looks fine.
+    set -a
+    source "$SCRIPT_DIR/.env"
+    set +a
+    : "${REVERB_APP_KEY:?REVERB_APP_KEY missing from .env}"
+    VITE_REVERB_APP_KEY="$REVERB_APP_KEY" \
+    VITE_REVERB_HOST="${VITE_REVERB_HOST:-${QNAP_HOST:-localhost}}" \
+    VITE_REVERB_PORT="${VITE_REVERB_PORT:-${APP_HTTPS_PORT:-8443}}" \
+    VITE_REVERB_SCHEME="${VITE_REVERB_SCHEME:-https}" \
+    VITE_APP_NAME="${APP_NAME:-AI Platform}" \
     npm run build
 
     echo "Local deploy complete."
